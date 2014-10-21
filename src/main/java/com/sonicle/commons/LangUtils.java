@@ -479,4 +479,10 @@ public class LangUtils {
 		}
 		throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
 	}
+	
+	public static String getPackageName(String className) {
+		int lastDot = StringUtils.lastIndexOf(className, ".");
+		if(lastDot < 0) return className;
+		return StringUtils.substring(className, 0, lastDot);
+	}
 }
