@@ -485,4 +485,18 @@ public class LangUtils {
 		if(lastDot < 0) return className;
 		return StringUtils.substring(className, 0, lastDot);
 	}
+	
+	public static String packageToPath(String pkg) {
+		return StringUtils.lowerCase(StringUtils.replace(pkg, ".", "/"));
+	}
+	
+	public static String pathToPackage(String path) {
+		return StringUtils.lowerCase(StringUtils.replace(path, "/", "."));
+	}
+	
+	public static ClassLoader findClassLoader(Class clazz) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(cl == null) cl = clazz.getClassLoader();
+		return cl;
+	}
 }
