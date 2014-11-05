@@ -262,9 +262,9 @@ public class LangUtils {
 		if(StringUtils.isEmpty(value)) return defaultValue;
 		
 		T valueof = null;
-		if(type.isInstance(String.class) || type.isInstance(Boolean.class) 
-			|| type.isInstance(Integer.class) || type.isInstance(Long.class)
-			|| type.isInstance(Float.class) || type.isInstance(Double.class)) {
+		if(type.isAssignableFrom(String.class) || type.isAssignableFrom(Boolean.class) 
+			|| type.isAssignableFrom(Integer.class) || type.isAssignableFrom(Long.class)
+			|| type.isAssignableFrom(Float.class) || type.isAssignableFrom(Double.class)) {
 			valueof = invokeStaticValueOf(type, value);
 		} else {
 			valueof = invokeStaticFromJson(type, value);
