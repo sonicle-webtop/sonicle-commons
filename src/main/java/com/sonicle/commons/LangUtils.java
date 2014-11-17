@@ -43,6 +43,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.CharacterIterator;
+import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -480,7 +481,11 @@ public class LangUtils {
 		throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
 	}
 	
-	public static String getPackageName(String className) {
+	public static String buildClassName(String packageName, String className) {
+		return MessageFormat.format("{0}.{1}", packageName, className);
+	}
+	
+	public static String extractPackageName(String className) {
 		int lastDot = StringUtils.lastIndexOf(className, ".");
 		if(lastDot < 0) return className;
 		return StringUtils.substring(className, 0, lastDot);
