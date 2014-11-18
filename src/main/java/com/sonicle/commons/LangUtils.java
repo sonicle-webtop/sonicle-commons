@@ -48,6 +48,7 @@ import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
@@ -503,5 +504,10 @@ public class LangUtils {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if(cl == null) cl = clazz.getClassLoader();
 		return cl;
+	}
+	
+	public static Locale languageTagToLocale(String languageTag) {
+		languageTag = StringUtils.replace(languageTag, "_", "-");
+		return Locale.forLanguageTag(languageTag);
 	}
 }
