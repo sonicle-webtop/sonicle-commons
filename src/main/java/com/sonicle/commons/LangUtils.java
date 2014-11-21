@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
@@ -509,5 +510,9 @@ public class LangUtils {
 	public static Locale languageTagToLocale(String languageTag) {
 		languageTag = StringUtils.replace(languageTag, "_", "-");
 		return Locale.forLanguageTag(languageTag);
+	}
+	
+	public static <K,V> V ifValue(Map<K,V> map, K key, V value) {
+		return (map.containsKey(key)) ? map.get(key) : value;
 	}
 }
