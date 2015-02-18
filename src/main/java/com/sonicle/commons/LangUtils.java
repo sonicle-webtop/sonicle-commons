@@ -158,6 +158,19 @@ public class LangUtils {
 	}
 	
 	/**
+	 * Convenience method for replacing line-breaks control characters
+	 * ('\r\n', '\n' and '\r') from passed string.
+	 * @param s The source string.
+	 * @return The cleaned string.
+	 */
+	public static String stripLineBreaks(String s) {
+		String str = StringUtils.replace(s, "\r\n", "");
+		str = StringUtils.replace(str, "\n", "");
+		str = StringUtils.replace(str, "\r", "");
+		return str;
+	}
+	
+	/**
 	 * Returns the String value of the passed string.
 	 * In case of empty value, default value is returned.
 	 * 
