@@ -520,6 +520,10 @@ public class LangUtils {
 		return cl;
 	}
 	
+	public static String homogenizeLocaleId(String languageTag) {
+		return StringUtils.replace(languageTag, "-", "_");
+	}
+	
 	public static Locale languageTagToLocale(String languageTag) {
 		languageTag = StringUtils.replace(languageTag, "_", "-");
 		return Locale.forLanguageTag(languageTag);
