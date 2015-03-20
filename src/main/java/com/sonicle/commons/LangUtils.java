@@ -276,7 +276,7 @@ public class LangUtils {
 	
 	public static <T>T value(String value, T defaultValue, Class<T> type) {
 		if(StringUtils.isEmpty(value)) return defaultValue;
-		
+		/*
 		T valueof = null;
 		if(type.isAssignableFrom(String.class) || type.isAssignableFrom(Boolean.class) 
 			|| type.isAssignableFrom(Integer.class) || type.isAssignableFrom(Long.class)
@@ -285,6 +285,8 @@ public class LangUtils {
 		} else {
 			valueof = invokeStaticFromJson(type, value);
 		}
+		*/
+		T valueof = deserialize(value, defaultValue, type);
 		return (valueof == null) ? defaultValue : valueof;
 	}
 	
@@ -341,9 +343,9 @@ public class LangUtils {
 	 */
 	public static <T>T deserialize(String value, T defaultValue, Class<T> type) {
 		T valueof = null;
-		if(type.isInstance(String.class) || type.isInstance(Boolean.class) || 
-			type.isInstance(Integer.class) || type.isInstance(Long.class) ||
-			type.isInstance(Float.class) || type.isInstance(Double.class)) {
+		if(type.isAssignableFrom(String.class) || type.isAssignableFrom(Boolean.class) || 
+			type.isAssignableFrom(Integer.class) || type.isAssignableFrom(Long.class) ||
+			type.isAssignableFrom(Float.class) || type.isAssignableFrom(Double.class)) {
 			logger.debug("Deserializing primitive class {}", type.toString());
 			valueof = invokeStaticValueOf(type, value);
 		} else {
