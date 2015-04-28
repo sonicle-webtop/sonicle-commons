@@ -502,7 +502,13 @@ public class LangUtils {
 		return MessageFormat.format("{0}.{1}", packageName, className);
 	}
 	
-	public static String extractPackageName(String className) {
+	public static String getClassSimpleName(String className) {
+		int lastDot = StringUtils.lastIndexOf(className, ".");
+		if(lastDot < 0) return className;
+		return StringUtils.substring(className, lastDot+1);
+	}
+	
+	public static String getClassPackageName(String className) {
 		int lastDot = StringUtils.lastIndexOf(className, ".");
 		if(lastDot < 0) return className;
 		return StringUtils.substring(className, 0, lastDot);
