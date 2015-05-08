@@ -34,7 +34,6 @@
 
 package com.sonicle.commons;
 
-import com.sonicle.commons.net.IPUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -46,8 +45,10 @@ import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedSet;
@@ -539,5 +540,27 @@ public class LangUtils {
 	
 	public static <K,V> V ifValue(Map<K,V> map, K key, V value) {
 		return (map.containsKey(key)) ? map.get(key) : value;
+	}
+	
+	public static <T>CollectionChangeSet getCollectionChanges(Collection<T> fromCollection, Collection<T> toCollection) {
+		List<T> created = new ArrayList<>(toCollection);
+		created.removeAll(fromCollection);
+		List<T> updated = new ArrayList<>(toCollection);
+		updated.retainAll(fromCollection);
+		List<T> deleted = new ArrayList<>(fromCollection);
+		deleted.removeAll(toCollection);
+		return new CollectionChangeSet<>(created, updated, deleted);
+	}
+	
+	public static class CollectionChangeSet<T> {
+		public List<T> created;
+		public List<T> updated;
+		public List<T> deleted;
+		
+		public CollectionChangeSet(List<T> created, List<T> updated, List<T> deleted) {
+			this.created = created;
+			this.updated = updated;
+			this.deleted = deleted;
+		}
 	}
 }
