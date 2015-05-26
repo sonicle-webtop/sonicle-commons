@@ -47,6 +47,14 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class DbUtils {
 	
+	public static void commitQuietly(Connection con) {
+		try { if(con != null) con.commit(); } catch(Exception ex) { /* Do nothing... */ }
+	}
+	
+	public static void rollbackQuietly(Connection con) {
+		try { if(con != null) con.rollback(); } catch(Exception ex) { /* Do nothing... */ }
+	}
+	
 	public static void closeQuietly(Connection con) {
 		try { if(con != null) con.close(); } catch(Exception ex) { /* Do nothing... */ }
 	}

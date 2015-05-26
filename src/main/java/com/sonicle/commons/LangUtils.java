@@ -57,6 +57,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -523,6 +524,14 @@ public class LangUtils {
 		return StringUtils.lowerCase(StringUtils.replace(path, "/", "."));
 	}
 	
+	public static String joinPaths(String... paths) {
+		ArrayList<String> parts = new ArrayList<>();
+		for(String path : paths) {
+			parts.add(StringUtils.removeStart(path, "/"));
+		}
+		return StringUtils.join(parts, "/");
+	}
+	
 	public static ClassLoader findClassLoader(Class clazz) {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if(cl == null) cl = clazz.getClassLoader();
@@ -540,6 +549,27 @@ public class LangUtils {
 	
 	public static <K,V> V ifValue(Map<K,V> map, K key, V value) {
 		return (map.containsKey(key)) ? map.get(key) : value;
+	}
+	
+	public static String camelize(String str) {
+		String value = WordUtils.capitalize(str, '.', '-', '_');
+		value = StringUtils.remove(value, '.');
+		value = StringUtils.remove(value, '-');
+		value = StringUtils.remove(value, '_');
+		return WordUtils.uncapitalize(value);
+	}
+	
+	/**
+	 * Returns first non-null object or null if not found.
+	 * @param <T>
+	 * @param objects Set of objects to check
+	 * @return 
+	 */
+	public static <T>T coalesce(T... objects) {
+		for(T obj : objects) {
+			if(obj != null) return obj;
+		}
+		return null;
 	}
 	
 	public static <T>CollectionChangeSet getCollectionChanges(Collection<T> fromCollection, Collection<T> toCollection) {
