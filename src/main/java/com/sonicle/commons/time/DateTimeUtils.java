@@ -33,6 +33,7 @@
  */
 package com.sonicle.commons.time;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableInstant;
@@ -45,6 +46,10 @@ import org.joda.time.format.DateTimeFormatter;
  * @author malbinola
  */
 public class DateTimeUtils {
+	
+	public static DateTime withTimeAtEndOfDay(DateTime dt) {
+		return dt.withTime(23, 59, 59, 999);
+	}
 	
 	/**
 	 * Compares two times and returns the youngest one.
