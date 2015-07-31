@@ -121,6 +121,15 @@ public class Validator {
 		return value1;
 	}
 	
+	public static boolean isInteger(Object value) {
+		try {
+			validateInteger(value);
+			return true;
+		} catch(ValidatorException ex) {
+			return false;
+		}
+	}
+	
 	public static Integer validateInteger(Object value) throws ValidatorException	{
 		return Validator.validateInteger(true, value, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
 	}
