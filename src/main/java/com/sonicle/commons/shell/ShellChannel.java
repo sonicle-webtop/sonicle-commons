@@ -31,38 +31,54 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.commons;
+package com.sonicle.commons.shell;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
  * @author malbinola
  */
-public class RegexUtils {
+public abstract class ShellChannel {
+	protected InputStream is = null;
+	protected OutputStream os = null;
+	protected InputStream es = null;
+	protected PrintWriter in = null;
+	protected BufferedReader out = null;
+	protected BufferedReader err = null;
 	
-	public static final String MATCH_ANY = ".*";
-	public static final String MATCH_URL_SEPARATOR = "\\/";
+	public int close() throws Exception {
+		IOUtils.closeQuietly(err);
+		IOUtils.closeQuietly(out);
+		IOUtils.closeQuietly(in);
+		return -1;
+	}
 	
-	public static final String MATCH_JAVA_PACKAGE = "(?:[a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*";
-	public static final String MATCH_SW_VERSION = "[0-9]+(?:\\.[0-9]+){1,2}";
+	public InputStream getShellInputStream() {
+		return is;
+	}
 	
-	public static final String MATCH_SCHEME = "[A-Za-z][A-Za-z0-9+.-]*"; //Also called 'protocol'
-	public static final String MATCH_AUTHORITY = "\\/{2}";
-	public static final String MATCH_USERINFO = "(?:[A-Za-z0-9-._~]|%[A-Fa-f0-9]{2})+(?::(?:[A-Za-z0-9-._~]|%[A-Fa-f0-9]{2})+)?";
-	public static final String MATCH_HOST = "(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.){1,126}[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?";
-	public static final String MATCH_PORT = "\\d+";
-	public static final String MATCH_PATH = "\\/(?:[A-Za-z0-9-._~]|%[A-Fa-f0-9]{2})*";
-	public static final String MATCH_QUERY = "\\?(?:[A-Za-z0-9-._~]+(?:=(?:[A-Za-z0-9-._~+]|%[A-Fa-f0-9]{2})+)?)(?:[&|;][A-Za-z0-9-._~]+(?:=(?:[A-Za-z0-9-._~+]|%[A-Fa-f0-9]{2})+)?)*";
+	public OutputStream getShellOutputStream() {
+		return os;
+	}
 	
-	/**
-	 * Matches a URI ()
-	 * Examples:
-	 * ssh://user@host.example.com
-	 * 
-	 */
-	public static final String MATCH_URI = "(" + MATCH_SCHEME + "):" + MATCH_AUTHORITY + "(?:(" + MATCH_USERINFO + ")@)?(" + MATCH_HOST + ")(?::(" + MATCH_PORT + "))?";
+	public InputStream getShellErrorStream() {
+		return es;
+	}
 	
+	public PrintWriter getIn() {
+		return in;
+	}
 	
-	public static String capture(String pattern) {
-		return "(" + pattern + ")";
+	public BufferedReader getOut() {
+		return out;
+	}
+	
+	public BufferedReader getErr() {
+		return err;
 	}
 }

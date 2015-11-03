@@ -31,38 +31,39 @@
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
  * display the words "Copyright (C) 2014 Sonicle S.r.l.".
  */
-package com.sonicle.commons;
+package com.sonicle.commons.shell;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  *
  * @author malbinola
  */
-public class RegexUtils {
+public class ProcessShellChannel extends ShellChannel {
+	private final Process process;
 	
-	public static final String MATCH_ANY = ".*";
-	public static final String MATCH_URL_SEPARATOR = "\\/";
+	public ProcessShellChannel(Process process) throws IOException {
+		this.process = process;
+		in = new PrintWriter(new OutputStreamWriter(os = process.getOutputStream()));
+        out = new BufferedReader(new InputStreamReader(is = process.getInputStream()));
+        err = new BufferedReader(new InputStreamReader(es = process.getErrorStream()));
+	}
 	
-	public static final String MATCH_JAVA_PACKAGE = "(?:[a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*";
-	public static final String MATCH_SW_VERSION = "[0-9]+(?:\\.[0-9]+){1,2}";
+	@Override
+	public int close() throws Exception {
+		try {
+			process.waitFor();
+			return process.exitValue();
+		} finally {
+			super.close();
+		}
+	}
 	
-	public static final String MATCH_SCHEME = "[A-Za-z][A-Za-z0-9+.-]*"; //Also called 'protocol'
-	public static final String MATCH_AUTHORITY = "\\/{2}";
-	public static final String MATCH_USERINFO = "(?:[A-Za-z0-9-._~]|%[A-Fa-f0-9]{2})+(?::(?:[A-Za-z0-9-._~]|%[A-Fa-f0-9]{2})+)?";
-	public static final String MATCH_HOST = "(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.){1,126}[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?";
-	public static final String MATCH_PORT = "\\d+";
-	public static final String MATCH_PATH = "\\/(?:[A-Za-z0-9-._~]|%[A-Fa-f0-9]{2})*";
-	public static final String MATCH_QUERY = "\\?(?:[A-Za-z0-9-._~]+(?:=(?:[A-Za-z0-9-._~+]|%[A-Fa-f0-9]{2})+)?)(?:[&|;][A-Za-z0-9-._~]+(?:=(?:[A-Za-z0-9-._~+]|%[A-Fa-f0-9]{2})+)?)*";
-	
-	/**
-	 * Matches a URI ()
-	 * Examples:
-	 * ssh://user@host.example.com
-	 * 
-	 */
-	public static final String MATCH_URI = "(" + MATCH_SCHEME + "):" + MATCH_AUTHORITY + "(?:(" + MATCH_USERINFO + ")@)?(" + MATCH_HOST + ")(?::(" + MATCH_PORT + "))?";
-	
-	
-	public static String capture(String pattern) {
-		return "(" + pattern + ")";
+	public Process getProcess() {
+		return process;
 	}
 }

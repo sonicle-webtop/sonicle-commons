@@ -35,6 +35,8 @@ package com.sonicle.commons.time;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
@@ -47,8 +49,40 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class DateTimeUtils {
 	
+	public static boolean isMidnight(DateTime dt) {
+		return (dt.compareTo(dt.withTimeAtStartOfDay()) == 0);
+	}
+	
+	public static boolean isEndOfDay(DateTime dt) {
+		return isEndOfDay(dt, false);
+	}
+	
+	public static boolean isEndOfDay(DateTime dt, boolean relaxed) {
+		if (relaxed) {
+			return ((dt.getHourOfDay() == 23) && (dt.getMinuteOfHour() == 59));
+		} else {
+			return (dt.compareTo(withTimeAtEndOfDay(dt)) == 0);
+		}	
+	}
+	
+	public static boolean isDayBefore(DateTime dt1, DateTime dt2) {
+		return isDayBefore(dt1.toLocalDate(), dt2.toLocalDate());
+	}
+	
+	public static boolean isDayBefore(LocalDate l1, LocalDate l2) {
+		return l1.isBefore(l2) && (Days.daysBetween(l1, l2).getDays() == 1);
+	}
+	
+	public static DateTime withTimeAtMidday(DateTime dt) {
+		return dt.withTime(12, 0, 0, 0);
+	}
+	
 	public static DateTime withTimeAtEndOfDay(DateTime dt) {
-		return dt.withTime(23, 59, 59, 999);
+		return dt.withTime(23, 59, 59, 0);
+	}
+	
+	public static DateTime ceilTimeAtEndOfDay(DateTime dt) {
+		return (isEndOfDay(dt, true)) ? withTimeAtEndOfDay(dt) : dt;
 	}
 	
 	/**
