@@ -159,6 +159,41 @@ public class LangUtils {
 		return result.toString();
 	}
 	
+    /**
+     * fills the left side of a number with zeros <br>
+     * e.g. zerofill(14, 3) -> "014" <br>
+     * e.g. zerofill(187, 6) -> "000014" <br>
+     * e.g. zerofill(-33, 4) -> "-033" <br>
+     **/
+    public static String zerofill(int x, int d) {
+        StringBuffer buf = new StringBuffer();
+        if (x < 0) {
+            buf.append("-");
+            d--;
+            x = -x;
+        }
+        while (d>7) {
+            buf.append("0");
+            d--;
+        }
+        switch (d) {
+        case 7:
+            if (x<1000000) buf.append("0");
+        case 6:
+            if (x<100000) buf.append("0");
+        case 5:
+            if (x<10000) buf.append("0");
+        case 4:
+            if (x<1000) buf.append("0");
+        case 3:
+            if (x<100) buf.append("0");
+        case 2:
+            if (x<10) buf.append( "0" );
+        }
+        buf.append(x);
+        return buf.toString();
+    }
+
 	/**
 	 * Convenience method for replacing line-breaks control characters
 	 * ('\r\n', '\n' and '\r') from passed string.

@@ -239,4 +239,19 @@ public class DbUtils {
 			StatementUtils.closeQuietly(stmt);
 		}
 	}
+	
+    public static String getSQLString(String content) {
+		if(content==null) {
+			return null;
+		}
+		int ix=0;
+		while((ix=content.indexOf('\'', ix))>=0) {
+			String s1=content.substring(0, ix);
+			String s2=content.substring(ix+1);
+			content=s1+"''"+s2;
+			ix+=2;
+		}
+		return content;
+    }
+
 }
