@@ -34,6 +34,7 @@
 
 package com.sonicle.commons.db;
 
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -370,6 +371,21 @@ public class StatementUtils {
 				stmt.setNull(parameterIndex, java.sql.Types.TIME);
 			}
 		}
+		return parameterIndex+1;
+	}
+	
+	/**
+	 * Sets the designated parameter to the given Java ByteArrayInputStream.
+	 * 
+	 * @param stmt The statement object.
+	 * @param parameterIndex The first parameter is 1, the second is 2, ...
+	 * @param is The stream.
+	 * @param length The length of the stream.
+	 * @return Next column index to use.
+	 * @throws SQLException Rethrow of a inner exception.
+	 */
+	public static int setBinaryStream(PreparedStatement stmt, int parameterIndex, InputStream is, long length) throws SQLException {
+		stmt.setBinaryStream(parameterIndex, is, length);
 		return parameterIndex+1;
 	}
 	
