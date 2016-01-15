@@ -457,8 +457,14 @@ public class MailUtils {
 		return value;
 	}
 
-	public static String getCharset(String contentType) {
-		String charset="ISO-8859-1";
+	public static String getCharsetOrDefault(String contentType) {
+		String charset=getCharsetOrNull(contentType);
+		if (charset==null) charset=java.nio.charset.Charset.defaultCharset().name();
+		return charset;
+	}
+
+	public static String getCharsetOrNull(String contentType) {
+		String charset=null;
 		int ix=contentType.indexOf(';');
 		if(ix>0&&ix<(contentType.length()-1)) {
 			String str=contentType.substring(ix+1).trim().toUpperCase();
@@ -473,7 +479,6 @@ public class MailUtils {
 		}
 		return charset;
 	}
-	
 	
 	public static String decodeQString(String s, String encoding) throws Exception {
 		String result=s;
