@@ -545,6 +545,10 @@ public class LangUtils {
 		return StringUtils.substring(className, lastDot+1);
 	}
 	
+	public static String getClassPackageName(Class clazz) {
+		return getClassPackageName(clazz.getCanonicalName());
+	}
+	
 	public static String getClassPackageName(String className) {
 		int lastDot = StringUtils.lastIndexOf(className, ".");
 		if(lastDot < 0) return className;
