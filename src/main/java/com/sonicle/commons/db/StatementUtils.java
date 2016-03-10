@@ -195,6 +195,42 @@ public class StatementUtils {
 	}
 	
 	/**
+	 * Sets the designated parameter to the given Java Long value.
+	 * 
+	 * @param stmt The statement object.
+	 * @param parameterIndex The first parameter is 1, the second is 2, ...
+	 * @param value The parameter value.
+	 * @return Next column index.
+	 * @throws SQLException Rethrow of a inner exception.
+	 */
+	public static int setLong(PreparedStatement stmt, int parameterIndex, Long value) throws SQLException {
+		return setLong(stmt, parameterIndex, value, null);
+	}
+	
+	/**
+	 * Sets the designated parameter to the given Java Long value.
+	 * 
+	 * @param stmt The statement object.
+	 * @param parameterIndex The first parameter is 1, the second is 2, ...
+	 * @param value The parameter value.
+	 * @param defaultValue A default value to use in case of null parameter.
+	 * @return Next column index.
+	 * @throws SQLException Rethrow of a inner exception.
+	 */
+	public static int setLong(PreparedStatement stmt, int parameterIndex, Long value, Long defaultValue) throws SQLException {
+		if(value != null) {
+			stmt.setLong(parameterIndex, value);
+		} else {
+			if(defaultValue != null) {
+				stmt.setLong(parameterIndex, defaultValue);
+			} else {
+				stmt.setNull(parameterIndex, java.sql.Types.BIGINT);
+			}
+		}
+		return parameterIndex+1;
+	}
+	
+	/**
 	 * Sets the designated parameter to the given Java Float value.
 	 * 
 	 * @param stmt The statement object.

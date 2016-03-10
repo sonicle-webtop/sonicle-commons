@@ -80,6 +80,16 @@ public class RSUtils {
 		return rs.wasNull() ? null : value;
 	}
 	
+	public static Long getLong(ResultSet rs, int columnIndex) throws SQLException {
+		long value = rs.getLong(columnIndex);
+		return rs.wasNull() ? null : value;
+	}
+	
+	public static Long getLong(ResultSet rs, String columnLabel) throws SQLException {
+		long value = rs.getLong(columnLabel);
+		return rs.wasNull() ? null : value;
+	}
+	
 	public static Float getFloat(ResultSet rs, int columnIndex) throws SQLException {
 		float value = rs.getFloat(columnIndex);
 		return rs.wasNull() ? null : value;
