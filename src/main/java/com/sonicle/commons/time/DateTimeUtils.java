@@ -85,6 +85,46 @@ public class DateTimeUtils {
 		return (isEndOfDay(dt, true)) ? withTimeAtEndOfDay(dt) : dt;
 	}
 	
+	
+	public static boolean startsInDay(DateTime day, ReadableInstant instant) {
+		DateTime dayFrom = day.withTimeAtStartOfDay();
+		DateTime dayTo = dayFrom.plusDays(1);
+		return (instant.compareTo(dayFrom) >= 0) && instant.isBefore(dayTo);
+	}
+	
+	public static boolean endsInDay(DateTime day, ReadableInstant instant) {
+		DateTime dayFrom = day.withTimeAtStartOfDay();
+		DateTime dayTo = dayFrom.plusDays(1);
+		return instant.isAfter(dayFrom) && instant.isBefore(dayTo); // We need to exclude midnight!
+	}
+	
+	/**
+	 * Returns the difference in days (or dates) not keeping into account the
+	 * real amount of time passed between the two dates.
+	 * To avoid wrong calculations, the two dates must be in same TimeZone.
+	 * @param dt1 The first dateTime
+	 * @param dt2 The second dateTime.
+	 * @return 
+	 */
+	public static int datesBetween(DateTime dt1, DateTime dt2) {
+		return datesBetween(dt1, dt2, false);
+	}
+	
+	/**
+	 * Returns the difference in days (or dates) not keeping into account the
+	 * real amount of time passed between the two dates.
+	 * To avoid wrong calculations, the two dates must be in same TimeZone.
+	 * @param dt1 The first dateTime
+	 * @param dt2 The second dateTime.
+	 * @param midnightAsDayBefore If 'true' and dt2 is at midnight, dt2 will be set at the day before.
+	 * @return 
+	 */
+	public static int datesBetween(DateTime dt1, DateTime dt2, boolean midnightAsDayBefore) {
+		LocalDate ld1 = dt1.toLocalDate();
+		LocalDate ld2 = (midnightAsDayBefore && DateTimeUtils.isMidnight(dt2)) ? dt2.minusDays(1).toLocalDate() : dt2.toLocalDate();
+		return Days.daysBetween(ld1, ld2).getDays();
+	}
+	
 	/**
 	 * Compares two times and returns the youngest one.
 	 * @param time1 Time instance 1.
