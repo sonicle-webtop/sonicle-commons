@@ -49,6 +49,18 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class DateTimeUtils {
 	
+	public static DateTime now() {
+		return now(false);
+	}
+	
+	public static DateTime now(boolean exact) {
+		if(exact) {
+			return DateTime.now(DateTimeZone.UTC);
+		} else {
+			return DateTime.now(DateTimeZone.UTC).withMillisOfSecond(0);
+		}
+	}
+	
 	public static boolean isMidnight(DateTime dt) {
 		return (dt.compareTo(dt.withTimeAtStartOfDay()) == 0);
 	}

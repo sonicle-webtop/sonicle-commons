@@ -1,57 +1,74 @@
-package com.sonicle.commons;
-
 /*
- * ====================================================================
- * Copyright (c) 1995-1999 Purple Technology, Inc. All rights
- * reserved.
+ * Sonicle Commons is a helper library developed by Sonicle S.r.l.
+ * Copyright (C) 2014 Sonicle S.r.l.
  *
- * PLAIN LANGUAGE LICENSE: Do whatever you like with this code, free
- * of charge, just give credit where credit is due. If you improve it,
- * please send your improvements to alex@purpletech.com. Check
- * http://www.purpletech.com/code/ for the latest version and news.
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by
+ * the Free Software Foundation with the addition of the following permission
+ * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY SONICLE, SONICLE DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
- * LEGAL LANGUAGE LICENSE: Redistribution and use in source and binary
- * forms, with or without modification, are permitted provided that
- * the following conditions are met:
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses or write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301 USA.
  *
- * 2. Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following
- * disclaimer in the documentation and/or other materials provided
- * with the distribution.
+ * You can contact Sonicle S.r.l. at email address sonicle@sonicle.com
  *
- * 3. The names of the authors and the names "Purple Technology,"
- * "Purple Server" and "Purple Chat" must not be used to endorse or
- * promote products derived from this software without prior written
- * permission. For written permission, please contact
- * server@purpletech.com.
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License version 3.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND PURPLE TECHNOLOGY ``AS
- * IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
- * AUTHORS OR PURPLE TECHNOLOGY BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * ====================================================================
- *
- **/
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
+ * reasonably feasible for technical reasons, the Appropriate Legal Notices must
+ * display the words "Copyright (C) 2014 Sonicle S.r.l.".
+ */
 
+package com.sonicle.commons;
 
 import java.io.*;
 import java.util.*;
+import java.io.UnsupportedEncodingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
-    
-
+	
+	public static boolean isAddressValid(InternetAddress ia) {
+		try {
+			if(ia == null) return false;
+			ia.validate();
+			return true;
+		} catch(AddressException ex) {
+			return false;
+		}
+	}
+	
+	public static InternetAddress buildInternetAddress(String local, String domain, String personal) {
+		return buildInternetAddress(local + "@" + domain, personal);
+	}
+	
+	public static InternetAddress buildInternetAddress(String address, String personal) {
+		try {
+			InternetAddress ia = new InternetAddress(address);
+			if(!StringUtils.isBlank(personal)) ia.setPersonal(personal, "UTF-8");
+			return ia;
+		} catch(AddressException | UnsupportedEncodingException ex) {
+			return null;
+		}
+	}
+	
+	
+	
     /**
      * Turns funky characters into HTML entity equivalents<p>
      * e.g. <tt>"bread" & "butter"</tt> => <tt>&amp;quot;bread&amp;quot; &amp;amp; &amp;quot;butter&amp;quot;</tt>.
