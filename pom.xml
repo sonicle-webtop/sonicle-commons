@@ -17,31 +17,36 @@
 			<artifactId>commons-net</artifactId>
 			<version>3.1</version>
 		</dependency>
-	 <dependency>
-	  <groupId>org.apache.commons</groupId>
-	  <artifactId>commons-lang3</artifactId>
-	  <version>3.3.2</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.slf4j</groupId>
-	  <artifactId>slf4j-api</artifactId>
-	  <version>1.7.6</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>joda-time</groupId>
-	  <artifactId>joda-time</artifactId>
-	  <version>2.7</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>com.jcraft</groupId>
-	  <artifactId>jsch</artifactId>
-	  <version>0.1.53</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>commons-io</groupId>
-	  <artifactId>commons-io</artifactId>
-	  <version>2.4</version>
-	 </dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.53</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.5.4</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
