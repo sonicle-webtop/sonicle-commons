@@ -159,6 +159,10 @@ public class LangUtils {
 		return result.toString();
 	}
 	
+	public static String unescapeUnicodeBackslashes(String s) {
+		return s.replaceAll("\\\\u", "\\u");
+	}
+	
     /**
      * fills the left side of a number with zeros <br>
      * e.g. zerofill(14, 3) -> "014" <br>
