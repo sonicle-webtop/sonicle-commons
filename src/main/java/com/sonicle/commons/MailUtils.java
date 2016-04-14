@@ -67,7 +67,22 @@ public class MailUtils {
 		}
 	}
 	
-	
+	public static InternetAddress buildInternetAddress(String fullAddress) {
+		try {
+			String address=null;
+			String personal=null;
+			int ix=fullAddress.indexOf('<');
+			if (ix>=0) {
+				int ix2=fullAddress.indexOf('>');
+				personal=fullAddress.substring(0,ix).trim();
+				address=fullAddress.substring(ix+1,ix2);
+				return buildInternetAddress(address,personal);
+			}
+			return new InternetAddress(fullAddress);
+		} catch(AddressException e) {
+			return null;
+		}
+	}	
 	
     /**
      * Turns funky characters into HTML entity equivalents<p>
