@@ -33,6 +33,7 @@
  */
 package com.sonicle.commons.time;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
@@ -251,5 +252,22 @@ public class DateTimeUtils {
 	public static DateTimeFormatter createFormatter(String pattern, DateTimeZone tz) {
 		DateTimeFormatter dtf = DateTimeFormat.forPattern(pattern);
 		return (tz != null) ? dtf.withZone(tz) : dtf;
+	}
+
+	public static DateTime parseYmdHmsWithZone(String date, String time, DateTimeZone tz) {
+		return parseYmdHmsWithZone(date + " " + time, tz);
+	}
+
+	public static DateTime parseYmdHmsWithZone(String dateTime, DateTimeZone tz) {
+		if(StringUtils.isBlank(dateTime)) return null;
+		String s = StringUtils.replace(dateTime, "T", " ");
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZone(tz);
+		return fmt.parseDateTime(s);
+	}
+	
+	public static String printYmdHmsWithZone(DateTime dateTime, DateTimeZone tz) {
+		if(dateTime == null) return null;
+		DateTimeFormatter fmt = DateTimeUtils.createYmdHmsFormatter(tz);
+		return fmt.print(dateTime);
 	}
 }
