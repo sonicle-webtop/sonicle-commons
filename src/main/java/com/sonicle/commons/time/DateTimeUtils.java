@@ -270,4 +270,9 @@ public class DateTimeUtils {
 		DateTimeFormatter fmt = DateTimeUtils.createYmdHmsFormatter(tz);
 		return fmt.print(dateTime);
 	}
+	
+	public static String printWithFormatter(DateTimeFormatter formatter, ReadableInstant ri) {
+		if(ri == null) return null;
+		return formatter.print(ri);
+	}
 }
