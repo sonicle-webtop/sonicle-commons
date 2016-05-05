@@ -53,6 +53,10 @@ public class MailUtils {
 		}
 	}
 	
+	public static String buildPersonal(String firstName, String lastName) {
+		return StringUtils.join(new String[]{firstName, lastName}, " ");
+	}
+	
 	public static InternetAddress buildInternetAddress(String local, String domain, String personal) {
 		return buildInternetAddress(local + "@" + domain, personal);
 	}
