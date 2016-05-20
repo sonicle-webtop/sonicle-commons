@@ -41,6 +41,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -130,10 +131,10 @@ public class StatementUtils {
 	 */
 	public static int setBoolean(PreparedStatement stmt, int parameterIndex, Boolean value, Boolean defaultValue) throws SQLException {
 		if(value != null) {
-			stmt.setBoolean(parameterIndex, value.booleanValue());
+			stmt.setBoolean(parameterIndex, value);
 		} else {
 			if(defaultValue != null) {
-				stmt.setBoolean(parameterIndex, defaultValue.booleanValue());
+				stmt.setBoolean(parameterIndex, defaultValue);
 			} else {
 				stmt.setNull(parameterIndex, java.sql.Types.BOOLEAN);
 			}
@@ -166,7 +167,7 @@ public class StatementUtils {
 	 */
 	public static int setInt(PreparedStatement stmt, int parameterIndex, Integer value, Integer defaultValue) throws SQLException {
 		if(value != null) {
-			stmt.setInt(parameterIndex, value.intValue());
+			stmt.setInt(parameterIndex, value);
 		} else {
 			if(defaultValue != null) {
 				stmt.setInt(parameterIndex, defaultValue);
@@ -186,7 +187,7 @@ public class StatementUtils {
 	 * @return Next column index.
 	 * @throws SQLException Rethrow of a inner exception.
 	 */
-	public static int setInts(PreparedStatement stmt, int parameterIndex, ArrayList<Integer> values) throws SQLException {
+	public static int setInts(PreparedStatement stmt, int parameterIndex, List<Integer> values) throws SQLException {
 		int index = parameterIndex;
 		for(Integer value: values) {
 			index = setInt(stmt, index, value);
@@ -255,7 +256,7 @@ public class StatementUtils {
 	 */
 	public static int setFloat(PreparedStatement stmt, int parameterIndex, Float value, Float defaultValue) throws SQLException {
 		if(value != null) {
-			stmt.setFloat(parameterIndex, value.floatValue());
+			stmt.setFloat(parameterIndex, value);
 		} else {
 			if(defaultValue != null) {
 				stmt.setFloat(parameterIndex, defaultValue);
@@ -291,7 +292,7 @@ public class StatementUtils {
 	 */
 	public static int setDouble(PreparedStatement stmt, int parameterIndex, Double value, Double defaultValue) throws SQLException {
 		if(value != null) {
-			stmt.setDouble(parameterIndex, value.doubleValue());
+			stmt.setDouble(parameterIndex, value);
 		} else {
 			if(defaultValue != null) {
 				stmt.setDouble(parameterIndex, defaultValue);
@@ -455,7 +456,7 @@ public class StatementUtils {
 		return sb.deleteCharAt(sb.length()-1).toString();
 	}
 	
-	public static String joinInClauseValues(ArrayList<?> values, String valueSeparator) {
+	public static String joinInClauseValues(List<?> values, String valueSeparator) {
 		StringBuilder sb = new StringBuilder();
 		if(values.isEmpty()) return "";
 		for(int i=0; i<values.size(); i++) {
@@ -467,7 +468,7 @@ public class StatementUtils {
 		return sb.deleteCharAt(sb.length() -1).toString();
 	}
 	
-	public static String buildPlaceholderList(ArrayList<?> values) {
+	public static String buildPlaceholderList(List<?> values) {
 		return buildPlaceholderList(values.size());
 	}
 	

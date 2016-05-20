@@ -39,6 +39,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -116,19 +117,19 @@ public class RSUtils {
 		} catch(SQLException ex) {
 			throw ex;
 		} finally {
-			if(rs != null) try { rs.close(); } catch(SQLException ex2) {}
+			closeQuietly(rs);
 		}
 	}
 	
-	public static ArrayList<String> toStringBeanList(ResultSet rs) throws SQLException {
-		ArrayList<String> items = new ArrayList<String>();
+	public static List<String> toStringBeanList(ResultSet rs) throws SQLException {
+		ArrayList<String> items = new ArrayList<>();
 		try {
 			while(rs.next()) items.add(RSUtils.getString(rs, 1));
 			return items;
 		} catch(SQLException ex) {
 			throw ex;
 		} finally {
-			if(rs != null) try { rs.close(); } catch(SQLException ex2) {}
+			closeQuietly(rs);
 		}
 	}
 	
@@ -138,21 +139,21 @@ public class RSUtils {
 		} catch(SQLException ex) {
 			throw ex;
 		} finally {
-			if(rs != null) try { rs.close(); } catch(SQLException ex2) {}
+			closeQuietly(rs);
 		}
 	}
 	
 	public static <T> T toBean(ResultSet rs, Class<T> type) throws SQLException, Exception {
-		ArrayList<T> items = RSUtils.toBeanList(rs, type);
+		List<T> items = RSUtils.toBeanList(rs, type);
 		return (items.size() == 1) ? items.get(0) : null;
 	}
 	
-	public static <T> ArrayList<T> toBeanList(ResultSet rs, Class<T> type) throws SQLException, Exception {
+	public static <T> List<T> toBeanList(ResultSet rs, Class<T> type) throws SQLException, Exception {
 		return toBeanList(rs, type, true);
 	}
 	
-	public static <T> ArrayList<T> toBeanList(ResultSet rs, Class<T> type, boolean close) throws SQLException, Exception {
-		ArrayList<T> items = new ArrayList<T>();
+	public static <T> List<T> toBeanList(ResultSet rs, Class<T> type, boolean close) throws SQLException, Exception {
+		ArrayList<T> items = new ArrayList<>();
 		
 		try {
 			Constructor<T> constructor = type.getConstructor(ResultSet.class);
@@ -163,7 +164,7 @@ public class RSUtils {
 		} catch(Exception ex) {
 			throw new BeanException(ex);
 		} finally {
-			if(close & (rs != null)) try { rs.close(); } catch(SQLException ex2) {}
+			if(close) closeQuietly(rs);
 		}
 	}
 }
