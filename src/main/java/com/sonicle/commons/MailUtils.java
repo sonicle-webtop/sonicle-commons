@@ -37,11 +37,18 @@ package com.sonicle.commons;
 import java.io.*;
 import java.util.*;
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Pattern;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
+	private static final Pattern EMAIL_PATTERN = Pattern.compile(RegexUtils.MATCH_EMAIL_ADDRESS);
+	
+	public static boolean isAddressValid(String address) {
+		if(StringUtils.isBlank(address)) return false;
+		return EMAIL_PATTERN.matcher(address).matches();
+	}
 	
 	public static boolean isAddressValid(InternetAddress ia) {
 		try {
