@@ -159,7 +159,39 @@ public class Validator {
 		return value1;
 	}
 	
-	public static Float validateFloat(Object value, Locale locale) throws ValidatorException	{
+
+	public static Long validateLong(Object value) throws ValidatorException	{
+		return Validator.validateLong(true, value, Long.MIN_VALUE, Long.MAX_VALUE, false);
+	}
+	
+	public static Long validateLong(boolean required, Object value) throws ValidatorException {
+		return Validator.validateLong(required, value, Long.MIN_VALUE, Long.MAX_VALUE, false);
+	}
+		
+	public static Long validateLong(boolean required, Object value, long minValue, long maxValue) throws ValidatorException {
+		return Validator.validateLong(required, value, minValue, maxValue, false);
+	}
+	
+	public static Long validateLong(boolean required, Object value, long minLength, long maxLength, boolean rangeExclusive) throws ValidatorException {
+		Long value1 = null;
+		if(required && Validator.isNull(value)) throw new ValidatorException("Value is null but marked as required.");
+		if(Validator.isNull(value)) return null;
+		try {
+			value1 = Long.valueOf(String.valueOf(value));
+		} catch(Exception ex) {
+			throw new ValidatorException("Unable to parse value as long value.", ex);
+		}
+		if(rangeExclusive) {
+			if((value1 < minLength)||(value1 > maxLength)) throw new ValidatorException("Value range mishmatch.");
+		} else {
+			if((value1 <= minLength)||(value1 >= maxLength)) throw new ValidatorException("Value range mishmatch.");
+		}
+		return value1;
+	}
+	
+    
+    
+    public static Float validateFloat(Object value, Locale locale) throws ValidatorException	{
 		return Validator.validateFloat(true, value, locale, -Float.MAX_VALUE, Float.MAX_VALUE, false);
 	}
 	
