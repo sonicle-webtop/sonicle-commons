@@ -75,7 +75,7 @@ public class RegexUtils {
 	}
     
     public static String escapeRegexSpecialChars(String str) {
-            return SPECIAL_REGEX_CHARS.matcher(str).replaceAll("\\\\$0").replaceAll("\\\\", "\\\\\\\\");   
+            return SPECIAL_REGEX_CHARS.matcher(str).replaceAll("\\\\$0");
     }
     
 }
