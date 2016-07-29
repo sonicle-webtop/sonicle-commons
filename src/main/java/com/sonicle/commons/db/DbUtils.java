@@ -59,6 +59,36 @@ public class DbUtils {
 		try { if(con != null) con.close(); } catch(Exception ex) { /* Do nothing... */ }
 	}
 	
+	/**
+	 * Perform basic SQL validation on input string.  This is to allow safe 
+	 * encoding of parameters that must contain quotes, while still protecting 
+	 * users from SQL injection.
+	 * @param str The SQL string
+	 * @return Escaped SQL string
+	 */
+	public static String escapeSQL(String str) {
+		if(str != null) {
+			// \x00 -> removed
+			str = str.replace("\\x00", "");
+			// \x1a -> removed
+			str = str.replace("\\x1a", "");
+			// ' -> ''
+			str = str.replace("'", "''");
+			// " -> ""
+			str = str.replace("\"", "\"\"");
+			// \ ->  \\
+			str = str.replace("\\", "\\\\");
+		}
+		return str;
+		/*
+		fixedConstant = fixedConstant.replaceAll("\\\\x00", "");
+42        fixedConstant = fixedConstant.replaceAll("\\\\x1a", "");
+43        fixedConstant = fixedConstant.replaceAll("'", "''");
+44        fixedConstant = fixedConstant.replaceAll("\\\\", "\\\\\\\\");
+45        fixedConstant = fixedConstant.replaceAll("\\\"", "\\\\\"");
+		*/
+	}
+	
 	public static Exception proxyException(SQLException ex) {
 		String state = ex.getSQLState();
 		String class1 = StringUtils.substring(state, 0, 2);

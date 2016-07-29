@@ -581,6 +581,11 @@ public class LangUtils {
 		return cl;
 	}
 	
+	public static String getMethodName(final int depth) {
+		final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+		return ste[ste.length - 1 - depth].getMethodName();
+	}
+	
 	public static String homogenizeLocaleId(String languageTag) {
 		return StringUtils.replace(languageTag, "-", "_");
 	}
