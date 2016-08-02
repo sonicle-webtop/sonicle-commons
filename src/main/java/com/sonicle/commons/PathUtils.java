@@ -33,6 +33,7 @@
  */
 package com.sonicle.commons;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -41,12 +42,55 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PathUtils {
 	
-	/*
-	public static String homogenizeSeparator(String path) {
-		
-		return StringUtils.replace(, path, path)
-		
-	}
+	/**
+	 * Converts all separators to the Unix separator of forward slash.
+	 * @param path The path to be changed, null ignored.
+	 * @return The updated path
 	*/
+	public static String homogenizeSeparator(String path) {
+		if(path == null) return null;
+		return FilenameUtils.separatorsToUnix(path);
+	}
 	
+	/**
+	 * Ensures that passed path is followed by separator (Unix forward slash).
+	 * This method does not check if passed path is a file path; you
+	 * should use this only within directory paths.
+	 * @param path The path to be changed, null ignored.
+	 * @return The updated path
+	 */
+	public static String ensureTrailingSeparator(String path) {
+		return ensureTrailingSeparator(path, false);
+	}
+	
+	/**
+	 * Ensures that passed path is followed by separator (Unix forward slash).
+	 * This method does not check if passed path is a file path; you
+	 * should use this only within directory paths.
+	 * @param path The path to be changed, null ignored.
+	 * @param homogenize True to homogenize separatore to the Unix style before checking.
+	 * @return The updated path
+	 */
+	public static String ensureTrailingSeparator(String path, boolean homogenize) {
+		if(path == null) return null;
+		if(homogenize) path = homogenizeSeparator(path);
+		return StringUtils.endsWith(path, "/") ? path : path + "/";
+	}
+	
+	public static String concatPaths(String path1, String path2) {
+		return concatPaths(path1, path2, false);
+	}
+	
+	public static String concatPaths(String path1, String path2, boolean homogenize) {
+		if(path1 == null && path2 == null) return null;
+		if(path1 == null) return path2;
+		if(path2 == null) return path1;
+		if(homogenize) {
+			path1 = homogenizeSeparator(path1);
+			path2 = homogenizeSeparator(path2);
+		}
+		path1 = ensureTrailingSeparator(path1, false);
+		path2 = StringUtils.removeStart(path2, "/");
+		return path1 + path2;
+	}
 }
