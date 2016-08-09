@@ -53,6 +53,27 @@ public class PathUtils {
 	}
 	
 	/**
+	 * Ensures that passed path starts by separator (Unix forward slash).
+	 * @param path The path to be changed, null ignored.
+	 * @return The updated path
+	 */
+	public static String ensureBeginningSeparator(String path) {
+		return ensureBeginningSeparator(path, false);
+	}
+	
+	/**
+	 * Ensures that passed path starts by separator (Unix forward slash).
+	 * @param path The path to be changed, null ignored.
+	 * @param homogenize True to homogenize separatore to the Unix style before checking.
+	 * @return The updated path
+	 */
+	public static String ensureBeginningSeparator(String path, boolean homogenize) {
+		if(path == null) return null;
+		if(homogenize) path = homogenizeSeparator(path);
+		return StringUtils.startsWith(path, "/") ? path : "/" + path;
+	}
+	
+	/**
 	 * Ensures that passed path is followed by separator (Unix forward slash).
 	 * This method does not check if passed path is a file path; you
 	 * should use this only within directory paths.
@@ -92,5 +113,29 @@ public class PathUtils {
 		path1 = ensureTrailingSeparator(path1, false);
 		path2 = StringUtils.removeStart(path2, "/");
 		return path1 + path2;
+	}
+	
+	public static String getFullParentPath(String path) {
+		if(StringUtils.endsWith(path, "/")) {
+			return FilenameUtils.getFullPath(StringUtils.removeEnd(path, "/"));
+		} else {
+			return FilenameUtils.getFullPath(path);
+		}
+	}
+	
+	public static String getFileName(String path) {
+		if(StringUtils.endsWith(path, "/")) {
+			return FilenameUtils.getName(StringUtils.removeEnd(path, "/"));
+		} else {
+			return FilenameUtils.getName(path);
+		}
+	}
+	
+	public static String getFileExtension(String path) {
+		if(StringUtils.endsWith(path, "/")) {
+			return "";
+		} else {
+			return FilenameUtils.getExtension(path);
+		}
 	}
 }
