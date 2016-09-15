@@ -115,6 +115,16 @@ public class PathUtils {
 		return path1 + path2;
 	}
 	
+	public static String concatPathParts(String... pathParts) {
+		String path = pathParts[0];
+		int i = 1;
+		while(i < pathParts.length) {
+			path = concatPaths(path, pathParts[i], false);
+			i++;
+		}
+		return path;
+	}
+	
 	public static String getFullParentPath(String path) {
 		if(StringUtils.endsWith(path, "/")) {
 			return FilenameUtils.getFullPath(StringUtils.removeEnd(path, "/"));
