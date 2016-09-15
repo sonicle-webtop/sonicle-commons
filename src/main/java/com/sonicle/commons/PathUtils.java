@@ -134,7 +134,7 @@ public class PathUtils {
 	}
 	
 	public static String getFileName(String path) {
-		if(StringUtils.endsWith(path, "/")) {
+		if(isFolder(path)) {
 			return FilenameUtils.getName(StringUtils.removeEnd(path, "/"));
 		} else {
 			return FilenameUtils.getName(path);
@@ -142,10 +142,14 @@ public class PathUtils {
 	}
 	
 	public static String getFileExtension(String path) {
-		if(StringUtils.endsWith(path, "/")) {
+		if(isFolder(path)) {
 			return "";
 		} else {
 			return FilenameUtils.getExtension(path);
 		}
+	}
+	
+	public static boolean isFolder(String path) {
+		return StringUtils.endsWith(path, "/");
 	}
 }
