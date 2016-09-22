@@ -42,6 +42,14 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PathUtils {
 	
+	public static boolean isFolder(String path) {
+		return StringUtils.endsWith(path, "/");
+	}
+	
+	public static boolean isRootFolder(String path) {
+		return StringUtils.equals(path, "/");
+	}
+	
 	/**
 	 * Converts all separators to the Unix separator of forward slash.
 	 * @param path The path to be changed, null ignored.
@@ -149,7 +157,5 @@ public class PathUtils {
 		}
 	}
 	
-	public static boolean isFolder(String path) {
-		return StringUtils.endsWith(path, "/");
-	}
+	
 }
