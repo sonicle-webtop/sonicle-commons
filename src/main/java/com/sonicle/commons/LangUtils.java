@@ -36,11 +36,13 @@ package com.sonicle.commons;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
@@ -197,6 +199,16 @@ public class LangUtils {
         buf.append(x);
         return buf.toString();
     }
+	
+	public static String encodeURL(String url) {
+		try {
+			if(StringUtils.isBlank(url)) return url;
+			String s = URLEncoder.encode(url, "UTF-8");
+			return StringUtils.replace(s, " ", "+");
+		} catch(UnsupportedEncodingException ex) {
+			return null;
+		}
+	}
 
 	/**
 	 * Convenience method for replacing line-breaks control characters
