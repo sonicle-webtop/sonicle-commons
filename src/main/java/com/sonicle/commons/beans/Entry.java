@@ -34,7 +34,7 @@
 package com.sonicle.commons.beans;
 
 /**
- *
+ * @deprecated 
  * @author malbinola
  * @param <M> Type of key property.
  * @param <D> Type of value property.

@@ -643,12 +643,12 @@ public class LangUtils {
 	}
 	
 	public static class CollectionChangeSet<T> {
-		public List<T> created;
+		public List<T> inserted;
 		public List<T> updated;
 		public List<T> deleted;
 		
-		public CollectionChangeSet(List<T> created, List<T> updated, List<T> deleted) {
-			this.created = created;
+		public CollectionChangeSet(List<T> inserted, List<T> updated, List<T> deleted) {
+			this.inserted = inserted;
 			this.updated = updated;
 			this.deleted = deleted;
 		}
