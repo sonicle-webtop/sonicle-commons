@@ -343,6 +343,22 @@ public class LangUtils {
 		return (valueof == null) ? defaultValue : valueof;
 	}
 	
+	public static Boolean value(Boolean value, Boolean defaultValue) {
+		return (value != null) ? value : defaultValue;
+	}
+	
+	public static Integer value(Integer value, Integer defaultValue) {
+		return (value != null) ? value : defaultValue;
+	}
+	
+	public static Long value(Long value, Long defaultValue) {
+		return (value != null) ? value : defaultValue;
+	}
+	
+	public static <T>T value(T value, T defaultValue, Class<T> type) {
+		return (value != null) ? value : defaultValue;
+	}
+	
 	/**
 	 * Serializes the passed object into a suitable string according to its type.
 	 * If the object is a primitive type toString method will be used, 
