@@ -32,8 +32,10 @@
  */
 package com.sonicle.commons;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -41,6 +43,14 @@ import org.apache.commons.lang3.StringUtils;
  * @author malbinola
  */
 public class URIUtils {
+	
+	public static String encodeQuietly(String s) {
+		try {
+			return URLEncoder.encode(s, "UTF-8");
+		} catch (UnsupportedEncodingException ex) {
+			return s;
+		}
+	}
 	
 	public static Integer getPort(String uri) throws URISyntaxException {
 		return getPort(new URI(uri));
