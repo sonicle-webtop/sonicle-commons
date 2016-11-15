@@ -18,7 +18,7 @@
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA.
  *
- * You can contact Sonicle S.r.l. at email address sonicle[at]sonicle.com
+ * You can contact Sonicle S.r.l. at email address sonicle[at]sonicle[dot]com
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -59,6 +59,10 @@ public class URIUtils {
 	public static Integer getPort(URI uri) {
 		int port = uri.getPort();
 		return port == -1 ? null : port;
+	}
+	
+	public static String getScheme(String uri) throws URISyntaxException {
+		return new URI(uri).getScheme();
 	}
 	
 	public static String[] parseUserInfo(URI uri) {
