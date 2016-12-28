@@ -513,7 +513,7 @@ public class LangUtils {
 	 * @return A List of type T objects.
 	 */
 	public static <T> ArrayList<T> fromNameValueString(String str, Class<T> type) {
-		ArrayList<T> items = new ArrayList<T>();
+		ArrayList<T> items = new ArrayList<>();
 		
 		if(!StringUtils.isEmpty(str)) {
 			String[] itemTokens = StringUtils.split(str, ",");
@@ -529,23 +529,22 @@ public class LangUtils {
 	}
 	
 	public static String[] listPackageFiles(Class clazz, String path) throws URISyntaxException, IOException {
-		URL dirURL = clazz.getClassLoader().getResource(path);
-		if(dirURL != null && dirURL.getProtocol().equals("file")) {
-			// A file path: easy enough
+		ClassLoader cl = findClassLoader(clazz);
+		URL dirURL = cl.getResource(path);
+		if(dirURL != null && dirURL.getProtocol().equals("file")) { // A file path: easy enough
 			return new File(dirURL.toURI()).list();
 		}
 		if(dirURL == null) {
 			// In case of a jar file, we can't actually find a directory.
 			// Have to assume the same jar as clazz.
-			String me = clazz.getName().replace(".", "/")+".class";
-			dirURL = clazz.getClassLoader().getResource(me);
+			String me = clazz.getName().replace(".", "/") + ".class";
+			dirURL = cl.getResource(me);
 		}
 		if(dirURL.getProtocol().equals("jar")) {
 			String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); // Strip out only the JAR file
 			JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
 			Enumeration<JarEntry> entries = jar.entries(); // Gives ALL entries in jar
-			//HashSet<String> result = new HashSet<String>(); // Avoid duplicates in case it is a subdirectory
-			SortedSet<String> result = new TreeSet<String>(); // Avoid duplicates in case it is a subdirectory
+			SortedSet<String> result = new TreeSet<>(); // Avoid duplicates in case it is a subdirectory
 			while(entries.hasMoreElements()) {
 				String name = entries.nextElement().getName();
 				if (name.startsWith(path)) { // Filter according to the path
