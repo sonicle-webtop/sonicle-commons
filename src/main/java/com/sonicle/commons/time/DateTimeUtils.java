@@ -166,6 +166,21 @@ public class DateTimeUtils {
 	}
 	
 	/**
+	 * Compares the standard offset (regard to UTC) of the two passed timezones.
+	 * If the offset is the same, the two timezones are considered compatible.
+	 * @param tz1 TimeZone instance 1.
+	 * @param tz2 TimeZone instance 2.
+	 * @param dt The reference date for checking the offset.
+	 * @return True if compatible, false otherwise.
+	 */
+	public static boolean isTimeZoneCompatible(DateTimeZone tz1, DateTimeZone tz2, DateTime dt) {
+		long instant = dt.withZone(DateTimeZone.UTC).getMillis();
+		int utcOff1 = tz1.getStandardOffset(instant);
+		int utcOff2 = tz2.getStandardOffset(instant);
+		return utcOff1 == utcOff2;
+	}
+	
+	/**
 	 * Instantiates the formatter using pattern "yyyy-MM-dd HH:mm" and specified timezone.
 	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
