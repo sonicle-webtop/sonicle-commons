@@ -38,6 +38,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.regex.Pattern;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import net.htmlparser.jericho.Renderer;
+import net.htmlparser.jericho.Segment;
+import net.htmlparser.jericho.Source;
 import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
@@ -762,7 +765,15 @@ public class MailUtils {
   }
   
   public static String htmlToText(String htmlstring) {
-    return (htmlstring==null?"":HtmlToText_convert(htmlstring));
+	  return htmlToText(htmlstring,false);
+  }
+  
+  public static String htmlToText(String htmlstring,boolean links) {
+    //return (htmlstring==null?"":HtmlToText_convert(htmlstring));
+	if (htmlstring==null) return "";
+	Renderer r=new Renderer(new Segment(new Source(htmlstring),0,htmlstring.length()));
+	r.setIncludeHyperlinkURLs(links);
+    return r.toString();
   }
 
 
