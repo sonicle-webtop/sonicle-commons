@@ -32,6 +32,8 @@
  */
 package com.sonicle.commons;
 
+import java.util.EnumSet;
+
 /**
  *
  * @author malbinola
@@ -54,5 +56,17 @@ public class EnumUtils {
 	public static <E extends Enum<E>> boolean equals(Enum<E> en1, Enum<E> en2) {
 		if(en1 == null) return false;
 		return en1.equals(en2);
+	}
+	
+	public static <E extends Enum<E>> E forValue(Class<E> enumClass, String enumValue) {
+		if (enumValue == null) return null;
+		for (E e : EnumSet.allOf(enumClass)) {
+			if (enumValue.equals(e.toString())) return e;
+		}
+		return null;
+	}
+	
+	public static <E extends Enum<E>> String getValue(E en) {
+		return (en == null) ? null : en.toString();
 	}
 }
