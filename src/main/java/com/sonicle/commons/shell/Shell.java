@@ -132,14 +132,18 @@ public class Shell {
 			if(StringUtils.equals(scheme, SCHEME_SH)) {
 				host = null;
 				port = -1;
+				username = null;
+				password = null;
 				
-				String[] tokens = StringUtils.split(uri.getUserInfo(), ":");
+				//shell mode has no authentication at all
+				
+				/*String[] tokens = StringUtils.split(uri.getUserInfo(), ":");
 				if(tokens.length == 1) {
 					username = tokens[0];
 				} else if(tokens.length == 2) {
 					username = tokens[0];
 					password = tokens[1];
-				}
+				}*/
 				
 			} else if(StringUtils.equals(scheme, SCHEME_SSH)) {
 				host = uri.getHost();
