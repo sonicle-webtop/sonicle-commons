@@ -564,6 +564,15 @@ public class LangUtils {
 		throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
 	}
 	
+	public static boolean classForNameQuietly(String className) {
+		try {
+			Class.forName(className);
+			return true;
+		} catch(ClassNotFoundException ex) {
+			return false;
+		}
+	}
+	
 	public static String buildClassName(String packageName, String className) {
 		return MessageFormat.format("{0}.{1}", packageName, className);
 	}
