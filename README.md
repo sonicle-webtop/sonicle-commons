@@ -1,4 +1,4 @@
-# Sonicle Commons Library
+# Commons Library
 
 [![License](https://img.shields.io/badge/license-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.txt)
 
@@ -7,4 +7,4 @@ Additionally, it contains useful methods for working with db-related classes (Co
 
 ## License
 
-Sonicle Commons Library is Open Source software released under the [AGPLv3 license](https://www.gnu.org/licenses/agpl-3.0.txt)
+Commons Library is Open Source software released under the [AGPLv3 license](https://www.gnu.org/licenses/agpl-3.0.txt)
