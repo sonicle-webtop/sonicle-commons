@@ -41,6 +41,31 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PathUtils {
 	
+	/**
+	 * Sanitizes a filename from certain chars.
+	 * This method replaces all occurrences of \, /, |, :, ?, *, &quot;, &lt;,
+	 * &gt;, control chars by _ (underscore).
+	 * 
+	 * @param fileName a potentially 'malicious' filename
+	 * @return Sanitized filename
+	 */
+	public static String sanitizeFileName(final String fileName) {
+		if (StringUtils.isEmpty(fileName)) return fileName;
+		return fileName.replaceAll("\\\\|/|\\||:|\\?|\\*|\"|<|>|\\p{Cntrl}", "_");
+	}
+	
+	/**
+	 * Sanitizes a foldername from certain chars.
+	 * This method replaces all occurrences of ., \, /, |, :, ?, *, &quot;, &lt;,
+	 * &gt;, control chars by _ (underscore).
+	 * @param folderName a potentially 'malicious' foldername
+	 * @return Sanitized foldername
+	 */
+	public static String sanitizeFolderName(final String folderName) {
+		if (StringUtils.isEmpty(folderName)) return folderName;
+		return folderName.replaceAll("\\.|\\\\|/|\\||:|\\?|\\*|\"|<|>|\\p{Cntrl}", "_");
+	}
+	
 	public static boolean isFolder(String path) {
 		return StringUtils.endsWith(path, "/");
 	}
