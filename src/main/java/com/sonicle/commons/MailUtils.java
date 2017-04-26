@@ -83,12 +83,14 @@ public class MailUtils {
 		try {
 			String address=null;
 			String personal=null;
-			int ix=fullAddress.indexOf('<');
+			int ix=fullAddress.lastIndexOf('<');
 			if (ix>=0) {
-				int ix2=fullAddress.indexOf('>');
-				personal=fullAddress.substring(0,ix).trim();
-				address=fullAddress.substring(ix+1,ix2);
-				return buildInternetAddress(address,personal);
+				int ix2=fullAddress.lastIndexOf('>');
+				if (ix2>0 && ix2>ix) {
+					personal=fullAddress.substring(0,ix).trim();
+					address=fullAddress.substring(ix+1,ix2);
+					return buildInternetAddress(address,personal);
+				}
 			}
 			return new InternetAddress(fullAddress);
 		} catch(AddressException e) {
