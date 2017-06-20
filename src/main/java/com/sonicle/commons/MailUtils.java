@@ -74,8 +74,9 @@ public class MailUtils {
 	
 	public static InternetAddress buildInternetAddress(String address, String personal) {
 		try {
+			if (StringUtils.isBlank(address)) return null;
 			InternetAddress ia = new InternetAddress(address);
-			if(!StringUtils.isBlank(personal)) ia.setPersonal(personal, "UTF-8");
+			if (!StringUtils.isBlank(personal)) ia.setPersonal(personal, "UTF-8");
 			return ia;
 		} catch(AddressException | UnsupportedEncodingException ex) {
 			return null;
@@ -84,19 +85,20 @@ public class MailUtils {
 	
 	public static InternetAddress buildInternetAddress(String fullAddress) {
 		try {
-			String address=null;
-			String personal=null;
-			int ix=fullAddress.lastIndexOf('<');
+			if (StringUtils.isBlank(fullAddress)) return null;
+			String address = null;
+			String personal = null;
+			int ix = fullAddress.lastIndexOf('<');
 			if (ix>=0) {
-				int ix2=fullAddress.lastIndexOf('>');
+				int ix2 = fullAddress.lastIndexOf('>');
 				if (ix2>0 && ix2>ix) {
-					personal=fullAddress.substring(0,ix).trim();
-					address=fullAddress.substring(ix+1,ix2);
-					return buildInternetAddress(address,personal);
+					personal = fullAddress.substring(0,ix).trim();
+					address = fullAddress.substring(ix+1, ix2);
+					return buildInternetAddress(address, personal);
 				}
 			}
 			return new InternetAddress(fullAddress);
-		} catch(AddressException e) {
+		} catch(AddressException ex) {
 			return null;
 		}
 	}	
