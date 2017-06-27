@@ -181,5 +181,11 @@ public class PathUtils {
 		}
 	}
 	
-	
+	public static String addFileExension(String filename, String extension) {
+		if (StringUtils.isBlank(extension)) {
+			return filename;
+		} else {
+			return StringUtils.join(filename, ".", extension);
+		}
+	}
 }

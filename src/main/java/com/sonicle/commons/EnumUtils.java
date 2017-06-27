@@ -120,9 +120,15 @@ public class EnumUtils {
 	 * @return The matching enum if found, null otherwise
 	 */
 	public static <E extends Enum<E>> E forSerializedName(String serializedName, Class<E> enumClass) {
-		return (serializedName == null) ? null : GSON.fromJson(serializedName, enumClass);
+		return forSerializedName(serializedName, null, enumClass);
 	}
 	
+	public static <E extends Enum<E>> E forSerializedName(String serializedName, E defaultValue, Class<E> enumClass) {
+		if (serializedName == null) return defaultValue;
+		final E value = GSON.fromJson(serializedName, enumClass);
+		return (value == null) ? defaultValue : value;
+	}
+			
 	public static <E extends Enum<E>> String toSerializedName(E en) {
 		if (en == null) {
 			return null;
