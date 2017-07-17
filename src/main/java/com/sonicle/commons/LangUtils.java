@@ -159,8 +159,12 @@ public class LangUtils {
 		return result.toString();
 	}
 	
+	public static String escapeDoubleQuote(String s) {
+		return (s != null) ? s.replaceAll("\"", "\\\\\"") : null;
+	}
+	
 	public static String unescapeUnicodeBackslashes(String s) {
-		return s.replaceAll("\\\\u", "\\u");
+		return (s != null) ? s.replaceAll("\\\\u", "\\u") : null;
 	}
 	
     /**
