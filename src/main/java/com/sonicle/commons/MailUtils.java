@@ -32,6 +32,7 @@
  */
 package com.sonicle.commons;
 
+import com.sun.mail.imap.IMAPMessage;
 import java.io.*;
 import java.util.*;
 import java.io.UnsupportedEncodingException;
@@ -783,6 +784,13 @@ public class MailUtils {
     return r.toString();
   }
 
+  
+	public static String peekText(IMAPMessage m) throws MessagingException, IOException {
+		m.setPeek(true);
+		String s=getText(m);
+		m.setPeek(false);
+		return s;
+	}
 
 	/**
      * Return the primary text content of the message.
