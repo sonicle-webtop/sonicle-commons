@@ -87,16 +87,11 @@ public class DbUtils {
 		*/
 	}
 	
-	public static Exception proxyException(SQLException ex) {
+	public static boolean isIntegrityConstraintViolation(SQLException ex) {
 		String state = ex.getSQLState();
 		String class1 = StringUtils.substring(state, 0, 2);
 		String class2 = StringUtils.substring(state, 2);
-		
-		if(class1.equals("23")) {
-			return new IntegrityConstraintViolationException(ex);
-		} else {
-			return ex;
-		}
+		return class1.equals("23");
 	}
 	
 	public static boolean existTable(Connection con, String tableName) {
