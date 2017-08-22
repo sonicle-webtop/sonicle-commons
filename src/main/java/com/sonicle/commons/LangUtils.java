@@ -159,8 +159,43 @@ public class LangUtils {
 		return result.toString();
 	}
 	
-	public static String escapeDoubleQuote(String s) {
+	/**
+	 * Escapes the double-quote char in a String using Json String double-quote rules.
+	 * Example:
+	 * input string: He didn't say, "Stop!"
+	 * output string: He didn't say, \\"Stop!\\"
+	 * 
+	 * @param s String to escape values in, may be null.
+	 * @return String with escaped values, null if null string input.
+	 */
+	public static String escapeJsonDoubleQuote(String s) {
 		return (s != null) ? s.replaceAll("\"", "\\\\\"") : null;
+	}
+	
+	/**
+	 * Escapes the single-quote char in a String.
+	 * Example:
+	 * input string: He can't say anything!
+	 * output string: He can\'t say anything!
+	 * 
+	 * @param s String to escape values in, may be null.
+	 * @return String with escaped values, null if null string input.
+	 */
+	public static String escapeSingleQuote(String s) {
+		return (s != null) ? s.replaceAll("'", "\\'") : null;
+	}
+	
+	/**
+	 * Escapes the single-quote char in a String using MessageFormat rules.
+	 * Example:
+	 * input string: He can't say anything!
+	 * output string: He can''t say anything!
+	 * 
+	 * @param s String to escape values in, may be null.
+	 * @return String with escaped values, null if null string input.
+	 */
+	public static String escapeMessageFormat(String s) {
+		return (s != null) ? s.replaceAll("(?<!')'(?!')", "''") : null;
 	}
 	
 	public static String unescapeUnicodeBackslashes(String s) {
