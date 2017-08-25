@@ -45,6 +45,29 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public class URIUtils {
 	
+	/**
+	 * Constructs a URI by parsing the given string. This method is null-safe.
+	 * @param s The string to be parsed into a URI
+	 * @return The URI
+	 * @throws URISyntaxException If the given string violates RFC&nbsp;2396
+	 */
+	public static URI createURI(String s) throws URISyntaxException {
+		return new URI(s);
+	}
+	
+	/**
+	 * Constructs a URI by parsing the given string. This method is null-safe.
+	 * @param s The string to be parsed into a URI
+	 * @return The URI
+	 */
+	public static URI createURIQuietly(String s) {
+		try {
+			return createURI(s);
+		} catch(URISyntaxException ex) {
+			return null;
+		}
+	}
+	
 	public static String encodeQuietly(String s) {
 		try {
 			return URLEncoder.encode(s, "UTF-8");
