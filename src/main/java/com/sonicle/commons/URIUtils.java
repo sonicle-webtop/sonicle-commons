@@ -32,12 +32,23 @@
  */
 package com.sonicle.commons;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
  *
@@ -52,7 +63,7 @@ public class URIUtils {
 	 * @throws URISyntaxException If the given string violates RFC&nbsp;2396
 	 */
 	public static URI createURI(String s) throws URISyntaxException {
-		return new URI(s);
+		return (s == null) ? null : new URI(s);
 	}
 	
 	/**
@@ -63,6 +74,19 @@ public class URIUtils {
 	public static URI createURIQuietly(String s) {
 		try {
 			return createURI(s);
+		} catch(URISyntaxException ex) {
+			return null;
+		}
+	}
+	
+	/**
+	 * Constructs a URI by parsing the given string. This method is null-safe.
+	 * @param builder The URI builder
+	 * @return The URI
+	 */
+	public static URI buildQuietly(URIBuilder builder) {
+		try {
+			return builder.build();
 		} catch(URISyntaxException ex) {
 			return null;
 		}
@@ -91,14 +115,24 @@ public class URIUtils {
 	
 	public static String[] getUserInfo(URI uri) {
 		String[] tokens = StringUtils.split(uri.getUserInfo(), ":", 2);
-		if(tokens == null || tokens.length == 0) return null;
+		if (tokens == null || tokens.length == 0) return null;
 		return (tokens.length == 1) ? new String[]{tokens[0], null} : tokens;
 	}
 	
+	public static URI appendUserInfo(URI uri, String username, String password) throws URISyntaxException {
+		return appendUserInfo(uri, asUserInfo(username, password));
+	}
+	
+	public static URI appendUserInfo(URI uri, String userInfo) throws URISyntaxException {
+		URIBuilder builder = new URIBuilder(uri);
+		builder.setUserInfo(userInfo);
+		return builder.build();
+	}
+	
 	public static URI appendPath(URI uri, String path) throws URISyntaxException {
-		URIBuilder ub = new URIBuilder(uri);
-		appendPath(ub, path);
-		return ub.build();
+		URIBuilder builder = new URIBuilder(uri);
+		appendPath(builder, path);
+		return builder.build();
 	}
 	
 	public static void appendPath(URIBuilder builder, String path) {
@@ -135,5 +169,15 @@ public class URIUtils {
 	
 	public static String toString(URI uri) {
 		return (uri == null) ? null : uri.toString();
+	}
+	
+	public static boolean looksLikeWebcalUri(URI uri) {
+		if (!StringUtils.equalsIgnoreCase(uri.getScheme(), "webcal")) return false;
+		if (!StringUtils.equalsIgnoreCase(FilenameUtils.getExtension(uri.getPath()), "ics")) return false;
+		return true;
+	}
+	
+	public static boolean looksLikeWebDAVUri(URI uri) {
+		return StringUtils.startsWithIgnoreCase(uri.getScheme(), "http");
 	}
 }
