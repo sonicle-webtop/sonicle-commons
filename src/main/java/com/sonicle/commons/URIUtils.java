@@ -119,11 +119,11 @@ public class URIUtils {
 		return (tokens.length == 1) ? new String[]{tokens[0], null} : tokens;
 	}
 	
-	public static URI appendUserInfo(URI uri, String username, String password) throws URISyntaxException {
-		return appendUserInfo(uri, asUserInfo(username, password));
+	public static URI setUserInfo(URI uri, String username, String password) throws URISyntaxException {
+		return setUserInfo(uri, asUserInfo(username, password));
 	}
 	
-	public static URI appendUserInfo(URI uri, String userInfo) throws URISyntaxException {
+	public static URI setUserInfo(URI uri, String userInfo) throws URISyntaxException {
 		URIBuilder builder = new URIBuilder(uri);
 		builder.setUserInfo(userInfo);
 		return builder.build();
