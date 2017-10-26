@@ -262,6 +262,20 @@ public class LangUtils {
 	}
 	
 	/**
+	 * Convenience method for building a pattern string (siutable for queries)
+	 * from a text containing many words.
+	 * @param text The source text.
+	 * @return The pattern.
+	 */
+	public static String patternizeWords(String text) {
+		String s = "";
+		for(String token : StringUtils.split(text, " ")) {
+			s += "%" + token + "% ";
+		}
+		return s.trim();
+	}
+	
+	/**
 	 * Returns the String value of the passed string.
 	 * In case of empty value, default value is returned.
 	 * 
