@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Sonicle S.r.l.
+ * Copyright (C) 2017 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,10 +28,11 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2014 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2017 Sonicle S.r.l.".
  */
-package com.sonicle.commons;
+package com.sonicle.commons.http;
 
+import com.sonicle.commons.URIUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -50,15 +51,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author malbinola
  */
 public class HttpClientUtils {
+	private final static Logger LOGGER = (Logger) LoggerFactory.getLogger(HttpClientUtils.class);
 	
 	public static void closeQuietly(HttpClient httpClient) {
 		org.apache.http.client.utils.HttpClientUtils.closeQuietly(httpClient);
@@ -68,14 +71,18 @@ public class HttpClientUtils {
 		return createBasicHttpClient(HttpClientBuilder.create(), uri);
 	}
 	
-	public static HttpClientBuilder configureSSLAcceptAll() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+	public static HttpClientBuilder configureSSLAcceptAll() {
 		return configureSSLAcceptAll(HttpClientBuilder.create());
 	}
 	
-	public static HttpClientBuilder configureSSLAcceptAll(HttpClientBuilder builder) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-		builder.setSSLContext(new SSLContextBuilder()
-			.loadTrustMaterial(null, new TrustSelfSignedStrategy()).build()
-		);
+	public static HttpClientBuilder configureSSLAcceptAll(HttpClientBuilder builder) {
+		try {
+			builder.setSSLContext(new SSLContextBuilder()
+				.loadTrustMaterial(null, new TrustAllStrategy()).build()
+			);
+		} catch(KeyStoreException | NoSuchAlgorithmException | KeyManagementException ex) {
+			LOGGER.error("Error applying SSLContext", ex);
+		}
 		builder.setSSLHostnameVerifier(new NoopHostnameVerifier());
 		return builder;
 	}
@@ -104,26 +111,5 @@ public class HttpClientUtils {
 		} else {
 			throw new IOException(MessageFormat.format("Server returns {0}: {1}", statusCode, response.getStatusLine().getReasonPhrase()));
 		}
-	}
-	
-	/**
-	 * @deprecated Use createBasicHttpClient instead
-	 */
-	public static HttpClient createHttpClient(URI uri) {
-		return createBasicHttpClient(uri);
-	}
-	
-	/**
-	 * @deprecated Use exists instead
-	 */
-	public static boolean exists(URI uri) throws IOException {
-		return exists(createHttpClient(uri), uri);
-	}
-	
-	/**
-	 * @deprecated Use get instead
-	 */
-	public static void get(URI uri, OutputStream output) throws IOException {
-		get(createHttpClient(uri), uri, output);
 	}
 }
