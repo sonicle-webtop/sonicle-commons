@@ -32,13 +32,13 @@
  */
 package com.sonicle.commons;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -48,6 +48,9 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -61,9 +64,23 @@ public class HttpClientUtils {
 		org.apache.http.client.utils.HttpClientUtils.closeQuietly(httpClient);
 	}
 	
-	public static HttpClient createHttpClient(URI uri) {
-		HttpClientBuilder builder = HttpClientBuilder.create();
-		
+	public static HttpClient createBasicHttpClient(URI uri) {
+		return createBasicHttpClient(HttpClientBuilder.create(), uri);
+	}
+	
+	public static HttpClientBuilder configureSSLAcceptAll() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+		return configureSSLAcceptAll(HttpClientBuilder.create());
+	}
+	
+	public static HttpClientBuilder configureSSLAcceptAll(HttpClientBuilder builder) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+		builder.setSSLContext(new SSLContextBuilder()
+			.loadTrustMaterial(null, new TrustSelfSignedStrategy()).build()
+		);
+		builder.setSSLHostnameVerifier(new NoopHostnameVerifier());
+		return builder;
+	}
+	
+	public static HttpClient createBasicHttpClient(HttpClientBuilder builder, URI uri) {
 		String[] tokens = URIUtils.getUserInfo(uri);
 		if (tokens != null) {
 			CredentialsProvider basic = new BasicCredentialsProvider();
@@ -73,14 +90,12 @@ public class HttpClientUtils {
 		return builder.build();
 	}
 	
-	public static boolean exists(URI uri) throws IOException {
-		HttpClient client = createHttpClient(uri);
+	public static boolean exists(HttpClient client, URI uri) throws IOException {
 		HttpResponse response = client.execute(new HttpHead(uri));
 		return response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;	
 	}
 	
-	public static void get(URI uri, OutputStream output) throws IOException {
-		HttpClient client = createHttpClient(uri);
+	public static void get(HttpClient client, URI uri, OutputStream output) throws IOException {
 		HttpResponse response = client.execute(new HttpGet(uri));
 		final int statusCode = response.getStatusLine().getStatusCode();
 		if (statusCode == HttpStatus.SC_OK) {
@@ -89,5 +104,26 @@ public class HttpClientUtils {
 		} else {
 			throw new IOException(MessageFormat.format("Server returns {0}: {1}", statusCode, response.getStatusLine().getReasonPhrase()));
 		}
+	}
+	
+	/**
+	 * @deprecated Use createBasicHttpClient instead
+	 */
+	public static HttpClient createHttpClient(URI uri) {
+		return createBasicHttpClient(uri);
+	}
+	
+	/**
+	 * @deprecated Use exists instead
+	 */
+	public static boolean exists(URI uri) throws IOException {
+		return exists(createHttpClient(uri), uri);
+	}
+	
+	/**
+	 * @deprecated Use get instead
+	 */
+	public static void get(URI uri, OutputStream output) throws IOException {
+		get(createHttpClient(uri), uri, output);
 	}
 }

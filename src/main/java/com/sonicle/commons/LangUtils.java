@@ -628,7 +628,8 @@ public class LangUtils {
 	}
 	
 	public static String buildClassName(String packageName, String className) {
-		return MessageFormat.format("{0}.{1}", packageName, className);
+		return StringUtils.removeEnd(packageName, ".") + "." + StringUtils.removeStart(className, ".");
+		//return MessageFormat.format("{0}.{1}", packageName, className);
 	}
 	
 	public static String getClassSimpleName(String className) {
