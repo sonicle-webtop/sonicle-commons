@@ -45,6 +45,7 @@ import javax.mail.internet.InternetAddress;
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
@@ -795,13 +796,14 @@ public class MailUtils {
 	/**
      * Return the primary text content of the message.
      */
-    public static String getText(Part p) throws
-                MessagingException, IOException {
-        if (p.isMimeType("text/*")) {
-            String s = (String)p.getContent();
-            if (p.isMimeType("text/html")) s=htmlToText(s);
-            return s;
-        }
+    public static String getText(Part p) throws MessagingException, IOException {
+		if (p.isMimeType("text/*")) {
+			final Object content = p.getContent();
+			if (!(content instanceof String)) return null;
+			String s = (String)p.getContent();
+			if (p.isMimeType("text/html")) s = htmlToText(s);
+			return s;
+		}
 
         if (p.isMimeType("multipart/alternative")) {
             // prefer html text over plain text
