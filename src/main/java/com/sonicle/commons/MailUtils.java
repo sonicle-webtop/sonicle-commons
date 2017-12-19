@@ -35,76 +35,14 @@ package com.sonicle.commons;
 import com.sun.mail.imap.IMAPMessage;
 import java.io.*;
 import java.util.*;
-import java.io.UnsupportedEncodingException;
-import java.util.regex.Pattern;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
-	private static final Pattern EMAIL_PATTERN = Pattern.compile(RegexUtils.MATCH_EMAIL_ADDRESS);
-	
-	public static boolean isAddressValid(String address) {
-		if(StringUtils.isBlank(address)) return false;
-		return EMAIL_PATTERN.matcher(address).matches();
-	}
-	
-	public static boolean isAddressValid(InternetAddress ia) {
-		try {
-			if(ia == null) return false;
-			ia.validate();
-			return true;
-		} catch(AddressException ex) {
-			return false;
-		}
-	}
-	
-	public static String buildPersonal(String firstName, String lastName) {
-		return StringUtils.join(new String[]{firstName, lastName}, " ");
-	}
-	
-	public static InternetAddress buildInternetAddress(String local, String domain, String personal) {
-		return buildInternetAddress(local + "@" + domain, personal);
-	}
-	
-	public static InternetAddress buildInternetAddress(String address, String personal) {
-		try {
-			if (StringUtils.isBlank(address)) return null;
-			InternetAddress ia = new InternetAddress(address);
-			if (!StringUtils.isBlank(personal)) ia.setPersonal(personal, "UTF-8");
-			return ia;
-		} catch(AddressException | UnsupportedEncodingException ex) {
-			return null;
-		}
-	}
-	
-	public static InternetAddress buildInternetAddress(String fullAddress) {
-		try {
-			if (StringUtils.isBlank(fullAddress)) return null;
-			String address = null;
-			String personal = null;
-			int ix = fullAddress.lastIndexOf('<');
-			if (ix>=0) {
-				int ix2 = fullAddress.lastIndexOf('>');
-				if (ix2>0 && ix2>ix) {
-					personal = fullAddress.substring(0,ix).trim();
-					address = fullAddress.substring(ix+1, ix2);
-					return buildInternetAddress(address, personal);
-				}
-			}
-			return new InternetAddress(fullAddress);
-		} catch(AddressException ex) {
-			return null;
-		}
-	}	
-	
     /**
      * Turns funky characters into HTML entity equivalents<p>
      * e.g. <tt>"bread" & "butter"</tt> => <tt>&amp;quot;bread&amp;quot; &amp;amp; &amp;quot;butter&amp;quot;</tt>.
