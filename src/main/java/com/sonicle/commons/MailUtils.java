@@ -41,15 +41,52 @@ import javax.mail.Part;
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
+	
+	/**
+	 * Useful method for generating Content-Type string for a mime part.
+	 * @param mediaType The mediaType (or mimeType).
+	 * @param charset The desired charset.
+	 * @return 
+	 * @throws MessagingException 
+	 */
+	public static String buildPartContentType(String mediaType, String charset) throws MessagingException {
+		return MailUtils.buildPartContentType(mediaType, charset, null);
+	}
+	
+	/**
+	 * Useful method for generating Content-Type string for a mime part.
+	 * @param mediaType The mediaType (or mimeType).
+	 * @param charset The desired charset.
+	 * @param method The method.
+	 * @return 
+	 * @throws MessagingException 
+	 */
+	public static String buildPartContentType(String mediaType, String charset, String method) throws MessagingException {
+		if (StringUtils.isBlank(mediaType)) throw new IllegalArgumentException("mediaType is blank or null");
+		String s = mediaType;
+		if (!StringUtils.isBlank(charset)) {
+			s += ("; charset=" + charset);
+		}
+		if (!StringUtils.isBlank(method)) {
+			s += ("; method=" + method);
+		}
+		return s;
+	}
+	
     /**
+	 * @deprecated user StringEscapeUtils.escapeHtml4 instead
      * Turns funky characters into HTML entity equivalents<p>
      * e.g. <tt>"bread" & "butter"</tt> => <tt>&amp;quot;bread&amp;quot; &amp;amp; &amp;quot;butter&amp;quot;</tt>.
      * Update: supports nearly all HTML entities, including funky accents. See the source code for more detail.
      * @see #htmlunescape(String)
      **/
     public static String htmlescape(String s1) {
+		return StringEscapeUtils.escapeHtml4(s1);
+		/*
         StringBuffer buf = new StringBuffer();
         int i;
         for (i=0; i<s1.length(); ++i) {
@@ -69,8 +106,10 @@ public class MailUtils {
             }
         }
         return buf.toString();
+		*/
     }
 
+	/*
     public static String htmlescape(char chars[], int start, int length) {
         StringBuffer buf = new StringBuffer();
         for (int i=0; i<length; ++i) {
@@ -91,6 +130,7 @@ public class MailUtils {
         }
         return buf.toString();
     }
+	*/
 	
     /**
      * Given a string containing entity escapes, returns a string
@@ -122,7 +162,8 @@ public class MailUtils {
 		}
 		return -1;
 	}
-
+	
+	/*
     public static String htmlunescape(char chars[], int start, int length, boolean nbsp) {
         StringBuffer buf = new StringBuffer();
         for (int i=0; i<length; ++i) {
@@ -158,8 +199,14 @@ public class MailUtils {
         }
         return buf.toString();
     }
+	*/
 	
+	/**
+	 * @deprecated user StringEscapeUtils.unescapeHtml4 instead
+	 */
     public static String htmlunescape(String s1, boolean nbsp) {
+		return StringEscapeUtils.unescapeHtml4(s1);
+		/*
         StringBuffer buf = new StringBuffer();
         int i;
         for (i=0; i<s1.length(); ++i) {
@@ -202,6 +249,7 @@ public class MailUtils {
             }
         }
         return buf.toString();
+		*/
     }
 	
 	
