@@ -34,6 +34,7 @@ package com.sonicle.commons;
 
 import com.sun.mail.imap.IMAPMessage;
 import java.io.*;
+import java.text.Normalizer;
 import java.util.*;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -543,7 +544,9 @@ public class MailUtils {
 	}
 	
 	public static String decodeQString(String s, String encoding) throws Exception {
-		String result=s;
+		return java.text.Normalizer.normalize(javax.mail.internet.MimeUtility.decodeText(s),Normalizer.Form.NFC);
+		
+		/*String result=s;
 
 		if (s.startsWith("=?") && s.endsWith("?=")) {
 
@@ -584,7 +587,7 @@ public class MailUtils {
 
 		}
 
-		return result;
+		return result;*/
 	}
 
     /**
