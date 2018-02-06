@@ -688,6 +688,15 @@ public class LangUtils {
 		return (map.containsKey(key)) ? map.get(key) : value;
 	}
 	
+	public static int charOccurrences(char c, String s) {
+		int n=0,ix=0;
+		while((ix=s.indexOf(c,ix))>=0) {
+			++n;
+			++ix;
+		}
+		return n;
+	}
+	
 	public static String camelize(String str) {
 		String value = WordUtils.capitalize(str, '.', '-', '_');
 		value = StringUtils.remove(value, '.');
