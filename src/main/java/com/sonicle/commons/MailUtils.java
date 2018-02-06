@@ -38,6 +38,8 @@ import java.util.*;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
@@ -45,6 +47,23 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
+	
+	public static MimeMultipart addPlainBodyPart(MimeMultipart parentPart, String plainText) throws MessagingException {
+		MimeBodyPart mbp = new MimeBodyPart();
+		mbp.setContent(plainText, MailUtils.buildPartContentType("text/plain", "UTF-8"));
+		parentPart.addBodyPart(mbp);
+		return parentPart;
+	}
+	
+	public static MimeMultipart addHtmlBodyPart(MimeMultipart parentPart, String html, boolean autoPlain) throws MessagingException {
+		if (autoPlain) {
+			addPlainBodyPart(parentPart, MailUtils.htmlToText(MailUtils.htmlunescapesource(html)));
+		}
+		MimeBodyPart mbp = new MimeBodyPart();
+		mbp.setContent(html, MailUtils.buildPartContentType("text/html", "UTF-8"));
+		parentPart.addBodyPart(mbp);
+		return parentPart;
+	}
 	
 	/**
 	 * Useful method for generating Content-Type string for a mime part.
