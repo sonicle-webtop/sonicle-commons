@@ -40,6 +40,7 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
@@ -97,12 +98,13 @@ public class MailUtils {
 	}
 	
     /**
-	 * @deprecated user StringEscapeUtils.escapeHtml4 instead
+	 * @deprecated use StringEscapeUtils.escapeHtml4 instead
      * Turns funky characters into HTML entity equivalents<p>
      * e.g. <tt>"bread" & "butter"</tt> => <tt>&amp;quot;bread&amp;quot; &amp;amp; &amp;quot;butter&amp;quot;</tt>.
      * Update: supports nearly all HTML entities, including funky accents. See the source code for more detail.
      * @see #htmlunescape(String)
      **/
+	@Deprecated
     public static String htmlescape(String s1) {
 		return StringEscapeUtils.escapeHtml4(s1);
 		/*
@@ -221,8 +223,9 @@ public class MailUtils {
 	*/
 	
 	/**
-	 * @deprecated user StringEscapeUtils.unescapeHtml4 instead
+	 * @deprecated use StringEscapeUtils.unescapeHtml4 instead
 	 */
+	@Deprecated
     public static String htmlunescape(String s1, boolean nbsp) {
 		return StringEscapeUtils.unescapeHtml4(s1);
 		/*
@@ -541,51 +544,6 @@ public class MailUtils {
 		}
 		return charset;
 	}
-	
-	public static String decodeQString(String s, String encoding) throws Exception {
-		String result=s;
-
-		if (s.startsWith("=?") && s.endsWith("?=")) {
-
-			String s2=s.substring(2,s.length()-2);
-			int ix=s2.indexOf('?');
-			if (ix>0) {
-				String sencoding=s2.substring(0,ix);
-				if (sencoding.equalsIgnoreCase(encoding)) {
-					int iy=s2.indexOf('?',ix+1);
-					if (iy>0) {
-						String code=s2.substring(ix+1,iy);
-						if (code.equalsIgnoreCase("Q")) {
-							s=s2.substring(iy+1);
-							StringBuffer sb=new StringBuffer();
-							byte ba[]=new byte[2];
-							for(int i=0;i<s.length();) {
-								char c = s.charAt(i++);
-
-								// Return '_' as ' '
-								if (c == '_') sb.append(' ');
-								else if (c == '=') {
-									// QP Encoded atom. Get the next two bytes ..
-									ba[0] = (byte)s.charAt(i++);
-									ba[1] = (byte)s.charAt(i++);
-									// .. and decode them
-									try {
-										sb.append(((char)parseInt(ba, 0, 2, 16)));
-									} catch (NumberFormatException nex) {
-										throw new Exception("Error in QP String " + nex.getMessage());
-									}
-								} else sb.append(c);
-							}
-							result=sb.toString();
-						}
-					}
-				}
-			}
-
-		}
-
-		return result;
-	}
 
     /**
      * Convert the bytes within the specified range of the given byte
@@ -670,7 +628,13 @@ public class MailUtils {
         }
     }
 	
+	/**
+	 * @deprecated use MimeUtility.decodeText instead
+	 */
+	@Deprecated
 	public static String decodeQString(String s) throws Exception {
+		return MimeUtility.decodeText(s);
+		/*
 		String result=s;
 
 		if (s.startsWith("=?") && s.endsWith("?=")) {
@@ -711,6 +675,7 @@ public class MailUtils {
 		}
 
 		return result;
+		*/
 	}
 
 	
