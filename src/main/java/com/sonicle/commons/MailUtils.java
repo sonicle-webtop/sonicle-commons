@@ -543,6 +543,11 @@ public class MailUtils {
 		return charset;
 	}
 	
+	public static String removeMSWordShit(String s) {
+		return s.replaceAll("<!\\[if !supportLists\\]>", "").
+				replaceAll("<!\\[endif\\]>", "");
+	}
+	
 	public static String decodeQString(String s, String encoding) throws Exception {
 		return java.text.Normalizer.normalize(javax.mail.internet.MimeUtility.decodeText(s),Normalizer.Form.NFC);
 		
