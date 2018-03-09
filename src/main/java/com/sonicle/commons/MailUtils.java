@@ -756,7 +756,8 @@ public class MailUtils {
   public static String htmlToText(String htmlstring,boolean links) {
     //return (htmlstring==null?"":HtmlToText_convert(htmlstring));
 	if (htmlstring==null) return "";
-	Renderer r=new Renderer(new Segment(new Source(htmlstring),0,htmlstring.length()));
+	//Renderer r=new Renderer(new Segment(new Source(htmlstring),0,htmlstring.length()));
+	Renderer r=new Source(htmlstring).getRenderer();
 	r.setIncludeHyperlinkURLs(links);
     return r.toString();
   }
