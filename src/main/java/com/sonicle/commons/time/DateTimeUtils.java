@@ -32,6 +32,8 @@
  */
 package com.sonicle.commons.time;
 
+import java.text.DateFormatSymbols;
+import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,6 +50,38 @@ import org.joda.time.format.DateTimeFormatter;
  * @author malbinola
  */
 public class DateTimeUtils {
+	
+	public static String[] getDayNamesShort(Locale locale) {
+		return new DateFormatSymbols(locale).getShortWeekdays();
+	}
+	
+	public static String getDayNameShort(int day, Locale locale) {
+		return getDayNamesShort(locale)[day];
+	}
+	
+	public static String[] getDayNamesLong(Locale locale) {
+		return new DateFormatSymbols(locale).getWeekdays();
+	}
+	
+	public static String getDayNameLong(int day, Locale locale) {
+		return getDayNamesLong(locale)[day];
+	}
+	
+	public static String[] getMonthNamesShort(Locale locale) {
+		return new DateFormatSymbols(locale).getShortMonths();
+	}
+	
+	public static String getMonthNameShort(int month, Locale locale) {
+		return getMonthNamesShort(locale)[month-1];
+	}
+	
+	public static String[] getMonthNamesLong(Locale locale) {
+		return new DateFormatSymbols(locale).getMonths();
+	}
+	
+	public static String getMonthNameLong(int month, Locale locale) {
+		return getMonthNamesLong(locale)[month-1];
+	}
 	
 	public static DateTime now() {
 		return now(false);
