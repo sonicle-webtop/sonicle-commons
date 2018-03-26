@@ -765,7 +765,13 @@ public class MailUtils {
   
 	public static String peekText(IMAPMessage m) throws MessagingException, IOException {
 		m.setPeek(true);
-		String s=getText(m);
+		String s;
+		try{
+		s=getText(m);
+		}catch(Exception e) {
+			System.out.println(e);
+			s="";
+		}
 		m.setPeek(false);
 		return s;
 	}
