@@ -767,8 +767,9 @@ public class MailUtils {
 		m.setPeek(true);
 		String s;
 		try{
-			s=getText(m);
-		} catch(Exception e) {
+		s=getText(m);
+		}catch(Exception e) {
+			System.out.println(e);
 			s="";
 		}
 		m.setPeek(false);
