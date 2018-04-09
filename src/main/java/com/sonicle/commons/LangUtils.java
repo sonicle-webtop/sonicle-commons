@@ -627,6 +627,10 @@ public class LangUtils {
 		}
 	}
 	
+	public static String joinClassPackages(String packageName1, String packageName2) {
+		return StringUtils.removeEnd(packageName1, ".") + "." + StringUtils.removeStart(packageName2, ".");
+	}
+	
 	public static String buildClassName(String packageName, String className) {
 		return StringUtils.removeEnd(packageName, ".") + "." + StringUtils.removeStart(className, ".");
 		//return MessageFormat.format("{0}.{1}", packageName, className);
