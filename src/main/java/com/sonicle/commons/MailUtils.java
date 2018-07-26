@@ -39,9 +39,11 @@ import java.util.*;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
+import javax.mail.internet.ParseException;
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
@@ -49,6 +51,10 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
+	
+	public static String getMediaTypeFromHeader(String contentTypeHeader) throws ParseException {
+		return new ContentType(contentTypeHeader).getBaseType();
+	}
 	
 	public static MimeMultipart addPlainBodyPart(MimeMultipart parentPart, String plainText) throws MessagingException {
 		MimeBodyPart mbp = new MimeBodyPart();
