@@ -37,9 +37,11 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import java.net.URI;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  *
@@ -69,6 +71,7 @@ public class Shell {
 	
 	public ShellChannel createShellChannel(String cmd) throws Exception {
 		if(parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
+			Security.insertProviderAt(new BouncyCastleProvider(), 1);
 			ChannelExec exec = createExecutor();
 			ExecShellChannel channel = new ExecShellChannel(exec);
 			exec.setCommand(cmd);
