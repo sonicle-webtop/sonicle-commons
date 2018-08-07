@@ -34,6 +34,7 @@ package com.sonicle.commons.http;
 
 import com.sonicle.commons.URIUtils;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.security.KeyManagementException;
@@ -102,12 +103,21 @@ public class HttpClientUtils {
 		return response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;	
 	}
 	
-	public static void get(HttpClient client, URI uri, OutputStream output) throws IOException {
+	public static void writeContent(HttpClient client, URI uri, OutputStream output) throws IOException {
 		HttpResponse response = client.execute(new HttpGet(uri));
 		final int statusCode = response.getStatusLine().getStatusCode();
 		if (statusCode == HttpStatus.SC_OK) {
-			HttpEntity entity = response.getEntity();
-			entity.writeTo(output);
+			response.getEntity().writeTo(output);
+		} else {
+			throw new IOException(MessageFormat.format("Server returns {0}: {1}", statusCode, response.getStatusLine().getReasonPhrase()));
+		}
+	}
+	
+	public static InputStream getContent(HttpClient client, URI uri) throws IOException {
+		HttpResponse response = client.execute(new HttpGet(uri));
+		final int statusCode = response.getStatusLine().getStatusCode();
+		if (statusCode == HttpStatus.SC_OK) {
+			return response.getEntity().getContent();
 		} else {
 			throw new IOException(MessageFormat.format("Server returns {0}: {1}", statusCode, response.getStatusLine().getReasonPhrase()));
 		}
