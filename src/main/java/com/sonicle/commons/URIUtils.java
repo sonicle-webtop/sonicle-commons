@@ -171,6 +171,34 @@ public class URIUtils {
 		return (uri == null) ? null : uri.toString();
 	}
 	
+	public static String ensureTrailingSeparator(String urlPath) {
+		if (urlPath == null) return null;
+		return StringUtils.endsWith(urlPath, "/") ? urlPath : urlPath + "/";
+	}
+	
+	public static String removeTrailingSeparator(String urlPath) {
+		return StringUtils.removeEnd(urlPath, "/");
+	}
+	
+	public static String concat(String urlPath1, String urlPath2) {
+		if (urlPath1 == null && urlPath2 == null) return null;
+		if (urlPath1 == null) return urlPath2;
+		if (urlPath2 == null) return urlPath1;
+		urlPath1 = ensureTrailingSeparator(urlPath1);
+		urlPath2 = StringUtils.removeStart(urlPath2, "/");
+		return urlPath1 + urlPath2;
+	}
+	
+	public static String concatPaths(String... urlPaths) {
+		String path = urlPaths[0];
+		int i = 1;
+		while(i < urlPaths.length) {
+			path = concat(path, urlPaths[i]);
+			i++;
+		}
+		return path;
+	}
+	
 	public static boolean looksLikeWebcalUri(URI uri) {
 		if (!StringUtils.equalsIgnoreCase(uri.getScheme(), "webcal")) return false;
 		if (!StringUtils.equalsIgnoreCase(FilenameUtils.getExtension(uri.getPath()), "ics")) return false;

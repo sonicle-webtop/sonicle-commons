@@ -33,17 +33,41 @@
 package com.sonicle.commons;
 
 import java.util.zip.Adler32;
+import java.util.zip.CRC32;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.Charsets;
 
 /**
  *
  * @author malbinola
  */
-public class DigestUtils {
+public class AlgoUtils {
+	
+	public static String md5Hex(final String data) {
+		return DigestUtils.md5Hex(data);
+	}
+	
+	public static String md5Hex(final byte[] bytes) {
+		return DigestUtils.md5Hex(bytes);
+	}
+	
+	public static String crc32Hex(final String data) {
+		return crc32Hex(data.getBytes(Charsets.UTF_8));
+	}
+	
+	public static String crc32Hex(final byte[] bytes) {
+		CRC32 crc32 = new CRC32();
+		crc32.update(bytes);
+		return Long.toHexString(crc32.getValue());
+	}
 	
 	public static String adler32Hex(final String data) {
+		return adler32Hex(data.getBytes(Charsets.UTF_8));
+	}
+	
+	public static String adler32Hex(final byte[] bytes) {
 		Adler32 adler = new Adler32();
-		adler.update(data.getBytes(Charsets.UTF_8));
+		adler.update(bytes);
 		return Long.toHexString(adler.getValue());
 	}
 }
