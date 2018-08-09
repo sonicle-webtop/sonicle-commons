@@ -722,6 +722,19 @@ public class LangUtils {
 		return null;
 	}
 	
+	/**
+	 * Returns first non-null object or null if not found.
+	 * @param <T>
+	 * @param objects Set of objects to check
+	 * @return 
+	 */
+	public static String coalesceStrings(String... strings) {
+		for(String s : strings) {
+			if (!StringUtils.isBlank(StringUtils.trim(s))) return s;
+		}
+		return null;
+	}
+	
 	public static String getThrowableDeepestMessage(Throwable t) {
 		String msg = ExceptionUtils.getRootCauseMessage(t);
 		return StringUtils.isBlank(msg) ? t.getMessage() : msg;
