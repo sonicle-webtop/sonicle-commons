@@ -171,6 +171,15 @@ public class URIUtils {
 		return (uri == null) ? null : uri.toString();
 	}
 	
+	public static String ensureLeadingSeparator(String urlPath) {
+		if (urlPath == null) return null;
+		return StringUtils.startsWith(urlPath, "/") ? urlPath : "/" + urlPath;
+	}
+	
+	public static String removeLeadingSeparator(String urlPath) {
+		return StringUtils.removeStart(urlPath, "/");
+	}
+	
 	public static String ensureTrailingSeparator(String urlPath) {
 		if (urlPath == null) return null;
 		return StringUtils.endsWith(urlPath, "/") ? urlPath : urlPath + "/";
