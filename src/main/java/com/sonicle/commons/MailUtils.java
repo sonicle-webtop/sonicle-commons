@@ -538,7 +538,7 @@ public class MailUtils {
 	public static String getCharsetOrNull(String contentType) {
 		String charset=null;
 		int ix=contentType.indexOf(';');
-		if(ix>0&&ix<(contentType.length()-1)) {
+		while(ix>0&&ix<(contentType.length()-1)) {
 			String str=contentType.substring(ix+1).trim().toUpperCase();
 			if(str.startsWith("CHARSET=")) {
 				str=str.substring(8);
@@ -547,7 +547,10 @@ public class MailUtils {
 					str=str.substring(0, ix);
 				}
 				charset=str;
+				break;
 			}
+			contentType=str;
+			ix=str.indexOf(';');
 		}
 		return charset;
 	}
