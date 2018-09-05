@@ -45,16 +45,31 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class DbUtils {
 	
+	public static void commit(Connection con) throws SQLException {
+		if (con != null && !con.getAutoCommit()) con.commit();
+	}
+	
+	public static void rollback(Connection con) throws SQLException {
+		if (con != null && !con.getAutoCommit()) con.rollback();
+	}
+	
 	public static void commitQuietly(Connection con) {
-		try { if(con != null) con.commit(); } catch(Exception ex) { /* Do nothing... */ }
+		try { commit(con); } catch(SQLException ex) { /* Do nothing... */ }
 	}
 	
 	public static void rollbackQuietly(Connection con) {
-		try { if(con != null) con.rollback(); } catch(Exception ex) { /* Do nothing... */ }
+		try { rollback(con); } catch(SQLException ex) { /* Do nothing... */ }
 	}
 	
 	public static void closeQuietly(Connection con) {
-		try { if(con != null) con.close(); } catch(Exception ex) { /* Do nothing... */ }
+		closeQuietly(con, true);
+	}
+	
+	public static void closeQuietly(Connection con, boolean rollbackOnClose) {
+		if (con != null) {
+			if (rollbackOnClose) rollbackQuietly(con);
+			try { con.close(); } catch(Exception ex) { /* Do nothing... */ }
+		}
 	}
 	
 	/**
