@@ -772,7 +772,7 @@ public class MailUtils {
   }
 
   
-	public static String peekText(IMAPMessage m) throws MessagingException, IOException {
+	public synchronized static String peekText(IMAPMessage m) throws MessagingException, IOException {
 		m.setPeek(true);
 		String s;
 		try{
