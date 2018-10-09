@@ -709,6 +709,43 @@ public class LangUtils {
 		return WordUtils.uncapitalize(value);
 	}
 	
+	public static String abbreviatePersonalName(boolean initialsOnly, String fullName) {
+		if (fullName == null) return null;
+		StringBuilder sb = new StringBuilder();
+		// https://english.stackexchange.com/questions/412943/initials-in-multiple-surnames
+		// We suppose that full-name has the following structure:
+		//   First-name Mid-name Last-name
+		
+		String[] tokens = StringUtils.split(fullName, " ");
+		if (initialsOnly) {
+			sb.append(tokens[0].substring(0, 1).toUpperCase());
+			if (tokens.length > 1) {
+				sb.append(tokens[tokens.length-1].substring(0, 1).toUpperCase());
+			}
+		} else {
+			if (tokens.length == 1) {
+				sb.append(StringUtils.capitalize(tokens[0]));
+				
+			} else {
+				sb.append(tokens[0].substring(0, 1).toUpperCase());
+				sb.append(".");
+				if (tokens.length > 2) {
+					sb.append(tokens[1].substring(0, 1).toUpperCase());
+					sb.append(".");
+				}
+				sb.append(" ");
+				sb.append(StringUtils.capitalize(tokens[tokens.length-1]));
+			}
+		}
+		
+		return sb.toString();
+	}
+	
+	public static void main(String args[]) {
+		System.out.println(abbreviatePersonalName(false, "stefano del torchio"));
+		//System.out.println(StringUtils.split("Matteo  Albinola ", " ").length);
+	}
+	
 	/**
 	 * Returns first non-null object or null if not found.
 	 * @param <T>
