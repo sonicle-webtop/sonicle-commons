@@ -319,8 +319,32 @@ public class DateTimeUtils {
 		return fmt.print(dateTime);
 	}
 	
+	//event.setRecurrence(orec.getRule(), orec.getLocalStartDate(event.getDateTimeZone()));
+	
+	public static DateTime parseDateTime(DateTimeFormatter formatter, String s) {
+		return StringUtils.isBlank(s) ? null : formatter.parseDateTime(s);
+	}
+	
+	public static LocalDate parseLocalDate(DateTimeFormatter formatter, String s) {
+		return StringUtils.isBlank(s) ? null : formatter.parseLocalDate(s);
+	}
+	
+	public static String print(DateTimeFormatter formatter, ReadablePartial rp) {
+		return (rp == null) ? null : formatter.print(rp);
+	}
+	
+	public static String print(DateTimeFormatter formatter, ReadableInstant ri) {
+		return (ri == null) ? null : formatter.print(ri);
+	}
+	
+	/**
+	 * @param formatter
+	 * @param ri
+	 * @return
+	 * @deprecated Use print instead
+	 */
+	@Deprecated
 	public static String printWithFormatter(DateTimeFormatter formatter, ReadableInstant ri) {
-		if(ri == null) return null;
-		return formatter.print(ri);
+		return print(formatter, ri);
 	}
 }
