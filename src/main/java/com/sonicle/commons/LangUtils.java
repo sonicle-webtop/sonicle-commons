@@ -741,35 +741,42 @@ public class LangUtils {
 		return sb.toString();
 	}
 	
-	public static void main(String args[]) {
-		System.out.println(abbreviatePersonalName(false, "stefano del torchio"));
-		//System.out.println(StringUtils.split("Matteo  Albinola ", " ").length);
-	}
-	
 	/**
-	 * Returns first non-null object or null if not found.
-	 * @param <T>
-	 * @param objects Set of objects to check
-	 * @return 
+	 * Returns first non-null object in arguments list, null otherwise.
+	 * @param objects Objects to evaluate.
+	 * @return The first object matching criteria
 	 */
 	public static <T>T coalesce(T... objects) {
-		for(T obj : objects) {
-			if(obj != null) return obj;
+		for (T obj : objects) {
+			if (obj != null) return obj;
 		}
 		return null;
 	}
 	
 	/**
-	 * Returns first non-null object or null if not found.
-	 * @param <T>
-	 * @param objects Set of objects to check
-	 * @return 
+	 * Returns first non-null/non-blank string in arguments list, null otherwise.
+	 * @param strings Strings to evaluate.
+	 * @return The first string matching criteria
 	 */
 	public static String coalesceStrings(String... strings) {
 		for(String s : strings) {
 			if (!StringUtils.isBlank(StringUtils.trim(s))) return s;
 		}
 		return null;
+	}
+	
+	/**
+	 * Joins passed strings using provided separator, string is joined only if it is not blank.
+	 * @param separator The string sepatator.
+	 * @param strings Strings to evaluate.
+	 * @return The joined string
+	 */
+	public static String joinStrings(String separator, String... strings) {
+		Collection<String> arr = new ArrayList<>(strings.length);
+		for (String s : strings) {
+			if (!StringUtils.isBlank(StringUtils.trim(s))) arr.add(s);
+		}
+		return StringUtils.join(arr, separator);
 	}
 	
 	public static String getThrowableDeepestMessage(Throwable t) {
