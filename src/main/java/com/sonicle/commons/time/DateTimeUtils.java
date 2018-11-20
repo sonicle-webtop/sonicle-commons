@@ -119,11 +119,18 @@ public class DateTimeUtils {
 		return l1.isBefore(l2) && (Days.daysBetween(l1, l2).getDays() == 1);
 	}
 	
+	public static DateTime withTimeAtStartOfDay(DateTime dt) {
+		if (dt == null) return null;
+		return dt.withTimeAtStartOfDay();
+	}
+	
 	public static DateTime withTimeAtMidday(DateTime dt) {
+		if (dt == null) return null;
 		return dt.withTime(12, 0, 0, 0);
 	}
 	
 	public static DateTime withTimeAtEndOfDay(DateTime dt) {
+		if (dt == null) return null;
 		return dt.withTime(23, 59, 59, 0);
 	}
 	
