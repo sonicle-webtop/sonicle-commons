@@ -142,8 +142,10 @@ public class PathUtils {
 			path1 = homogenizeSeparator(path1);
 			path2 = homogenizeSeparator(path2);
 		}
-		path1 = ensureTrailingSeparator(path1, false);
-		path2 = StringUtils.removeStart(path2, "/");
+		//path1 = ensureTrailingSeparator(path1, false);
+		//path2 = StringUtils.removeStart(path2, "/");
+		path1 = StringUtils.removeEnd(path1, "/");
+		path2 = ensureBeginningSeparator(path2, false);
 		return path1 + path2;
 	}
 	
