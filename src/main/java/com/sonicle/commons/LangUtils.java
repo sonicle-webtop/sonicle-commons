@@ -61,6 +61,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  *
@@ -777,6 +778,16 @@ public class LangUtils {
 			if (!StringUtils.isBlank(StringUtils.trim(s))) arr.add(s);
 		}
 		return StringUtils.join(arr, separator);
+	}
+	
+	/**
+	 * Formats a message using provided pattern and arguments.
+	 * @param pattern The message pattern.
+	 * @param arguments The arguments list.
+	 * @return The formatted message
+	 */
+	public static String formatMessage(String pattern, Object... arguments) {
+		return MessageFormatter.arrayFormat(pattern, arguments).getMessage();
 	}
 	
 	public static String getThrowableDeepestMessage(Throwable t) {
