@@ -39,6 +39,7 @@ import java.util.*;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.Store;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
@@ -51,6 +52,36 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class MailUtils {
+	public static final String MTYPE_OCTET_STREAM = "application/octet-stream";
+	public static final String MTYPE_MAIL_MESSAGE = "message/rfc822";
+	
+	public static void closeQuietly(Store store) {
+		if (store != null) try { store.close(); } catch (MessagingException ex) { /* Do nothing... */ }
+	}
+	
+	/**
+	 * Returns the decoded (as per RFC 822) text value, if an exception is 
+	 * thrown during operation, the raw text is simply returned.
+	 * @param text The possibly encoded value
+	 * @return The decoded text
+	 */
+	public static String quietlyDecodeText(String text) {
+		try {
+			return MimeUtility.decodeText(text);
+		} catch(UnsupportedEncodingException ex) {
+			return text;
+		}
+	}
+	
+	/**
+	 * Extracts the filename from a message part. If necessary filename will be decoded.
+	 * @param part The message part
+	 * @return The part's filename
+	 * @throws MessagingException 
+	 */
+	public static String getPartFilename(Part part) throws MessagingException {
+		return quietlyDecodeText(part.getFileName());
+	}
 	
 	public static String getMediaTypeFromHeader(String contentTypeHeader) throws ParseException {
 		return new ContentType(contentTypeHeader).getBaseType();

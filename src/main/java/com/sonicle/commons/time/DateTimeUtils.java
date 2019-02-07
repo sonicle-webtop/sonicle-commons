@@ -50,6 +50,7 @@ import org.joda.time.format.DateTimeFormatter;
  * @author malbinola
  */
 public class DateTimeUtils {
+	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
 	
 	public static String[] getDayNamesShort(Locale locale) {
 		return new DateFormatSymbols(locale).getShortWeekdays();
