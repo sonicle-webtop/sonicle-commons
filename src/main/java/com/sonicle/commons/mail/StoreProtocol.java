@@ -38,7 +38,7 @@ import java.util.Properties;
  *
  * @author malbinola
  */
-public enum MailboxProtocol {
+public enum StoreProtocol {
 	// https://docs.oracle.com/javaee/6/api/javax/mail/package-summary.html
 	// https://javaee.github.io/javamail/docs/api/com/sun/mail/imap/package-summary.html
 	// https://github.com/simple-java-mail/core-module/blob/develop/src/main/java/org/simplejavamail/api/mailer/config/TransportStrategy.java
