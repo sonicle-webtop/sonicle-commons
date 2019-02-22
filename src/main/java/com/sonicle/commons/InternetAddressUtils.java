@@ -72,19 +72,31 @@ public class InternetAddressUtils {
 	}
 	
 	/**
-	 * Converts the address into a RFC 822 form of Unicode characters.
+	 * Returns a full address string in RFC822 style.
+	 * Address and personal will be used as is without doing any validity
+	 * check and applying any characters encoding.
+	 * @param address The address
+	 * @param personal The personal name
+	 * @return Unicode address string
+	 */
+	public static String toFullAddress(String address, String personal) {
+		if (address == null) return null;
+		if (StringUtils.isBlank(personal)) {
+			return address;
+		} else {
+			return personal + " <" + address + ">";
+		}
+	}
+	
+	/**
+	 * Converts specified address into a full address string in RFC822 style.
 	 * Personal is not outputted in quoted-style format.
 	 * @param address The source address.
 	 * @return Unicode address string
 	 */
 	public static String toFullAddress(InternetAddress address) {
 		if (address == null) return null;
-		String personal = address.getPersonal();
-		if (StringUtils.isBlank(personal)) {
-			return address.getAddress();
-		} else {
-			return personal + " <" + address.getAddress() + ">";
-		}
+		return toFullAddress(address.getAddress(), address.getPersonal());
 	}
 	
 	public static InternetAddress toInternetAddress(String local, String domain, String personal) {
