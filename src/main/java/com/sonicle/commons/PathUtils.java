@@ -56,14 +56,14 @@ public class PathUtils {
 	
 	/**
 	 * Sanitizes a foldername from certain chars.
-	 * This method replaces all occurrences of ., \, /, |, :, ?, *, &quot;, &lt;,
+	 * This method replaces all occurrences of \, /, |, :, ?, *, &quot;, &lt;,
 	 * &gt;, control chars by _ (underscore).
 	 * @param folderName a potentially 'malicious' foldername
 	 * @return Sanitized foldername
 	 */
 	public static String sanitizeFolderName(final String folderName) {
 		if (StringUtils.isEmpty(folderName)) return folderName;
-		return folderName.replaceAll("\\.|\\\\|/|\\||:|\\?|\\*|\"|<|>|\\p{Cntrl}", "_");
+		return folderName.replaceAll("\\\\|/|\\||:|\\?|\\*|\"|<|>|\\p{Cntrl}", "_");
 	}
 	
 	public static boolean isFolder(String path) {
