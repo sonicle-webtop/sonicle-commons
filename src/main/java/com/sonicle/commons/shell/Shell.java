@@ -37,7 +37,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import java.net.URI;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -53,14 +52,14 @@ public class Shell {
 	
 	public Shell(URI uri) {
 		this.parsedUri = new ParsedUri(uri);
-		if(parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
+		if (parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
 			this.jsch = new JSch();
 			JSch.setConfig("StrictHostKeyChecking", "no");
 		}	
 	}
 	
 	private synchronized ChannelExec createExecutor() throws Exception {
-		if(parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
+		if (parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
 			ensureSession();
 			return (ChannelExec)session.openChannel("exec");
 		} else {
@@ -69,7 +68,7 @@ public class Shell {
 	}
 	
 	public ShellChannel createShellChannel(String cmd) throws Exception {
-		if(parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
+		if (parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
 			//Security.insertProviderAt(new BouncyCastleProvider(), 1);
 			ChannelExec exec = createExecutor();
 			ExecShellChannel channel = new ExecShellChannel(exec);
@@ -102,8 +101,8 @@ public class Shell {
 	}
 	
 	public void close() {
-		if(parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
-			if((session != null) && session.isConnected()) session.disconnect();
+		if (parsedUri.scheme.equals(ParsedUri.SCHEME_SSH)) {
+			if ((session != null) && session.isConnected()) session.disconnect();
 			session = null;
 		} else {
 			// Do nothing...
@@ -111,11 +110,11 @@ public class Shell {
 	}
 	
 	private void ensureSession() throws JSchException {
-		if(session == null) {
+		if (session == null) {
 			session = jsch.getSession(parsedUri.username, parsedUri.host, parsedUri.port);
 			session.setUserInfo(new SshUserInfo(parsedUri.password));
 			session.connect();
-		} else if(!session.isConnected()) {
+		} else if (!session.isConnected()) {
 			session.connect();
 		}
 	}
@@ -131,7 +130,7 @@ public class Shell {
 		
 		public ParsedUri(URI uri) {
 			scheme = uri.getScheme();
-			if(StringUtils.equals(scheme, SCHEME_SH)) {
+			if (StringUtils.equals(scheme, SCHEME_SH)) {
 				host = null;
 				port = -1;
 				username = null;
@@ -147,17 +146,17 @@ public class Shell {
 					password = tokens[1];
 				}*/
 				
-			} else if(StringUtils.equals(scheme, SCHEME_SSH)) {
+			} else if (StringUtils.equals(scheme, SCHEME_SSH)) {
 				host = uri.getHost();
-				if(StringUtils.isEmpty(host)) throw new RuntimeException("Invalid host");
+				if (StringUtils.isEmpty(host)) throw new RuntimeException("Invalid host");
 
 				port = uri.getPort();
-				if(port == -1) port = 22;
+				if (port == -1) port = 22;
 
 				String[] tokens = StringUtils.split(uri.getUserInfo(), ":");
-				if(tokens.length == 1) {
+				if (tokens.length == 1) {
 					username = tokens[0];
-				} else if(tokens.length == 2) {
+				} else if (tokens.length == 2) {
 					username = tokens[0];
 					password = tokens[1];
 				}
