@@ -50,6 +50,7 @@ import org.joda.time.format.DateTimeFormatter;
  * @author malbinola
  */
 public class DateTimeUtils {
+	public static final LocalTime TIME_AT_STARTOFDAY = new LocalTime(0, 0, 0, 0);
 	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
 	
 	public static String[] getDayNamesShort(Locale locale) {
@@ -125,9 +126,19 @@ public class DateTimeUtils {
 		return dt.withTimeAtStartOfDay();
 	}
 	
+	public static DateTime withTimeAtStartOfDay(LocalDate ld, DateTimeZone tz) {
+		if (ld == null) return null;
+		return ld.toDateTimeAtStartOfDay(tz);
+	}
+	
 	public static DateTime withTimeAtMidday(DateTime dt) {
 		if (dt == null) return null;
 		return dt.withTime(12, 0, 0, 0);
+	}
+	
+	public static DateTime withTimeAtEndOfDay(LocalDate ld, DateTimeZone tz) {
+		if (ld == null) return null;
+		return withTimeAtEndOfDay(withTimeAtStartOfDay(ld, tz));
 	}
 	
 	public static DateTime withTimeAtEndOfDay(DateTime dt) {
