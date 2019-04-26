@@ -36,6 +36,7 @@ import com.sun.mail.imap.IMAPMessage;
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;
+import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
@@ -54,6 +55,10 @@ import org.apache.commons.lang3.StringUtils;
 public class MailUtils {
 	public static final String MTYPE_OCTET_STREAM = "application/octet-stream";
 	public static final String MTYPE_MAIL_MESSAGE = "message/rfc822";
+	
+	public static void closeQuietly(Folder folder, boolean expunge) {
+		if (folder != null) try { if (folder.isOpen()) folder.close(expunge); } catch (MessagingException ex) { /* Do nothing... */ }
+	}
 	
 	public static void closeQuietly(Store store) {
 		if (store != null) try { store.close(); } catch (MessagingException ex) { /* Do nothing... */ }
