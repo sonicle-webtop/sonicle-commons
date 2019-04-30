@@ -33,7 +33,9 @@
 package com.sonicle.commons.time;
 
 import java.text.DateFormatSymbols;
+import java.time.ZoneOffset;
 import java.util.Locale;
+import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -365,5 +367,66 @@ public class DateTimeUtils {
 	@Deprecated
 	public static String printWithFormatter(DateTimeFormatter formatter, ReadableInstant ri) {
 		return print(formatter, ri);
+	}
+	
+	
+	// ---------- Conversions java.time <-> JodaTime
+	
+	public static java.time.ZoneId toZoneId(DateTimeZone timezone) {
+		if (timezone == null) return null;
+		return java.time.ZoneId.of(timezone.getID());
+	}
+	
+	public static DateTimeZone toDateTimeZone(java.time.ZoneId zone) {
+		if (zone == null) return null;
+		if (java.time.ZoneOffset.UTC.getId().equals(zone.getId())) {
+			return DateTimeZone.UTC;
+		} else {
+			// This might crash for any unsupported or unrecognized id
+			return DateTimeZone.forID(zone.getId());
+		}
+	}
+	
+	public static DateTime toDateTime(java.time.ZonedDateTime dateTime) {
+		if (dateTime == null) return null;
+		DateTimeZone timezone = toDateTimeZone(dateTime.getZone());
+		return new DateTime(dateTime.toInstant().toEpochMilli(), timezone);
+	}
+	
+	// ---------- java.time utilities
+	
+	public static java.time.LocalDate parseLocalDate(String isoLocalDate) {
+		return parseLocalDate(isoLocalDate, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+	
+	public static java.time.LocalDate parseLocalDate(String date, java.time.format.DateTimeFormatter formatter) {
+		if (StringUtils.isBlank(date)) return null;
+		return java.time.LocalDate.parse(date, formatter);
+	}
+	
+	public static java.time.Instant toInstant(java.time.LocalDate date, java.time.ZoneId zone) {
+		if (date == null) return null;
+		return date.atStartOfDay((zone == null) ? java.time.ZoneId.systemDefault() : zone).toInstant();
+	}
+	
+	public static java.time.ZonedDateTime toZonedDateTime(java.time.Instant instant, java.time.ZoneId zone) {
+		if (instant == null) return null;
+		return instant.atZone((zone == null) ? java.time.ZoneId.systemDefault() : zone);
+	}
+	
+	
+	
+	public static java.time.ZonedDateTime toZonedDateTime(LocalDate localDate, DateTimeZone timezone) {
+		if (localDate == null) return null;
+		if (timezone == null) {
+			return toZonedDateTime(localDate.toDateTimeAtStartOfDay());
+		} else {
+			return toZonedDateTime(localDate.toDateTimeAtStartOfDay(timezone));
+		}
+	}
+	
+	public static java.time.ZonedDateTime toZonedDateTime(DateTime dateTime) {
+		if (dateTime == null) return null;
+		return java.time.ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(dateTime.getMillis()), java.time.ZoneId.of(dateTime.getZone().getID()));
 	}
 }
