@@ -790,9 +790,25 @@ public class LangUtils {
 		return MessageFormatter.arrayFormat(pattern, arguments).getMessage();
 	}
 	
-	public static String getThrowableDeepestMessage(Throwable t) {
-		String msg = ExceptionUtils.getRootCauseMessage(t);
-		return StringUtils.isBlank(msg) ? t.getMessage() : msg;
+	/**
+	 * Introspects the Throwable to obtain the deepest (root) cause.
+	 * @param t The throwable to get the root cause for, may be null.
+	 * @return The deepest cause or throwable itself
+	 */
+	public static Throwable getDeepestCause(Throwable t) {
+		Throwable deepest = ExceptionUtils.getRootCause(t);
+		return (deepest == null) ? t : deepest;
+	}
+	
+	/**
+	 * Introspects the Throwable to obtain the deepest (root) cause message.
+	 * The message returned is of the form {ClassNameWithoutPackage}: {ThrowableMessage}.
+	 * @param t The throwable to get the root cause for, may be null.
+	 * @return The deepest cause message, or null if the initial input is null
+	 */
+	public static String getDeepestCauseMessage(Throwable t) {
+		String s = ExceptionUtils.getRootCauseMessage(t);
+		return StringUtils.isBlank(s) ? null : s;	
 	}
 	
 	public static <T>CollectionChangeSet getCollectionChanges(Collection<T> fromCollection, Collection<T> toCollection) {
