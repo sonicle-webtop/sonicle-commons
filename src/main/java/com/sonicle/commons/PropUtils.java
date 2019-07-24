@@ -32,13 +32,32 @@
  */
 package com.sonicle.commons;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
  * @author malbinola
  */
 public class PropUtils {
+	
+	public static void loadFromFile(Properties properties, File file) {
+		if (file.exists() && file.canRead()) {
+			FileInputStream fis = null;
+			try {
+				fis = new FileInputStream(file);
+				properties.load(fis);
+				
+			} catch(IOException ex) {
+				throw new RuntimeException("Unable to load property file [" + file.getAbsolutePath() + "]", ex);
+			} finally {
+				IOUtils.closeQuietly(fis);
+			}
+		}
+	}
 	
 	public static boolean isDefined(Properties props, String key) {
 		return props.containsKey(key);
