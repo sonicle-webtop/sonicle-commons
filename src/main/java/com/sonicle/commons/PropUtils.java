@@ -44,12 +44,13 @@ import org.apache.commons.io.IOUtils;
  */
 public class PropUtils {
 	
-	public static void loadFromFile(Properties properties, File file) {
+	public static boolean loadFromFile(Properties properties, File file) {
 		if (file.exists() && file.canRead()) {
 			FileInputStream fis = null;
 			try {
 				fis = new FileInputStream(file);
 				properties.load(fis);
+				return true;
 				
 			} catch(IOException ex) {
 				throw new RuntimeException("Unable to load property file [" + file.getAbsolutePath() + "]", ex);
@@ -57,6 +58,7 @@ public class PropUtils {
 				IOUtils.closeQuietly(fis);
 			}
 		}
+		return false;
 	}
 	
 	public static boolean isDefined(Properties props, String key) {
