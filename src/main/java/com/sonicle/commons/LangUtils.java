@@ -42,12 +42,13 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.CharacterIterator;
-import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -760,8 +761,9 @@ public class LangUtils {
 	 * @return The first string matching criteria
 	 */
 	public static String coalesceStrings(String... strings) {
-		for(String s : strings) {
-			if (!StringUtils.isBlank(StringUtils.trim(s))) return s;
+		if (strings == null) throw new IllegalArgumentException("String varargs must not be null");
+		for (String value : strings) {
+			if (!StringUtils.isBlank(StringUtils.trim(value))) return value;
 		}
 		return null;
 	}
@@ -772,12 +774,21 @@ public class LangUtils {
 	 * @param strings Strings to evaluate.
 	 * @return The joined string
 	 */
-	public static String joinStrings(String separator, String... strings) {
-		Collection<String> arr = new ArrayList<>(strings.length);
-		for (String s : strings) {
-			if (!StringUtils.isBlank(StringUtils.trim(s))) arr.add(s);
+	public static String joinStrings(final String separator, final String... strings) {
+		if (strings == null) throw new IllegalArgumentException("String varargs must not be null");
+		final String sanitizedSeparator = StringUtils.defaultString(separator);
+		final StringBuilder result = new StringBuilder();
+		final Iterator<String> it = Arrays.asList(strings).iterator();
+		while (it.hasNext()) {
+			final String value = it.next();
+			if (!StringUtils.isBlank(StringUtils.trim(value))) {
+				result.append(value);
+				if (it.hasNext()) {
+					result.append(sanitizedSeparator);
+				}
+			}
 		}
-		return StringUtils.join(arr, separator);
+		return result.toString();
 	}
 	
 	/**

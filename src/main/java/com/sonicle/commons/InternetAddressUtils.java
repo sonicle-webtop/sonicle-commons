@@ -67,8 +67,8 @@ public class InternetAddressUtils {
 	 * @param lastName Last name.
 	 * @return Personal string
 	 */
-	public static String buildPersonal(String firstName, String lastName) {
-		return StringUtils.join(new String[]{firstName, lastName}, " ");
+	public static String toPersonal(String firstName, String lastName) {
+		return LangUtils.joinStrings(" ", firstName, lastName);
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class InternetAddressUtils {
 	 * @return Unicode address string
 	 */
 	public static String toFullAddress(String address, String personal) {
-		if (address == null) return null;
+		if (StringUtils.isBlank(address)) return null;
 		if (StringUtils.isBlank(personal)) {
 			return address;
 		} else {
