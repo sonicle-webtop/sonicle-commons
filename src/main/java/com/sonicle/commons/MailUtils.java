@@ -33,6 +33,7 @@
 package com.sonicle.commons;
 
 import com.sun.mail.imap.IMAPMessage;
+import com.sun.mail.util.PropUtil;
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;
@@ -55,6 +56,9 @@ import org.apache.commons.lang3.StringUtils;
 public class MailUtils {
 	public static final String MTYPE_OCTET_STREAM = "application/octet-stream";
 	public static final String MTYPE_MAIL_MESSAGE = "message/rfc822";
+	
+	private static final boolean encodeFileName = PropUtil.getBooleanSystemProperty("mail.mime.encodefilename", false);
+	private static final boolean decodeTextStrict = PropUtil.getBooleanSystemProperty("mail.mime.decodetext.strict", true);
 	
 	public static void closeQuietly(Folder folder, boolean expunge) {
 		if (folder != null) try { if (folder.isOpen()) folder.close(expunge); } catch (MessagingException ex) { /* Do nothing... */ }
@@ -79,15 +83,81 @@ public class MailUtils {
 	}
 	
 	/**
-	 * Extracts the filename from a message part. If necessary filename will be decoded.
-	 * @param part The message part
-	 * @return The part's filename
+	 * Extracts the filename from a message Part. If necessary filename will be decoded.
+	 * @param part The message Part.
+	 * @return The filename.
 	 * @throws MessagingException 
 	 */
 	public static String getPartFilename(Part part) throws MessagingException {
-		return quietlyDecodeText(part.getFileName());
+		return getPartFilename(part, false);
 	}
 	
+	/**
+	 * Extracts the filename from a message Part. If necessary filename will be decoded.
+	 * @param part The message Part.
+	 * @param fallbackOnSubType True to use contentType subType in case of missing filename in common headers.
+	 * @return The filename.
+	 * @throws MessagingException 
+	 */
+	public static String getPartFilename(Part part, boolean fallbackOnSubType) throws MessagingException {
+		if (part == null) return null;
+		
+		// Internally JavaMail already take into account any decoding only if
+		// the property "mail.mime.decodefilename" is set to "true". In order
+		// to make sure that any other encoding will be handled well (eg. QString)
+		// system property "mail.mime.decodetext.strict" should be set to "false".
+		
+		// A valid filename is searched before in Content-Disposition header:
+		//	"attachment; filename="Undelivered Mail Returned to Sender.eml""
+		// ..and then in Content-Type header:
+		//	"message/rfc822; name="Undelivered Mail Returned to Sender.eml""
+		String filename = part.getFileName();
+		
+		if (fallbackOnSubType && (filename == null)) {
+			String ctype = part.getContentType();
+			if (ctype != null) filename = new ContentType(ctype).getSubType();
+		}
+		
+		if (!encodeFileName && (filename != null)) {
+			try {
+				filename = MimeUtility.decodeText(filename);
+			} catch (UnsupportedEncodingException ex) {
+				throw new MessagingException("Can't decode filename", ex);
+			}
+		}
+		if (decodeTextStrict && (filename != null)) filename = decodeQText(filename);
+		return filename;
+	}
+	
+	/**
+	 * Returns message Part's contentType in form "type/subType", 
+	 * skipping any trailing parameters.
+	 * @param part The message Part.
+	 * @return Sanitized content type
+	 * @throws MessagingException 
+	 */
+	public static String getPartMediaType(Part part) throws MessagingException {
+		ContentType ctype = getPartContentType(part);
+		return (ctype != null) ? ctype.getBaseType() : null;
+	}
+	
+	/**
+	 * Extract the ContentType object from a message Part.
+	 * @param part The message Part.
+	 * @return The ContentType object.
+	 * @throws MessagingException 
+	 */
+	public static ContentType getPartContentType(Part part) throws MessagingException {
+		if (part == null) return null;
+		
+		String ctype = part.getContentType();
+		return (ctype != null) ? new ContentType(ctype) : null;
+	}
+	
+	/**
+	 * @deprecated use getPartContentType instead
+	 */
+	@Deprecated
 	public static String getMediaTypeFromHeader(String contentTypeHeader) throws ParseException {
 		return new ContentType(contentTypeHeader).getBaseType();
 	}
@@ -136,6 +206,14 @@ public class MailUtils {
 		}
 		if (!StringUtils.isBlank(method)) {
 			s += ("; method=" + method);
+		}
+		return s;
+	}
+	
+	public static String decodeQText(String s) {
+		if (s == null) return s;
+		if (!Normalizer.isNormalized(s, Normalizer.Form.NFC)) {
+			return Normalizer.normalize(s, Normalizer.Form.NFC);
 		}
 		return s;
 	}
@@ -677,7 +755,7 @@ public class MailUtils {
 	public static String removeMSWordShit(String s) {
 		return s.replaceAll("<!\\[if !supportLists\\]>", "").
 				replaceAll("<!\\[endif\\]>", "");
-	}	
+	}
 	
 	/**
 	 * @deprecated use MimeUtility.decodeText instead
