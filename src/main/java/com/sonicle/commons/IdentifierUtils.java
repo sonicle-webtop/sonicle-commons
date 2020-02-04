@@ -32,6 +32,7 @@
  */
 package com.sonicle.commons;
 
+import com.devskiller.friendly_id.FriendlyId;
 import com.fasterxml.uuid.Generators;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -79,6 +80,10 @@ public class IdentifierUtils {
 	public static synchronized String getUUIDRandom(boolean noDashes) {
 		final String uuid = Generators.randomBasedGenerator().generate().toString();
 		return (noDashes) ? StringUtils.replace(uuid, "-", "") : uuid;
+	}
+	
+	public static synchronized String getTimeBasedShortID() {
+		return FriendlyId.toFriendlyId(Generators.timeBasedGenerator().generate());
 	}
 	
 	public static synchronized String getCRSFToken() {
