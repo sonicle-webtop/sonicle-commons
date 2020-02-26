@@ -69,11 +69,7 @@ import org.slf4j.helpers.MessageFormatter;
  * @author malbinola
  */
 public class LangUtils {
-	
 	final static Logger logger = (Logger) LoggerFactory.getLogger(LangUtils.class);
-	public static final String REGEX_FULL_CLASSNAME = "([a-z][a-z_0-9]*\\.)*[A-Z_]($[A-Z_]|[\\w_])*"; // Chi la usa?
-	public static final Pattern PATTERN_FULL_CLASSNAME = Pattern.compile("^"+REGEX_FULL_CLASSNAME+"$"); // Chi la usa?
-	
 	public static final HashMap<Integer, String> htmlEscapeEntities2 = new HashMap<Integer, String>();
 	
 	static {

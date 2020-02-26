@@ -44,7 +44,25 @@ public class RegexUtils {
 	public static final String MATCH_URL_SEPARATOR = "\\/";
 	
 	public static final String MATCH_JAVA_PACKAGE = "(?:[a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*";
+	public static final String MATCH_JAVA_FULLCLASSNAME = "([a-z][a-z_0-9]*\\.)*[A-Z_]($[A-Z_]|[\\w_])*";
 	public static final String MATCH_SW_VERSION = "[0-9]+(?:\\.[0-9]+){1,2}";
+	
+	/**
+	 * Matches a db-field name
+	 * Examples:
+	 * Fld1
+	 * _Fld1
+	 * 0Fld
+	 */
+	public static final String MATCH_DBFIELD_NAME = "[_A-Za-z0-9\\-]+";
+	
+	/**
+	 * Matches a variable name
+	 * Examples:
+	 * Var1
+	 * _Var1
+	 */
+	public static final String MATCH_VARIABLE_NAME = "[_A-Za-z0-9][_A-Za-z0-9\\-]*";
 	
 	public static final String MATCH_SCHEME = "[A-Za-z][A-Za-z0-9+.-]*"; //Also called 'protocol'
 	public static final String MATCH_AUTHORITY = "\\/{2}";
@@ -62,20 +80,26 @@ public class RegexUtils {
     public static final Pattern SPECIAL_REGEX_CHARS = Pattern.compile("([^a-zA-z0-9])");
 	
 	/**
-	 * Matches a URI ()
+	 * Matches a URI
 	 * Examples:
 	 * ssh://user@host.example.com
-	 * 
 	 */
 	public static final String MATCH_URI = "(" + MATCH_SCHEME + "):" + MATCH_AUTHORITY + "(?:(" + MATCH_USERINFO + ")@)?(" + MATCH_HOST + ")(?::(" + MATCH_PORT + "))?";
 	
 	
+	public static Pattern matchStartEnd(String pattern) {
+		return Pattern.compile("^" + pattern + "$");
+	}
+	
 	public static String capture(String pattern) {
 		return "(" + pattern + ")";
 	}
-    
-    public static String escapeRegexSpecialChars(String str) {
-            return SPECIAL_REGEX_CHARS.matcher(str).replaceAll("\\\\$0");//.replaceAll("\\\\", "\\\\\\\\");   
-    }
-    
+	
+	public static String ignoreCapture(String pattern) {
+		return "(?:" + pattern + ")";
+	}
+	
+	public static String escapeRegexSpecialChars(String str) {
+		return SPECIAL_REGEX_CHARS.matcher(str).replaceAll("\\\\$0");//.replaceAll("\\\\", "\\\\\\\\");   
+	}
 }
