@@ -287,6 +287,23 @@ public class DateTimeUtils {
 	}
 	
 	/**
+	 * Instantiates the formatter using pattern "HH:mm:ss" and specified timezone.
+	 * @param tz Desired formatter timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createHmsFormatter(DateTimeZone tz) {
+		return createFormatter("HH:mm:ss", tz);
+	}
+	
+	/**
+	 * Instantiates the formatter using pattern "HH:mm:ss" and default timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createHmsFormatter() {
+		return createHmsFormatter(null);
+	}
+	
+	/**
 	 * Instantiates the formatter using pattern "HH:mm" and specified timezone.
 	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
