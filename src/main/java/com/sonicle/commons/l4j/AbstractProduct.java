@@ -48,6 +48,8 @@ public abstract class AbstractProduct {
 	
 	public abstract String getProductId();
 	
+	public abstract String getProductName();
+	
 	public String getCustomHardwareId() {
 		return customHardwareId;
 	}
