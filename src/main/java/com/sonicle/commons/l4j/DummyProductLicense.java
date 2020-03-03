@@ -34,18 +34,11 @@ package com.sonicle.commons.l4j;
 
 /**
  *
- * @author gabriele.bulfon
+ * @author malbinola
  */
-public abstract class DomainBasedProduct extends AbstractProduct {
+public class DummyProductLicense extends ProductLicense {
 	
-	private String internetDomain;
-	
-	public DomainBasedProduct(String internetDomain) {
-		super(internetDomain.replace('.', '-'));
-		this.internetDomain=internetDomain;
-	}
-
-	public String getInternetDomain() {
-		return internetDomain;
+	public DummyProductLicense() {
+		super(LicenseType.DUMMY, ActivationLicenseType.OFF_NO_ACTIVATION, null, null, null, null, null, null, (String)null);
 	}
 }

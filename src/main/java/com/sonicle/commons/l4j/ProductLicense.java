@@ -71,7 +71,7 @@ public class ProductLicense {
 		this.activationReturnType = activationReturnType;
 		this.productId = product.getProductId();
 		this.publicKey = product.getPublicKey();
-		this.customHardwareId = product.getCustomHardwareId();
+		this.customHardwareId = product.getHardwareId();
 		this.internalHiddenString = internalHiddenString;
 		this.licenseServer = licenseServer;
 		this.trialLicense = trialLicense;
@@ -84,7 +84,7 @@ public class ProductLicense {
 		this.activationReturnType = activationReturnType;
 		this.productId = product.getProductId();
 		this.publicKey = product.getPublicKey();
-		this.customHardwareId = product.getCustomHardwareId();
+		this.customHardwareId = product.getHardwareId();
 		this.licenseString = licenseString;
 		this.properties = new Properties();
 	}
@@ -287,7 +287,7 @@ public class ProductLicense {
 	*/
 	
 	public static enum LicenseType {
-		LICENSE_TEXT, BASIC_KEY, CRYPTO_KEY
+		LICENSE_TEXT, BASIC_KEY, CRYPTO_KEY, DUMMY
 	}
 	
 	public static enum ActivationLicenseType {

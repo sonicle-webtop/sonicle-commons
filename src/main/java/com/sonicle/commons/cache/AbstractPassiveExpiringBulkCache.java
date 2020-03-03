@@ -38,24 +38,24 @@ import java.util.concurrent.TimeUnit;
  *
  * @author malbinola
  */
-public abstract class AbstractPassiveExpiringCache extends AbstractCache {
+public abstract class AbstractPassiveExpiringBulkCache extends AbstractBulkCache {
 	private static final long serialVersionUID = 1L;
 	protected final ExpirationPolicy expiringPolicy;
 	protected Long expirationTime;
 	
-	public AbstractPassiveExpiringCache() {
+	public AbstractPassiveExpiringBulkCache() {
 		this(-1L);
 	}
 	
-	public AbstractPassiveExpiringCache(final ExpirationPolicy expiringPolicy) {
+	public AbstractPassiveExpiringBulkCache(final ExpirationPolicy expiringPolicy) {
 		this.expiringPolicy = expiringPolicy;
 	}
 	
-	public AbstractPassiveExpiringCache(final long timeToLiveMillis) {
+	public AbstractPassiveExpiringBulkCache(final long timeToLiveMillis) {
 		this(new ConstantTimeToLiveExpirationPolicy(timeToLiveMillis));
 	}
 	
-	public AbstractPassiveExpiringCache(final long timeToLive, final TimeUnit timeUnit) {
+	public AbstractPassiveExpiringBulkCache(final long timeToLive, final TimeUnit timeUnit) {
 		this(ConstantTimeToLiveExpirationPolicy.validateAndConvertToMillis(timeToLive, timeUnit));
 	}
 

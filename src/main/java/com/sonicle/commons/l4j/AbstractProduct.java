@@ -37,20 +37,17 @@ package com.sonicle.commons.l4j;
  * @author gabriele.bulfon
  */
 public abstract class AbstractProduct {
+	private String hardwareId;
 	
-	private String customHardwareId;
-	
-	public AbstractProduct(String customHardwareId) {
-		this.customHardwareId=customHardwareId;
+	public AbstractProduct(String hardwareId) {
+		this.hardwareId = hardwareId;
 	}
 	
+	public abstract String getProductId();
+	public abstract String getProductName();
 	public abstract String getPublicKey();
 	
-	public abstract String getProductId();
-	
-	public abstract String getProductName();
-	
-	public String getCustomHardwareId() {
-		return customHardwareId;
+	public String getHardwareId() {
+		return hardwareId;
 	}
 }

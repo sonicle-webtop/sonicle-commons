@@ -38,7 +38,7 @@ import java.util.concurrent.locks.StampedLock;
  *
  * @author malbinola
  */
-public abstract class AbstractCache {
+public abstract class AbstractBulkCache {
 	private static final long serialVersionUID = 1L;
 	protected final StampedLock lock = new StampedLock();
 	private int initCount = 0;
