@@ -33,9 +33,7 @@
 package com.sonicle.commons.time;
 
 import java.text.DateFormatSymbols;
-import java.time.ZoneOffset;
 import java.util.Locale;
-import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -421,9 +419,37 @@ public class DateTimeUtils {
 		return java.time.LocalDate.parse(date, formatter);
 	}
 	
+	public static java.time.LocalTime parseLocalTime(String isoLocalTime) {
+		return parseLocalTime(isoLocalTime, java.time.format.DateTimeFormatter.ISO_LOCAL_TIME);
+	}
+	
+	public static java.time.LocalTime parseLocalTime(String time, java.time.format.DateTimeFormatter formatter) {
+		if (StringUtils.isBlank(time)) return null;
+		return java.time.LocalTime.parse(time, formatter);
+	}
+	
+	public static java.time.ZonedDateTime parseDateTime(String isoDateTime, java.time.ZoneId zone) {
+		return parseDateTime(isoDateTime, java.time.format.DateTimeFormatter.ISO_DATE_TIME.withZone(zone));
+	}
+	
+	public static java.time.ZonedDateTime parseDateTime(String dateTime, java.time.format.DateTimeFormatter formatter) {
+		if (StringUtils.isBlank(dateTime)) return null;
+		return java.time.ZonedDateTime.parse(dateTime, formatter);
+	}
+	
 	public static java.time.Instant toInstant(java.time.LocalDate date, java.time.ZoneId zone) {
 		if (date == null) return null;
 		return date.atStartOfDay((zone == null) ? java.time.ZoneId.systemDefault() : zone).toInstant();
+	}
+	
+	public static java.time.Instant toInstant(java.time.LocalTime time, java.time.ZoneId zone) {
+		if (time == null) return null;
+		return time.atDate(java.time.LocalDate.ofEpochDay(0)).atZone((zone == null) ? java.time.ZoneId.systemDefault() : zone).toInstant();
+	}
+	
+	public static java.time.Instant toInstant(java.time.ZonedDateTime dateTime) {
+		if (dateTime == null) return null;
+		return dateTime.toInstant();
 	}
 	
 	public static java.time.ZonedDateTime toZonedDateTime(java.time.Instant instant, java.time.ZoneId zone) {
