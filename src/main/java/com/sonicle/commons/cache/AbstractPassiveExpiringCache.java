@@ -32,91 +32,74 @@
  */
 package com.sonicle.commons.cache;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
  *
  * @author malbinola
+ * @param <K>
+ * @param <V>
  */
-public abstract class AbstractPassiveExpiringBulkCache extends AbstractBulkCache {
-	private static final long serialVersionUID = 1L;
-	protected final ExpirationPolicy expiringPolicy;
-	protected Long expirationTime;
+public abstract class AbstractPassiveExpiringCache<K, V> extends AbstractPassiveExpiringBulkCache {
+	protected Map<K, V> map;
 	
-	public AbstractPassiveExpiringBulkCache() {
-		this(-1L);
+	public AbstractPassiveExpiringCache() {
+		super();
 	}
 	
-	public AbstractPassiveExpiringBulkCache(final ExpirationPolicy expiringPolicy) {
-		this.expiringPolicy = expiringPolicy;
+	public AbstractPassiveExpiringCache(final ExpirationPolicy expiringPolicy) {
+		super(expiringPolicy);
 	}
 	
-	public AbstractPassiveExpiringBulkCache(final long timeToLiveMillis) {
-		this(new ConstantTimeToLiveExpirationPolicy(timeToLiveMillis));
+	public AbstractPassiveExpiringCache(final long timeToLiveMillis) {
+		super(timeToLiveMillis);
 	}
 	
-	public AbstractPassiveExpiringBulkCache(final long timeToLive, final TimeUnit timeUnit) {
-		this(ConstantTimeToLiveExpirationPolicy.validateAndConvertToMillis(timeToLive, timeUnit));
+	public AbstractPassiveExpiringCache(final long timeToLive, final TimeUnit timeUnit) {
+		super(timeToLive, timeUnit);
 	}
+	
+	protected abstract Map<K, V> internalGetCache();
 	
 	@Override
-	protected void internalInit() {
-		super.internalInit();
-		expirationTime = expiringPolicy.expirationTime();
+	protected void internalBuildCache() {
+		map = internalGetCache();
 	}
-	
+
 	@Override
-	protected void internalCheckBeforeGetDoNotLockThis() {
-		long stamp = lock.writeLock();
+	protected void internalCleanupCache() {
+		map = null;
+	}
+	
+	public V get(K key) {
+		this.internalCheckBeforeGetDoNotLockThis();
+		long stamp = this.readLock();
 		try {
-			if (!isInited() || isExpired(now(), expirationTime)) {
-				internalInit();
-			}
+			return (map != null) ? map.get(key) : null;
 		} finally {
-			lock.unlockWrite(stamp);
+			this.unlockRead(stamp);
 		}
 	}
 	
-	public void forceExpire() {
-		long stamp = lock.writeLock();
+	public boolean containsKey(K key) {
+		this.internalCheckBeforeGetDoNotLockThis();
+		long stamp = this.readLock();
 		try {
-			expirationTime = now();
+			return (map != null) ? map.containsKey(key) : false;
 		} finally {
-			lock.unlockWrite(stamp);
+			this.unlockRead(stamp);
 		}
 	}
 	
-	protected boolean isExpired(final long now, final Long expirationTime) {
-		if (expirationTime != null) {
-			return expirationTime >= 0 && now >= expirationTime;
-		}
-		return false;
-	}
-	
-	protected long now() {
-		return System.currentTimeMillis();
-	}
-	
-	
-	
-	
-		/*
-	public T getValue() {
-		nullIfExpired(now());
-		return value;
-	}
-	
-	public T setValue(T value) {
-		nullIfExpired(now());
-		expirationTime = expiringPolicy.expirationTime();
-		this.value = value;
-		return value;
-	}
-	
-	private void nullIfExpired(final long now) {
-		if (isExpired(now, expirationTime)) {
-			value = null;
+	public Map<K, V> shallowCopy() {
+		this.internalCheckBeforeGetDoNotLockThis();
+		long stamp = this.readLock();
+		try {
+			return (map != null) ? new HashMap<>(map) : null;
+		} finally {
+			this.unlockRead(stamp);
 		}
 	}
-	*/
 }

@@ -50,7 +50,6 @@ public abstract class AbstractBulkCache {
 		long stamp = lock.writeLock();
 		try {
 			internalInit();
-			initCount++;
 		} finally {
 			lock.unlockWrite(stamp);
 		}
@@ -63,6 +62,10 @@ public abstract class AbstractBulkCache {
 		} finally {
 			lock.unlockWrite(stamp);
 		}
+	}
+	
+	public boolean isInited() {
+		return initCount > 0;
 	}
 	
 	public int getInitCount() {
@@ -87,13 +90,14 @@ public abstract class AbstractBulkCache {
 	
 	protected void internalInit() {
 		internalBuildCache();
+		initCount++;
 	}
 	
 	protected void internalClear() {
 		internalCleanupCache();
 	}
 	
-	protected void internalCheckDoNotLockThis() {
+	protected void internalCheckBeforeGetDoNotLockThis() {
 		// This may be useful for subclasses, do nothing for now...
 	}
 }
