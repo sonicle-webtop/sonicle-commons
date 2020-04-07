@@ -32,6 +32,9 @@
  */
 package com.sonicle.commons.mail;
 
+import com.sun.mail.util.MailSSLSocketFactory;
+import java.security.GeneralSecurityException;
+import java.util.Collection;
 import java.util.Properties;
 
 /**
@@ -165,4 +168,22 @@ public enum StoreProtocol {
 	public abstract String getProtocol();
 	public abstract String getPropertyName(String remaining);
 	public abstract void applyProperties(Properties props);
+	
+	public void sslTrustAllHosts(Properties props) throws GeneralSecurityException {
+		sslTrustHosts(props, null);
+	}
+	
+	public void sslTrustHosts(Properties props, Collection<String> hosts) throws GeneralSecurityException {
+		MailSSLSocketFactory ssf = new MailSSLSocketFactory();
+		if (hosts == null) {
+			ssf.setTrustAllHosts(true);
+		} else {
+			ssf.setTrustedHosts(hosts.toArray(new String[hosts.size()]));
+		}
+		props.put(getPropertyName("ssl.socketFactory"), ssf);
+	}
+	
+	public void sslCheckHostIdentity(Properties props, boolean verifyServerIdentity) {
+		props.setProperty(getPropertyName("ssl.checkserveridentity"), String.valueOf(verifyServerIdentity));
+	}
 }
