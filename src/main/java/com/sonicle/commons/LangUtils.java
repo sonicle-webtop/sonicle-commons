@@ -740,11 +740,26 @@ public class LangUtils {
 	}
 	
 	/**
+	 * 
+	 * @param <T>
+	 * @param objects
+	 * @return 
+	 */
+	public static <T> List<T> nonNulls(T... objects) {
+		ArrayList<T> items = new ArrayList<>();
+		for (T obj : objects) {
+			if (obj != null) items.add(obj);
+		}
+		return items;
+	}
+	
+	/**
 	 * Returns first non-null object in arguments list, null otherwise.
+	 * @param <T>
 	 * @param objects Objects to evaluate.
 	 * @return The first object matching criteria
 	 */
-	public static <T>T coalesce(T... objects) {
+	public static <T> T coalesce(T... objects) {
 		for (T obj : objects) {
 			if (obj != null) return obj;
 		}
