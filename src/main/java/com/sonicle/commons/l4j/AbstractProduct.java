@@ -43,9 +43,13 @@ public abstract class AbstractProduct {
 		this.hardwareId = hardwareId;
 	}
 	
-	public abstract String getProductId();
+	public abstract String getProductCode();
 	public abstract String getProductName();
 	public abstract String getPublicKey();
+	public abstract ProductLicense.LicenseType getLicenseType();
+	public abstract ProductLicense.ActivationLicenseType getActivationReturnType();
+	public abstract String getInternalHiddenString();
+	public abstract String getLicenseServer();
 	
 	public String getHardwareId() {
 		return hardwareId;
