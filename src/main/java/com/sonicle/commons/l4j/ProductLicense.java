@@ -12,16 +12,15 @@ import com.license4j.LicenseText;
 import com.license4j.LicenseValidator;
 import com.license4j.ModificationStatus;
 import com.license4j.ValidationStatus;
-import com.license4j.util.FileUtils;
-import com.sonicle.commons.LangUtils;
+import com.sonicle.commons.URIUtils;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Properties;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.joda.time.LocalDate;
 
 /**
@@ -39,12 +38,7 @@ public class ProductLicense {
 	private String licenseServer;
 	private String trialLicense; // license-key or license-text
 	private String licenseString; // license-key or license-text
-	private String licenseActivationString; // license-text
-	private LicenseInfo info;
-	
-	private File licenseFile;
-	private Properties properties;
-	private LicenseInfo validatedLicenseObject;
+	private String activatedLicenseString; // license-text
 	
 	public ProductLicense(final LicenseType licenseType, final ActivationLicenseType activationReturnType, final String productCode, final String publicKey, final String customHardwareId, final String internalHiddenString, final String licenseServer, final String trialLicense, final File licenseFile) {
 		this.licenseType = licenseType;
@@ -55,8 +49,6 @@ public class ProductLicense {
 		this.licenseServer = licenseServer;
 		this.trialLicense = trialLicense;
 		this.publicKey = publicKey;
-		this.licenseFile = licenseFile;
-		this.properties = new Properties();
 	}
 	
 	public ProductLicense(final LicenseType licenseType, final ActivationLicenseType activationReturnType, final String productCode, final String publicKey, final String customHardwareId, final String internalHiddenString, final String licenseServer, final String trialLicense, final String licenseString) {
@@ -69,7 +61,6 @@ public class ProductLicense {
 		this.trialLicense = trialLicense;
 		this.publicKey = publicKey;
 		this.licenseString = licenseString;
-		this.properties = new Properties();
 	}
 	
 	public ProductLicense(final AbstractProduct product) {
@@ -80,7 +71,25 @@ public class ProductLicense {
 		this.customHardwareId = product.getHardwareId();
 		this.internalHiddenString = product.getInternalHiddenString();
 		this.licenseServer = product.getLicenseServer();
-		this.properties = new Properties();
+	}
+	
+	private String getLicenseServerBaseUrl() {
+		return StringUtils.isBlank(licenseServer) ? ONLINE_SERVER_URL : licenseServer;
+	}
+	
+	private static final String ONLINE_SERVER_URL = "https://online.license4j.com";
+	private static final String ACTIVATION_URL_PATH = "/d/manualactivation";
+	private static final String DEACTIVATION_URL_PATH = "/d/manualdeactivation";
+	private static final String MODIFICATION_URL_PATH = "/d/manualmodification";
+	
+	private String buildLicenseServerPathUrl(String path) {
+		try {
+			URIBuilder builder = new URIBuilder(getLicenseServerBaseUrl());
+			URIUtils.appendPath(builder, path);
+			return builder.build().toASCIIString();
+		} catch(URISyntaxException ex) {
+			return null;
+		}	
 	}
 	
 	public LicenseType getLicenseType() {
@@ -103,6 +112,10 @@ public class ProductLicense {
 		return internalHiddenString;
 	}
 	
+	public String getLicenseServer() {
+		return licenseServer;
+	}
+	
 	public String getHardwareID() {
 		return customHardwareId != null ? customHardwareId : HardwareID.getHardwareIDFromVolumeSerialNumber();
 	}
@@ -121,115 +134,171 @@ public class ProductLicense {
 	
 	public void setLicenseString(String licenseString) {
 		this.licenseString = licenseString;
-		setLicenseActivationString(null);
+		setActivatedLicenseString(null);
 	}
 	
-	public String getLicenseActivationString() {
-		return this.licenseActivationString;
+	public String getLicenseString() {
+		return this.licenseString;
 	}
 	
-	public void setLicenseActivationString(String licenseActivationString) {
-		this.licenseActivationString = licenseActivationString;
+	public String getActivatedLicenseString() {
+		return this.activatedLicenseString;
+	}
+	
+	public void setActivatedLicenseString(String activatedLicenseString) {
+		this.activatedLicenseString = activatedLicenseString;
 	}
 	
 	public void setActivationCustomHardwareId(String activationCustomHardwareId) {
 		this.activationCustomHardwareId = activationCustomHardwareId;
 	}
 	
-	/*
-	public synchronized LicenseInfo validate() {
-		LicenseInfo vlic = internalValidate(activationReturnType.name(), licenseActivationString);
-		if (vlic == null) vlic = internalValidate(licenseType.name(), licenseString);
-		return info = vlic;
-	}
-	*/
-	
-	private LicenseInfo updateLicenseInfo() {
-		LicenseInfo ilic = internalValidate2(activationReturnType.name(), licenseActivationString, activationCustomHardwareId);
-		if (ilic == null) ilic = internalValidate2(licenseType.name(), licenseString, customHardwareId);
-		return info = ilic;
-		
-		//LicenseInfo ilic = internalValidate(activationReturnType.name(), licenseActivationString);
-		//if (ilic == null) ilic = internalValidate(licenseType.name(), licenseString);
-		//return info = ilic;
-	}
-	
-	public synchronized LicenseInfo getLicenseInfo() {
-		if (info == null) updateLicenseInfo();
-		return info;
-	}
-	
-	public synchronized LicenseInfo validate() {
-		return updateLicenseInfo();
-	}
-	
-	public synchronized LicenseInfo manualActivate(final String licenseActivationString) throws IOException {
-		LicenseInfo lic = updateLicenseInfo();
-		if (lic != null && lic.isValid() && lic.isActivationRequired() && !lic.isActivated()) {
-			this.licenseActivationString = licenseActivationString;
-			updateLicenseInfo();
-			/*
-			if ((info != null) && info.isActivated()) {
-				save();
-			}
-			*/
+	public LicenseInfo validate(final boolean beforeActivation) {
+		LicenseInfo li = null;
+		if (activatedLicenseString != null && !beforeActivation) {
+			// After activation, validate the latest activated license string.
+			li = internalValidate(activationReturnType.name(), activatedLicenseString, activationCustomHardwareId);
+		} else {
+			// Before activation, it will be activate, so validate the original not activated license string.
+			li = internalValidate(licenseType.name(), Check.notNull(licenseString, "licenseString"), customHardwareId);
 		}
-		return info;
+		return li;
 	}
 	
-	public synchronized LicenseInfo autoActivate() throws IOException {
-		LicenseInfo lic = updateLicenseInfo();
-		if (lic != null && lic.isValid() && lic.isActivationRequired() && !lic.isActivated()) {
-			LicenseInfo alic = internalActivate(lic.getLicense()); 
-			if ((alic != null) && alic.isActivated()) {
-				licenseActivationString = alic.getLicenseString();
-				info = alic;
+	public LicenseInfo autoActivate() throws IOException {
+		LicenseInfo li = validate(true);
+		if (li.isValid() && li.isActivationRequired()) {
+			LicenseInfo ali = internalActivate(li.getLicense());
+			if (ali.isValid() && ali.isActivationCompleted()) {
+				activatedLicenseString = ali.getLicenseString();
+				li = ali;
 			} else {
-				licenseActivationString = null;
-				updateLicenseInfo();
+				activatedLicenseString = null;
 			}
-			//save();
 		}
-		return info;
+		return li;
 	}
 	
-	public synchronized LicenseInfo autoDeactivate() throws IOException {
-		LicenseInfo lic = updateLicenseInfo();
-		if (lic != null && lic.isValid() && lic.isActivated()) {
-			LicenseInfo dlic = internalDeactivate(lic.getLicense()); 
-			if ((dlic != null) && (ActivationStatus.DEACTIVATION_COMPLETED == dlic.getLicense().getActivationStatus())) {
-				licenseActivationString = null;
-				info = dlic;
+	public LicenseInfo manualActivate(final String activatedLicenseString) throws IOException {
+		LicenseInfo li = validate(true);
+		if (li.isValid() && li.isActivationRequired()) {
+			this.activatedLicenseString = activatedLicenseString;
+			li = validate(false);
+		}
+		return li;
+	}
+	
+	public LicenseInfo autoDeactivate() throws IOException {
+		LicenseInfo li = validate(false);
+		if (!li.isInvalid() && li.isActivationCompleted()) {
+			LicenseInfo dli = internalDeactivate(li.getLicense());
+			if (dli.isDeactivationCompleted()) {
+				activatedLicenseString = null;
+				li = dli;
 			} else {
-				updateLicenseInfo();
+				activatedLicenseString = null;
 			}
-			//save();
 		}
-		return info;
+		return li;
 	}
 	
-	public synchronized LicenseInfo manualDeactivate(final String licenseDeactivationString) throws IOException {
-		LicenseInfo lic = updateLicenseInfo();
-		if (lic != null && lic.isValid() && lic.isActivated()) {
-			LicenseInfo dlic = internalValidate2(activationReturnType.name(), licenseDeactivationString, activationCustomHardwareId);
-			//LicenseInfo dlic = internalValidate(activationReturnType.name(), licenseDeactivationString);
-			if ((dlic != null) && (ActivationStatus.DEACTIVATION_COMPLETED == dlic.getLicense().getActivationStatus())) {
-				licenseActivationString = null;
-			}
-			updateLicenseInfo();
-			//save();
+	public LicenseInfo manualDeactivate() throws IOException {
+		LicenseInfo li = validate(false);
+		if (!li.isInvalid() && li.isActivationCompleted()) {
+			activatedLicenseString = null;
+			li = validate(true);
 		}
-		return info;
+		return li;
+	}
+	
+	public LicenseInfo modifyLicense(final String modificationKey) throws IOException {
+		LicenseInfo li = validate(false);
+		if (!li.isInvalid()) {
+			LicenseInfo mli = internalModify(li.getLicense(), modificationKey);
+			if (mli.isModified()) {
+				activatedLicenseString = mli.getLicenseString();
+				li = mli;
+			}
+		}
+		return li;
+	}
+	
+	public LicenseInfo manualModify(final String activatedLicenseString) throws IOException {
+		LicenseInfo li = validate(true);
+		if (!li.isInvalid()) {
+			this.activatedLicenseString = activatedLicenseString;
+			li = validate(false);
+		}
+		return li;
+	}
+	
+	public RequestInfo getManualActivationRequestInfo() {
+		LicenseInfo li = validate(true);
+		if (li != null && li.isActivationRequired()) {
+			if (activationCustomHardwareId == null) {
+				String hwid = HardwareID.getHardwareIDFromHostName() + "&&" + HardwareID.getHardwareIDFromEthernetAddress();
+				return new RequestInfo(buildLicenseServerPathUrl(ACTIVATION_URL_PATH), li.getManualActivationRequestString(), hwid);
+			} else {
+				return new RequestInfo(buildLicenseServerPathUrl(ACTIVATION_URL_PATH), li.getLicense().getManualActivationRequestStringWithCustomHardwareID(activationCustomHardwareId), activationCustomHardwareId);
+			}
+		}
+		return null;
+	}
+	
+	public RequestInfo getManualDeactivationRequestInfo() {
+		LicenseInfo li = validate(false);
+		if (li != null && li.isActivationCompleted()) {
+			return new RequestInfo(buildLicenseServerPathUrl(DEACTIVATION_URL_PATH), li.getManualDeactivationRequestString(), li.getHardwareID());
+		}
+		return null;
+	}
+	
+	public RequestInfo getManualModificationRequestInfo(String modificationKey) {
+		LicenseInfo li = validate(false);
+		if (li != null && li.isValid()) {
+			String hwid = HardwareID.getHardwareIDFromHostName() + "&&" + HardwareID.getHardwareIDFromEthernetAddress();
+			return new RequestInfo(buildLicenseServerPathUrl(MODIFICATION_URL_PATH), li.getManualModificationRequestString(modificationKey), hwid);
+		}
+		return null;
+	}
+	
+	public int updateUseInfo(final int timeout) {
+		LicenseInfo li = validate(true);
+		if (StringUtils.isBlank(licenseServer)) {
+			return LicenseValidator.updateLicenseUseInfo(publicKey, li.getLicense(), timeout);
+		} else {
+			return LicenseValidator.updateLicenseUseInfo(publicKey, li.getLicense(), licenseServer, timeout);
+		}
+	}
+	
+	public int updateTrackingInfo(final HashMap<String, String> map, final int timeout) {
+		LicenseInfo li = validate(true);
+		if (StringUtils.isBlank(licenseServer)) {
+			return LicenseValidator.updateLicenseUseTrackingInfo(publicKey, li.getLicense(), map, timeout);
+		} else {
+			return LicenseValidator.updateLicenseUseTrackingInfo(publicKey, li.getLicense(), map, licenseServer, timeout);
+		}
 	}
 	
 	public int queryTrackingInfo(HashMap<String, String> map, final int timeout) {
-		LicenseInfo licInfo = updateLicenseInfo();
-		if (licInfo == null) return -3;
-		return LicenseValidator.queryLicenseUseTrackingInfo(publicKey, licInfo.getLicense(), map, licenseServer, timeout);
+		LicenseInfo li = validate(true);
+		if (StringUtils.isBlank(licenseServer)) {
+			return LicenseValidator.queryLicenseUseTrackingInfo(publicKey, li.getLicense(), map, timeout);
+		} else {
+			return LicenseValidator.queryLicenseUseTrackingInfo(publicKey, li.getLicense(), map, licenseServer, timeout);
+		}
 	}
 	
+	public int checkOnlineAvailability(final int timeout) {
+		LicenseInfo li = validate(true);
+		if (StringUtils.isBlank(licenseServer)) {
+			return LicenseValidator.checkOnlineAvailability(publicKey, li.getLicense(),  timeout);
+		} else {
+			return LicenseValidator.checkOnlineAvailability(publicKey, li.getLicense(), licenseServer, timeout);
+		}
+	}
 	
-	
+	/*
 	public LicenseInfo modify(final String modificationKey) throws IOException {
 		LicenseInfo alic = internalValidate2(activationReturnType.name(), licenseActivationString, activationCustomHardwareId);
 		//LicenseInfo alic = internalValidate(activationReturnType.name(), licenseActivationString);
@@ -283,18 +352,10 @@ public class ProductLicense {
 			return false;
 		}	
 	}
+	*/
 	
-	private LicenseInfo internalValidate(String typeName, String licenseString) {
-		if (licenseString == null) return null;
-		if (customHardwareId == null) {
-			return internalValidateWithDefaultHardwareID(typeName, licenseString);
-		} else {
-			return internalValidateWithCustomHardwareID(typeName, licenseString);
-		}
-	}
-	
-	private LicenseInfo internalValidate2(String typeName, String licenseString, String hardwareId) {
-		if (licenseString == null) return null;
+	private LicenseInfo internalValidate(String typeName, String licenseString, String hardwareId) {
+		if (licenseString == null) return null; // Is still useful?
 		License license = null;
 		if (LicenseType.LICENSE_TEXT.name().equals(typeName)) {
 			if (hardwareId == null) {
@@ -308,26 +369,6 @@ public class ProductLicense {
 			} else {
 				license = LicenseValidator.validateWithCustomHardwareID(licenseString, publicKey, internalHiddenString, (String)null, (String)null, hardwareId);
 			}
-		}
-		return createLicenseInfo(license);
-	}
-	
-	private LicenseInfo internalValidateWithDefaultHardwareID(String typeName, String licenseString) {
-		License license = null;
-		if (LicenseType.LICENSE_TEXT.name().equals(typeName)) {
-			license = LicenseValidator.validate(licenseString, publicKey, productCode, (String)null, (String)null, (Date)null, (Date)null);
-		} else if (LicenseType.BASIC_KEY.name().equals(typeName) || LicenseType.CRYPTO_KEY.name().equals(typeName)) {
-			license = LicenseValidator.validate(licenseString, publicKey, internalHiddenString, (String)null, (String)null, 0);
-		}
-		return createLicenseInfo(license);
-	}
-	
-	private LicenseInfo internalValidateWithCustomHardwareID(String typeName, String licenseString) {
-		License license = null;
-		if (LicenseType.LICENSE_TEXT.name().equals(typeName)) {
-			license = LicenseValidator.validateWithCustomHardwareID(licenseString, publicKey, productCode, (String)null, (String)null, customHardwareId, (Date)null, (Date)null);
-		} else if (LicenseType.BASIC_KEY.name().equals(typeName) || LicenseType.CRYPTO_KEY.name().equals(typeName)) {
-			license = LicenseValidator.validateWithCustomHardwareID(licenseString, publicKey, internalHiddenString, (String)null, (String)null, customHardwareId);
 		}
 		return createLicenseInfo(license);
 	}
@@ -360,25 +401,19 @@ public class ProductLicense {
 		return createLicenseInfo(dlic);
 	}
 	
+	public LicenseInfo internalModify(License license, String modificationKey) {
+		License mlic = null;
+		if (StringUtils.isBlank(licenseServer)) {
+			mlic = LicenseValidator.modifyLicense(license, modificationKey);
+		} else {
+			mlic = LicenseValidator.modifyLicense(license, licenseServer, modificationKey);
+		}
+		return createLicenseInfo(mlic);
+	}
+	
 	private LicenseInfo createLicenseInfo(License license) {
 		return (license != null) ? new LicenseInfo(productCode, license) : null;
 	}
-	
-	/*
-	private License internalValidate2(boolean activated) {
-		//String targetLicenseString = activated ? activatedLicenseString : licenseString;
-		String targetLicenseString = licenseString;
-		if (LicenseType.LICENSE_TEXT.equals(licenseType)) {
-			return LicenseValidator.validate(targetLicenseString, publicKey, productId, (String)null, (String)null, (Date)null, (Date)null);
-		} else if (LicenseType.BASIC_KEY.equals(licenseType)) {
-			return LicenseValidator.validate(targetLicenseString, publicKey, internalHiddenString, (String)null, (String)null, 0);
-		} else if (LicenseType.CRYPTO_KEY.equals(licenseType)) {
-			return LicenseValidator.validate(targetLicenseString, publicKey, productId, (String)null, (String)null, (Date)null, (Date)null);
-		} else {
-			return null;
-		}
-	}
-	*/
 	
 	public static enum LicenseType {
 		LICENSE_TEXT, BASIC_KEY, CRYPTO_KEY, DUMMY
@@ -386,6 +421,18 @@ public class ProductLicense {
 	
 	public static enum ActivationLicenseType {
 		OFF_NO_ACTIVATION, LICENSE_TEXT, CODE
+	}
+	
+	public static class RequestInfo {
+		public final String url;
+		public final String request;
+		public final String hardwareId;
+		
+		public RequestInfo(final String url, final String request, final String hardwareId) {
+			this.url = url;
+			this.request = request;
+			this.hardwareId = hardwareId;
+		}
 	}
 	
 	public static class LicenseInfo {
@@ -403,6 +450,11 @@ public class ProductLicense {
 		
 		public License getLicense() {
 			return this.license;
+		}
+		
+		public long getLicenseID() {
+			LicenseText lt = license.getLicenseText();
+			return (lt != null) ? lt.getLicenseID() : -1;
 		}
 		
 		public String getLicenseString() {
@@ -429,13 +481,23 @@ public class ProductLicense {
 			return license.getManualDeactivationRequestString();
 		}
 		
+		public String getManualModificationRequestString(String modificationKey) {
+			return license.getManualModificationRequestString(modificationKey);
+		}
+		
 		public int getActivationDaysRemaining() {
 			return license.getLicenseActivationDaysRemaining(null);
 		}
 		
-		public int getExpireDaysRemaining() {
+		public Integer getQuantity() {
 			LicenseText lt = license.getLicenseText();
-			return (lt != null) ? lt.getLicenseExpireDaysRemaining(null) : -1;
+			Integer i =(lt != null) ? lt.getLicenseQuantity() :null;
+			return (i == 999999) ? null : i;
+		}
+		
+		public Integer getExpireDaysRemaining() {
+			LicenseText lt = license.getLicenseText();
+			return (lt != null) ? lt.getLicenseExpireDaysRemaining(null) : null;
 		}
 		
 		public LocalDate getExpirationDate() {
@@ -450,6 +512,10 @@ public class ProductLicense {
 			return (lt != null) ? lt.getLicenseHardwareID() : null;
 		}
 		
+		public boolean isInvalid() {
+			return ValidationStatus.LICENSE_INVALID == license.getValidationStatus();
+		}
+		
 		public boolean isValid() {
 			return ValidationStatus.LICENSE_VALID == license.getValidationStatus();
 		}
@@ -457,13 +523,26 @@ public class ProductLicense {
 		public boolean isExpired() {
 			return ValidationStatus.LICENSE_EXPIRED == license.getValidationStatus();
 		}
-
-		public boolean isActivated() {
-			return (ValidationStatus.LICENSE_VALID == license.getValidationStatus()) && license.isActivationCompleted();
+		
+		public boolean isActivationCompleted() {
+			return license.isActivationCompleted();
 		}
 		
-		public boolean isDeactivated() {
-			return (ValidationStatus.LICENSE_VALID == license.getValidationStatus()) && (ActivationStatus.DEACTIVATION_COMPLETED == license.getActivationStatus());
+		public boolean isActivationNotFound() {
+			return ActivationStatus.ACTIVATION_NOT_FOUND_ON_SERVER == license.getActivationStatus();
+		}
+		
+		public boolean isDeactivationCompleted() {
+			return ActivationStatus.DEACTIVATION_COMPLETED == license.getActivationStatus();
+		}
+		
+		public boolean isModified() {
+			return ModificationStatus.MODIFICATION_COMPLETED == license.getModificationStatus()
+					|| ModificationStatus.MODIFICATION_COMPLETED_PREVIOUSLY == license.getModificationStatus();
+		}
+		
+		public boolean isValidAndDeactivated2() {
+			return isValid() && isDeactivationCompleted();
 		}
 
 		public boolean isActivationRequired() {
@@ -483,13 +562,9 @@ public class ProductLicense {
 			return lt != null ? lt.getUserRegisteredTo() : null;
 		}
 		
-		public Integer getUsersNo() {
+		public String getCustomSignedFeature(String key) {
 			LicenseText lt = license.getLicenseText();
-			return lt != null ? LangUtils.value(lt.getCustomSignedFeature("usersNo"), (Integer)null) : null;
+			return lt != null ? lt.getCustomSignedFeature(key) : null;
 		}
-	}
-	
-	public static class Builder {
-		
 	}
 }
