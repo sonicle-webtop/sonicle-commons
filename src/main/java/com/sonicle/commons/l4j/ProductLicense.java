@@ -562,6 +562,11 @@ public class ProductLicense {
 			return lt != null ? lt.getUserRegisteredTo() : null;
 		}
 		
+		public String getUserCompany() {
+			LicenseText lt = license.getLicenseText();
+			return lt != null ? lt.getUserCompany(): null;
+		}
+		
 		public String getCustomSignedFeature(String key) {
 			LicenseText lt = license.getLicenseText();
 			return lt != null ? lt.getCustomSignedFeature(key) : null;
