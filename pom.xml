@@ -36,15 +36,13 @@
 	
 	<repositories>
 		<repository>
+			<id>license4j-releases</id>
+			<url>https://www.license4j.com/maven/</url>
+			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
 				<checksumPolicy>ignore</checksumPolicy>
 			</releases>
-			<id>license4j-runtime-library</id>
-			<name>License4J Runtime Library Maven Repository</name>
-			<url>http://www.license4j.com/maven/</url>
-			<layout>default</layout>
 		</repository>
 	</repositories>
 	
