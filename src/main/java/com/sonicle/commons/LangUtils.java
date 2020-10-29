@@ -42,6 +42,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.CharacterIterator;
+import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -809,7 +810,22 @@ public class LangUtils {
 	 * @return The formatted message
 	 */
 	public static String formatMessage(String pattern, Object... arguments) {
-		return MessageFormatter.arrayFormat(pattern, arguments).getMessage();
+		return formatMessage(false, pattern, arguments);
+	}
+	
+	/**
+	 * Formats a message using provided pattern and arguments.
+	 * @param autoDetect Wether to activate MessageFormat patter auto-detect, `false` to fallback on smarter MessageFormatter.
+	 * @param pattern The message pattern.
+	 * @param arguments The arguments list.
+	 * @return The formatted message
+	 */
+	public static String formatMessage(boolean autoDetect, String pattern, Object... arguments) {
+		if (autoDetect && StringUtils.contains(pattern, "{0}")) {
+			return MessageFormat.format(escapeMessageFormat(pattern), arguments);
+		} else {
+			return MessageFormatter.arrayFormat(pattern, arguments).getMessage();
+		}
 	}
 	
 	/**

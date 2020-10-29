@@ -32,6 +32,8 @@
  */
 package com.sonicle.commons;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -43,16 +45,16 @@ import org.apache.commons.io.Charsets;
  */
 public class AlgoUtils {
 	
-	public static String md5Hex(final String data) {
-		return DigestUtils.md5Hex(data);
+	public static String md5Hex(final String s) {
+		return DigestUtils.md5Hex(s);
 	}
 	
 	public static String md5Hex(final byte[] bytes) {
 		return DigestUtils.md5Hex(bytes);
 	}
 	
-	public static String crc32Hex(final String data) {
-		return crc32Hex(data.getBytes(Charsets.UTF_8));
+	public static String crc32Hex(final String s) {
+		return crc32Hex(s.getBytes(Charsets.UTF_8));
 	}
 	
 	public static String crc32Hex(final byte[] bytes) {
@@ -61,13 +63,43 @@ public class AlgoUtils {
 		return Long.toHexString(crc32.getValue());
 	}
 	
-	public static String adler32Hex(final String data) {
-		return adler32Hex(data.getBytes(Charsets.UTF_8));
+	public static String adler32Hex(final String s) {
+		return adler32Hex(s.getBytes(Charsets.UTF_8));
 	}
 	
 	public static String adler32Hex(final byte[] bytes) {
 		Adler32 adler = new Adler32();
 		adler.update(bytes);
 		return Long.toHexString(adler.getValue());
+	}
+	
+	/**
+	 * Encodes a string in a way that makes it harder to read it "as is" this makes 
+	 * it possible for Strings to be "encoded" within the app and thus harder to 
+	 * discover by a casual search.
+	 * https://github.com/codenameone/CodenameOne/blob/c3322f5f50c56c4abedfd4b1ff78ecae7b006b48/CodenameOne/src/com/codename1/io/Util.java
+	 * @param s The string to decode
+	 * @return The decoded string
+	 */
+	public static String xorDecode(final String s) {
+		byte[] dat = Base64.getDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
+		for (int i = 0 ; i < dat.length ; i++) {
+			dat[i] = (byte)(dat[i] ^ (i % 254 + 1));
+		}
+		return new String(dat, StandardCharsets.UTF_8);
+	}
+	
+	/**
+	 * The inverse method of xorDecode, this is normally unnecessary and is here 
+	 * mostly for completeness.
+	 * @param s The string to encode
+	 * @return The encoded string
+	 */
+	public static String xorEncode(final String s) {
+		byte[] dat = s.getBytes(StandardCharsets.UTF_8);
+		for (int i = 0 ; i < dat.length ; i++) {
+			dat[i] = (byte)(dat[i] ^ (i % 254 + 1));
+		}
+		return Base64.getEncoder().encodeToString(dat);
 	}
 }

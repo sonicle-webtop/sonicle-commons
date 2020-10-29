@@ -28,12 +28,17 @@ import org.joda.time.LocalDate;
  * @author malbinola
  */
 public class ProductLicense {
+	private static final String ONLINE_SERVER_URL = "https://online.license4j.com";
+	private static final String ACTIVATION_URL_PATH = "/d/manualactivation";
+	private static final String DEACTIVATION_URL_PATH = "/d/manualdeactivation";
+	private static final String MODIFICATION_URL_PATH = "/d/manualmodification";
+	
 	private final LicenseType licenseType;
 	private final ActivationLicenseType activationReturnType;
 	private final String productCode;
 	private final String publicKey;
-	private final String internalHiddenString; // only for basic and crypto (maybe a l4j bug?) key
-	private final String customHardwareId;
+	private final String internalHiddenString; // only for basic and crypto key (maybe a l4j bug?)
+	private String customHardwareId;
 	private String activationCustomHardwareId;
 	private String licenseServer;
 	private String trialLicense; // license-key or license-text
@@ -71,25 +76,6 @@ public class ProductLicense {
 		this.customHardwareId = product.getHardwareId();
 		this.internalHiddenString = product.getInternalHiddenString();
 		this.licenseServer = product.getLicenseServer();
-	}
-	
-	private String getLicenseServerBaseUrl() {
-		return StringUtils.isBlank(licenseServer) ? ONLINE_SERVER_URL : licenseServer;
-	}
-	
-	private static final String ONLINE_SERVER_URL = "https://online.license4j.com";
-	private static final String ACTIVATION_URL_PATH = "/d/manualactivation";
-	private static final String DEACTIVATION_URL_PATH = "/d/manualdeactivation";
-	private static final String MODIFICATION_URL_PATH = "/d/manualmodification";
-	
-	private String buildLicenseServerPathUrl(String path) {
-		try {
-			URIBuilder builder = new URIBuilder(getLicenseServerBaseUrl());
-			URIUtils.appendPath(builder, path);
-			return builder.build().toASCIIString();
-		} catch(URISyntaxException ex) {
-			return null;
-		}	
 	}
 	
 	public LicenseType getLicenseType() {
@@ -139,6 +125,10 @@ public class ProductLicense {
 	
 	public String getLicenseString() {
 		return this.licenseString;
+	}
+	
+	public void setCustomHardwareId(String customHardwareId) {
+		this.customHardwareId = customHardwareId;
 	}
 	
 	public String getActivatedLicenseString() {
@@ -409,6 +399,20 @@ public class ProductLicense {
 			mlic = LicenseValidator.modifyLicense(license, licenseServer, modificationKey);
 		}
 		return createLicenseInfo(mlic);
+	}
+	
+	private String getLicenseServerBaseUrl() {
+		return StringUtils.isBlank(licenseServer) ? ONLINE_SERVER_URL : licenseServer;
+	}
+	
+	private String buildLicenseServerPathUrl(String path) {
+		try {
+			URIBuilder builder = new URIBuilder(getLicenseServerBaseUrl());
+			URIUtils.appendPath(builder, path);
+			return builder.build().toASCIIString();
+		} catch(URISyntaxException ex) {
+			return null;
+		}	
 	}
 	
 	private LicenseInfo createLicenseInfo(License license) {

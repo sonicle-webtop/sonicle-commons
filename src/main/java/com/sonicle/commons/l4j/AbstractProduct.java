@@ -37,10 +37,14 @@ package com.sonicle.commons.l4j;
  * @author gabriele.bulfon
  */
 public abstract class AbstractProduct {
-	private String hardwareId;
+	private final String hardwareId;
 	
 	public AbstractProduct(String hardwareId) {
 		this.hardwareId = hardwareId;
+	}
+	
+	public String getHardwareId() {
+		return hardwareId;
 	}
 	
 	public abstract String getProductCode();
@@ -50,8 +54,5 @@ public abstract class AbstractProduct {
 	public abstract ProductLicense.ActivationLicenseType getActivationReturnType();
 	public abstract String getInternalHiddenString();
 	public abstract String getLicenseServer();
-	
-	public String getHardwareId() {
-		return hardwareId;
-	}
+	public abstract String getBuiltInLicenseString();
 }
