@@ -60,6 +60,16 @@ public class MailUtils {
 	private static final boolean encodeFileName = PropUtil.getBooleanSystemProperty("mail.mime.encodefilename", false);
 	private static final boolean decodeTextStrict = PropUtil.getBooleanSystemProperty("mail.mime.decodetext.strict", true);
 	
+	private static final ArrayList<String> html2text_TagsWithNewline=new ArrayList<String>();
+	
+	static {
+		html2text_TagsWithNewline.add("p");
+		html2text_TagsWithNewline.add("div");
+		html2text_TagsWithNewline.add("br");
+		html2text_TagsWithNewline.add("table");
+		html2text_TagsWithNewline.add("td");
+	}
+	
 	public static void closeQuietly(Folder folder, boolean expunge) {
 		if (folder != null) try { if (folder.isOpen()) folder.close(expunge); } catch (MessagingException ex) { /* Do nothing... */ }
 	}
@@ -827,6 +837,8 @@ public class MailUtils {
 		StringBuffer sbuffer=new StringBuffer();
 
 		boolean justAppended=false;
+		
+		String lastTag=null;
 
 		// Otherwise construct a new input tokenizer.  This will split the line
 		// at the characters '<' and '>'.  The string will consist of the line that
@@ -839,7 +851,6 @@ public class MailUtils {
 			token = st.nextToken();
 			// If the character was a '<' we are inside a tag.
 			if ( token.equals( "<" ) ) {
-				if (justAppended) sbuffer.append("\n");
 				insideTag = true;
 				justAppended=false;
 
@@ -851,7 +862,7 @@ public class MailUtils {
 				// if we are currently inside a tag do nothing, otherwise we have the text
 				// of the document, so send it to the output steam
 			} else if ( insideTag == false ) {
-				token=token.trim();
+				//token=token.trim();
 				if (token.length()>0) {
 					try {
 						BufferedReader reader=new BufferedReader(new StringReader(token));
@@ -863,6 +874,23 @@ public class MailUtils {
 						justAppended=true;
 					} catch(IOException exc) {
 						exc.printStackTrace();
+					}
+				}
+			} else {
+				token=token.trim().toLowerCase();
+				if (token.equals("br")||token.equals("br /")) sbuffer.append("\n");
+				else if (token.startsWith("/")) {
+					int ix=token.indexOf(" ");
+					if (ix<0) ix=token.indexOf(" ");
+					if (ix>0) {
+						lastTag=token.substring(1,ix).trim();
+					} else {
+						lastTag=token.substring(1).trim();
+					}
+					if (lastTag.equals("br")) sbuffer.append("\n");
+					else /*if (justAppended)*/ {
+						if (html2text_TagsWithNewline.contains(lastTag))
+							sbuffer.append("\n");
 					}
 				}
 			}
