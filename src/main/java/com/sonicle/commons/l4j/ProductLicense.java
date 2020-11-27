@@ -517,7 +517,9 @@ public class ProductLicense {
 		}
 		
 		public boolean isInvalid() {
-			return ValidationStatus.LICENSE_INVALID == license.getValidationStatus();
+			return ValidationStatus.LICENSE_INVALID == license.getValidationStatus()
+					|| ValidationStatus.MISMATCH_PRODUCT_ID == license.getValidationStatus()
+					|| ValidationStatus.MISMATCH_HARDWARE_ID == license.getValidationStatus();
 		}
 		
 		public boolean isValid() {
