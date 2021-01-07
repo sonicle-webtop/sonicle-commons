@@ -86,9 +86,17 @@ public class RegexUtils {
 	 */
 	public static final String MATCH_URI = "(" + MATCH_SCHEME + "):" + MATCH_AUTHORITY + "(?:(" + MATCH_USERINFO + ")@)?(" + MATCH_HOST + ")(?::(" + MATCH_PORT + "))?";
 	
-	
+	@Deprecated
 	public static Pattern matchStartEnd(String pattern) {
-		return Pattern.compile("^" + pattern + "$");
+		return match(pattern);
+	}
+	
+	public static Pattern match(String pattern) {
+		return match(pattern, true, true);
+	}
+	
+	public static Pattern match(String pattern, boolean start, boolean end) {
+		return Pattern.compile((start ? "^" : "") + pattern + (end ? "$" : ""));
 	}
 	
 	public static String capture(String pattern) {

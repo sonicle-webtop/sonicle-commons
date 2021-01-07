@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,10 +58,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -237,7 +238,7 @@ public class LangUtils {
         return buf.toString();
     }
 	
-	public static String encodeURL(String url) {
+	public static String encodeURL(final String url) {
 		try {
 			if(StringUtils.isBlank(url)) return url;
 			String s = URLEncoder.encode(url, "UTF-8");
@@ -246,18 +247,56 @@ public class LangUtils {
 			return null;
 		}
 	}
+	
+	/**
+	 * Encode data for use in HTML using HTML entity encoding.
+	 * For both for content and attributes.
+	 * @see
+	 * <a href="http://en.wikipedia.org/wiki/Character_encodings_in_HTML">HTML
+	 * Encodings [wikipedia.org]</a>
+	 * @see <a href="http://www.w3.org/TR/html4/sgml/sgmldecl.html">SGML
+	 * Specification [w3.org]</a>
+	 * @see <a href="http://www.w3.org/TR/REC-xml/#charsets">XML Specification
+	 * [w3.org]</a>
+	 * @param str The string to encode.
+	 * @return Encoded for use in HTML.
+	 */
+	public static String encodeForHTML(final String str) {
+		if (StringUtils.isBlank(str)) return str;
+		return Encode.forHtml(str);
+	}
+	
+	/**
+	 * Encode data for use in HTML content.
+	 * @param str The string to encode.
+	 * @return Encoded for use in HTML attribute.
+	 */
+	public static String encodeForHTMLContent(final String str) {
+		if (StringUtils.isBlank(str)) return str;
+		return Encode.forHtmlContent(str);
+	}
+	
+	/**
+	 * Encode data for use in HTML attributes.
+	 * @param str The string to encode.
+	 * @return Encoded for use in HTML attribute.
+	 */
+	public static String encodeForHTMLAttribute(final String str) {
+		if (StringUtils.isBlank(str)) return str;
+		return Encode.forHtmlAttribute(str);
+	}
 
 	/**
 	 * Convenience method for replacing line-breaks control characters
 	 * ('\r\n', '\n' and '\r') from passed string.
-	 * @param s The source string.
+	 * @param str The source string.
 	 * @return The cleaned string.
 	 */
-	public static String stripLineBreaks(String s) {
-		String str = StringUtils.replace(s, "\r\n", "");
-		str = StringUtils.replace(str, "\n", "");
-		str = StringUtils.replace(str, "\r", "");
-		return str;
+	public static String stripLineBreaks(final String str) {
+		String s = StringUtils.replace(str, "\r\n", "");
+		s = StringUtils.replace(s, "\n", "");
+		s = StringUtils.replace(s, "\r", "");
+		return s;
 	}
 	
 	/**
@@ -551,6 +590,24 @@ public class LangUtils {
 			}
 		}
 		return sb.toString();
+	}
+	
+	public static Map<String, String> parseStringAsKeyValueMap(final String str) {
+		return parseStringAsKeyValueMap(str, 0, 1);
+	}
+	
+	public static Map<String, String> parseStringAsKeyValueMap(final String str, final int keyIndex, final int valueIndex) {
+		LinkedHashMap<String, String> map = new LinkedHashMap();
+		if (!StringUtils.isBlank(str)) {
+			int ki = keyIndex >= 0 && keyIndex <= 1 ? keyIndex : 0;
+			int vi = valueIndex >= 0 && valueIndex <= 1 ? valueIndex : 1;
+			String[] ltokens = StringUtils.split(str, ",");
+			for (int i=0; i<ltokens.length; i++) {
+				String[] itokens = StringUtils.split(ltokens[i], ":", 2);
+				if (itokens.length == 2) map.put(itokens[ki], itokens[vi]);
+			}
+		}
+		return map;
 	}
 	
 	/**
