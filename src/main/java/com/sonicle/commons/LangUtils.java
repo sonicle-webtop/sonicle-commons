@@ -597,13 +597,17 @@ public class LangUtils {
 	}
 	
 	public static Map<String, String> parseStringAsKeyValueMap(final String str, final int keyIndex, final int valueIndex) {
+		return parseStringAsKeyValueMap(str, keyIndex, valueIndex, ",", "=");
+	}
+	
+	public static Map<String, String> parseStringAsKeyValueMap(final String str, final int keyIndex, final int valueIndex, final String itemsSeparator, final String valuesSeparator) {
 		LinkedHashMap<String, String> map = new LinkedHashMap();
 		if (!StringUtils.isBlank(str)) {
 			int ki = keyIndex >= 0 && keyIndex <= 1 ? keyIndex : 0;
 			int vi = valueIndex >= 0 && valueIndex <= 1 ? valueIndex : 1;
-			String[] ltokens = StringUtils.split(str, ",");
+			String[] ltokens = StringUtils.split(str, itemsSeparator);
 			for (int i=0; i<ltokens.length; i++) {
-				String[] itokens = StringUtils.split(ltokens[i], ":", 2);
+				String[] itokens = StringUtils.split(ltokens[i], valuesSeparator, 2);
 				if (itokens.length == 2) map.put(itokens[ki], itokens[vi]);
 			}
 		}

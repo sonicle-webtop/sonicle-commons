@@ -86,6 +86,24 @@ public class RegexUtils {
 	 */
 	public static final String MATCH_URI = "(" + MATCH_SCHEME + "):" + MATCH_AUTHORITY + "(?:(" + MATCH_USERINFO + ")@)?(" + MATCH_HOST + ")(?::(" + MATCH_PORT + "))?";
 	
+	/**
+	 * Matches any URIs inside a block of text.
+	 * https://stackoverflow.com/questions/30847/regex-to-validate-uris
+	 * https://snipplr.com/view/6889/regular-expressions-for-uri-validationparsing
+	 * 
+	 * Examples:
+	 * ________________________________________________________________________________
+	 * Riunione di Microsoft Teams
+	 * Partecipa sul computer o con l'app per dispositivi mobili
+	 * Fai clic qui per partecipare alla riunione<https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZGFiZjFhMWItMDRkMC00ZDE0LWIzNjMtYjI4OGE0NDQ2Y2Jm%40thread.v2/0?context=%7b%22Tid%22%3a%229252ed8b-dffc-401c-86ca-6237da9991fa%22%2c%22Oid%22%3a%221027e6c1-bd43-449d-a5df-476dc68bbbaa%22%7d>
+	 * Altre informazioni<https://aka.ms/JoinTeamsMeeting> | Opzioni riunione<https://teams.microsoft.com/meetingOptions/?organizerId=1027e6c1-bd43-449d-a5df-476dc68bbbaa&tenantId=9252ed8b-dffc-401c-86ca-6237da9991fa&threadId=19_meeting_ZGFiZjFhMWItMDRkMC00ZDE0LWIzNjMtYjI4OGE0NDQ2Y2Jm@thread.v2&messageId=0&language=it-IT>
+	 * ________________________________________________________________________________
+	 * 
+	 */
+	public static final String MATCH_URI_IN_TEXT = "([a-z0-9+.-]+):(?:\\/\\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\\d*))?(\\/(?:[a-z0-9-._~!$&'()*+,;=:@\\/]|%[0-9A-F]{2})*)?|(\\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\\/]|%[0-9A-F]{2})*)?)(?:\\?((?:[a-z0-9-._~!$&'()*+,;=:\\/?@]|%[0-9A-F]{2})*))?(?:#((?:[a-z0-9-._~!$&'()*+,;=:\\/?@]|%[0-9A-F]{2})*))?";
+	
+	public static final String MATCH_NETMASK4 = "(((255\\.){3}(255|254|252|248|240|224|192|128|0+))|((255\\.){2}(255|254|252|248|240|224|192|128|0+)\\.0)|((255\\.)(255|254|252|248|240|224|192|128|0+)(\\.0+){2})|((255|254|252|248|240|224|192|128|0+)(\\.0+){3}))";
+	
 	@Deprecated
 	public static Pattern matchStartEnd(String pattern) {
 		return match(pattern);

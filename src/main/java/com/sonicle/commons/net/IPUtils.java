@@ -32,10 +32,12 @@
  */
 package com.sonicle.commons.net;
 
+import com.sonicle.commons.RegexUtils;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +47,15 @@ import org.slf4j.LoggerFactory;
  * @author malbinola
  */
 public class IPUtils {
-	
 	final static Logger logger = (Logger) LoggerFactory.getLogger(IPUtils.class);
 	public static final String _255 = "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
 	public static final Pattern patternIPv4 = Pattern.compile("^(?:" + _255 + "\\.){3}" + _255 + "$");
+	private static final Pattern NETMASK4_PATTERN = RegexUtils.match(RegexUtils.MATCH_NETMASK4, true, true);
+	
+	//private static final String ADDRESS4 = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
+	//private static final String CIDR4 = ADDRESS4 + "/(\\d{1,3})";
+	//private static final Pattern ADDRESS4_PATTERN = Pattern.compile(ADDRESS4);
+	//private static final Pattern CIDR4_PATTERN = Pattern.compile(CIDR4);
 	
 	public static String longToIpV4(long longIp) {
 		int octet3 = (int) ((longIp >> 24) % 256);
@@ -71,8 +78,8 @@ public class IPUtils {
 				|| longIp >= ipV4ToLong("192.168.0.0") && longIp <= ipV4ToLong("192.168.255.255");
 	}
 
-	public static boolean isIPv4Valid(String ip) {
-		return patternIPv4.matcher(ip).matches();
+	public static boolean isIPv4Valid(String address) {
+		return patternIPv4.matcher(address).matches();
 	}
 	
 	public static boolean isIPInRange(String[] cidrs, String clientIP) throws UnknownHostException {
@@ -98,5 +105,50 @@ public class IPUtils {
 			}
 		}
 		return false;
+	}
+	
+	private static int packDottedString4(String dottedString) {
+		String tokens[] = StringUtils.split(dottedString, ".", 4);
+		if (tokens.length != 4) throw new IllegalArgumentException("Invalid dotted notation [" + dottedString + "]");
+		int addr = 0;
+		for (int i = 1; i <= 4; ++i) {
+			int n = Integer.parseInt(tokens[i]);
+			if (n < 0 && n > 255) throw new IllegalArgumentException("Value out of range: [" + n + "]");
+			addr |= ((n & 0xff) << 8*(4-i));
+		}
+		return addr;
+	}
+	
+	
+	/**
+	 * Converts a netmask (IPv4), in dotted notation format, into number of bits.
+	 * @param netmask Netmask in dotted notation.
+	 * @return The corresponding number of bits.
+	 */
+	public static Integer toIntNetmask4(String netmask) {
+		if (netmask == null) return null;
+		if (NETMASK4_PATTERN.matcher(netmask).matches()) {
+			return packDottedString4(netmask);
+		} else {
+			throw new IllegalArgumentException("Could not parse [" + netmask + "]");
+		}
+	}
+	
+	/**
+	 * Converts a netmask (IPv4), in number of bits format, into dotted notation.
+	 * Example:
+	 *	- 24 -> 255.255.255.0
+	 *	-  0 -> 0.0.0.0
+	 * @param netmask Netmask in number of bits.
+	 * @return The corresponding dotted notation.
+	 */
+	public static String toStringNetmask4(Integer netmask) {
+		if (netmask == null) return null;
+		if (netmask == 0) {
+			return "0.0.0.0";
+		} else {
+			long bits = 0xffffffff ^ (1 << 32 - netmask) - 1;
+			return String.format("%d.%d.%d.%d", (bits & 0x0000000000ff000000L) >> 24, (bits & 0x0000000000ff0000) >> 16, (bits & 0x0000000000ff00) >> 8, bits & 0xff);
+		}
 	}
 }
