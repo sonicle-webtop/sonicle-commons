@@ -78,6 +78,10 @@ public class PropUtils {
 		return getString(getProp(props, name), defaultValue);
 	}
 	
+	public static short getShortProperty(Properties props, String name, short defaultValue) {
+		return getShort(getProp(props, name), defaultValue);
+	}
+	
 	public static int getIntProperty(Properties props, String name, int defaultValue) {
 		return getInt(getProp(props, name), defaultValue);
 	}
@@ -96,6 +100,13 @@ public class PropUtils {
 		if (value == null) return defaultValue;
 		if (value instanceof String) return LangUtils.value((String)value, defaultValue);
 		if (value instanceof Boolean) return (Boolean)value;
+		return defaultValue;
+	}
+	
+	private static short getShort(Object value, short defaultValue) {
+		if (value == null) return defaultValue;
+		if (value instanceof String) return LangUtils.value((String)value, defaultValue);
+		if (value instanceof Short) return (Short)value;
 		return defaultValue;
 	}
 	

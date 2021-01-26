@@ -47,7 +47,7 @@ public class EnumUtils {
 		.serializeNulls()
 		.create();
 	
-	public static <E extends Enum<E>> E getEnum(Class<E> enumClass, String enumName) {
+	public static <E extends Enum<E>> E getEnum(String enumName, Class<E> enumClass) {
 		if(enumName == null) return null;
 		try {
 			return Enum.valueOf(enumClass, enumName);
@@ -65,10 +65,8 @@ public class EnumUtils {
 		return en1.equals(en2);
 	}
 	
-	@Deprecated
-	public static <E extends Enum<E>> E forValue(Class<E> enumClass, String value) {
-		return forValue(value, enumClass);
-	}
+	
+	
 	
 	/**
 	 * Convenience method for getting the enum from its string value representation.
@@ -137,5 +135,30 @@ public class EnumUtils {
 			return StringUtils.substring(s, 1, s.length()-1);
 		}
 		//return (en == null) ? null : GSON.toJson(en, en.getClass());
+	}
+	
+	
+	
+	
+	
+	/**
+	 * @deprecated use getEnum instead
+	 */
+	@Deprecated
+	public static <E extends Enum<E>> E getEnum(Class<E> enumClass, String enumName) {
+		if(enumName == null) return null;
+		try {
+			return Enum.valueOf(enumClass, enumName);
+		} catch(IllegalArgumentException ex) {
+			return null;
+		}
+	}
+	
+	/**
+	 * @deprecated use forValue instead
+	 */
+	@Deprecated
+	public static <E extends Enum<E>> E forValue(Class<E> enumClass, String value) {
+		return forValue(value, enumClass);
 	}
 }

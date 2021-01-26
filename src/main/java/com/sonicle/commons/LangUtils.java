@@ -314,9 +314,26 @@ public class LangUtils {
 	}
 	
 	/**
+	 * Analyzes a source string s and compares it with referenceString by 
+	 * building sub-string blocks of specified length and comparing them with 
+	 * the reference string. If any token is found, the source string is  
+	 * classified as similar returning true.
+	 * @param s The source string being compared.
+	 * @param referenceString The reference string in which look for tokens.
+	 * @param tokenSize The choosen token size.
+	 * @return True if string are classified as similar, false otherwise.
+	 */
+	public static boolean containsSimilarTokens(String s, String referenceString, int tokenSize) {
+		if ((s.length() < tokenSize) || (referenceString.length() < tokenSize)) return false;
+		for (int i = 0; (i + tokenSize) < s.length(); i++) {
+			if (referenceString.contains(s.substring(i, i + tokenSize))) return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Returns the String value of the passed string.
 	 * In case of empty value, default value is returned.
-	 * 
 	 * @param value The value
 	 * @param defaultValue The dafault value
 	 * @return The String value
@@ -329,22 +346,33 @@ public class LangUtils {
 	 * Returns the Boolean value of the passed string.
 	 * In case of empty value, default value is returned.
 	 * During conversion Boolean.valueOf method is used!
-	 * 
 	 * @param value The value
 	 * @param defaultValue The dafault value
 	 * @return The Boolean value
 	 */
 	public static Boolean value(String value, Boolean defaultValue) {
-		if(StringUtils.isEmpty(value)) return defaultValue;
+		if (StringUtils.isEmpty(value)) return defaultValue;
 		Boolean valueof = Boolean.valueOf(value);
 		return (valueof != null) ? valueof : defaultValue;
+	}
+	
+	/**
+	 * Returns the Short value of the passed string.
+	 * In case of empty value, default value is returned.
+	 * During conversion Boolean.valueOf method is used.
+	 * @param value The value
+	 * @param defaultValue The dafault value
+	 * @return The Short value
+	 */
+	public static Short value(String value, Short defaultValue) {
+		if (StringUtils.isEmpty(value)) return defaultValue;
+		return Short.valueOf(value);
 	}
 	
 	/**
 	 * Returns the Integer value of the passed string.
 	 * In case of empty value, default value is returned.
 	 * During conversion Integer.valueOf method is used!
-	 * 
 	 * @param value The value
 	 * @param defaultValue The dafault value
 	 * @return The Integer value
@@ -359,7 +387,6 @@ public class LangUtils {
 	 * Returns the Long value of the passed string.
 	 * In case of empty value, default value is returned.
 	 * During conversion Integer.valueOf method is used!
-	 * 
 	 * @param value The value
 	 * @param defaultValue The dafault value
 	 * @return The Long value
@@ -374,7 +401,6 @@ public class LangUtils {
 	 * Returns the Float value of the passed string.
 	 * In case of empty value, default value is returned.
 	 * During conversion Float.valueOf method is used!
-	 * 
 	 * @param value The value
 	 * @param defaultValue The dafault value
 	 * @return The Float value
@@ -388,7 +414,6 @@ public class LangUtils {
 	/**
 	 * Returns the Type value of the passed string.
 	 * During conversion Type.valueOf method is used!
-	 * 
 	 * @param <T> The Type
 	 * @param value The value
 	 * @param type The class Type
@@ -434,6 +459,10 @@ public class LangUtils {
 	}
 	
 	public static Boolean value(Boolean value, Boolean defaultValue) {
+		return (value != null) ? value : defaultValue;
+	}
+	
+	public static Short value(Short value, Short defaultValue) {
 		return (value != null) ? value : defaultValue;
 	}
 	
