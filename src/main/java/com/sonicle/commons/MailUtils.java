@@ -678,6 +678,24 @@ public class MailUtils {
 		}
 		return charset;
 	}
+        
+        //Workaround for NethServer installation:
+        // Part.getContentType() may add a default charset value of "US-ASCII" in case
+        // of non existant charset in content-type. This would mislead any code
+        // looking for null when charset is actually not present in content-type.
+        // So we look directly in the content-type header and return null in this case.
+        public static String getCharsetOrNull(Part p) throws MessagingException {
+            String hdrs[]=p.getHeader("content-type");
+            if (hdrs!=null && hdrs[0]!=null && hdrs[0].toLowerCase().indexOf("charset=")<0) return null;
+            return getCharsetOrNull(p.getContentType());
+        }
+        
+        //Use workaround for NethServer installation:
+        public static String getCharsetOrDefault(Part p) throws MessagingException {
+            String charset=getCharsetOrNull(p);
+            if (charset==null) charset=java.nio.charset.Charset.defaultCharset().name();
+            return charset;
+        }
 
     /**
      * Convert the bytes within the specified range of the given byte
