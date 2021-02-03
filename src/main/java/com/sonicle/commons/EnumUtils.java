@@ -34,7 +34,10 @@ package com.sonicle.commons;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -102,7 +105,7 @@ public class EnumUtils {
 	}
 	
 	/**
-	 * Convenience method for getting the enum from its string value representation.
+	 * Transforms a string name to enum value equivalent representation.
 	 * JSON library annotation will be used for getting the serializedName, so you
 	 * need to annotate the enum class properly before using this method.
 	 * 
@@ -112,32 +115,77 @@ public class EnumUtils {
 	 *		@SerializedName("val1") VAL_1, @SerializedName("val2") VAL_2;
 	 * }
 	 * 
-	 * @param <E>
-	 * @param serializedName The serialized name
-	 * @param enumClass The enum class
+	 * @param <E> Enum type
+	 * @param serializedName The name as string
+	 * @param enumClass The enum class The Enum class type
 	 * @return The matching enum if found, null otherwise
 	 */
-	public static <E extends Enum<E>> E forSerializedName(String serializedName, Class<E> enumClass) {
+	public static <E extends Enum<E>> E forSerializedName(final String serializedName, final Class<E> enumClass) {
 		return forSerializedName(serializedName, null, enumClass);
 	}
 	
-	public static <E extends Enum<E>> E forSerializedName(String serializedName, E defaultValue, Class<E> enumClass) {
+	/**
+	 * Transforms a string name to enum value equivalent representation.
+	 * JSON library annotation will be used for getting the serializedName, so you
+	 * need to annotate the enum class properly before using this method.
+	 * 
+	 * @param <E> Enum type
+	 * @param serializedName The name as string
+	 * @param defaultValue Default value to return if no match is found
+	 * @param enumClass The enum class The Enum class type
+	 * @return The matching enum if found, the default value otherwise
+	 */
+	public static <E extends Enum<E>> E forSerializedName(final String serializedName, final E defaultValue, final Class<E> enumClass) {
 		if (serializedName == null) return defaultValue;
 		final E value = GSON.fromJson(serializedName, enumClass);
 		return (value == null) ? defaultValue : value;
 	}
-			
-	public static <E extends Enum<E>> String toSerializedName(E en) {
+	
+	/**
+	 * Transforms an enum to its string value equivalent.
+	 * @param <E> Enum type
+	 * @param en The enum value
+	 * @return The name of enum value as string
+	 */
+	public static <E extends Enum<E>> String toSerializedName(final E en) {
 		if (en == null) {
 			return null;
 		} else {
 			final String s = GSON.toJson(en, en.getClass());
 			return StringUtils.substring(s, 1, s.length()-1);
 		}
-		//return (en == null) ? null : GSON.toJson(en, en.getClass());
 	}
 	
+	/**
+	 * Transforms a set of enums to their string values equivalent.
+	 * Resulting nulls during conversion will be skipped.
+	 * @param <E> Enum type
+	 * @param ens The enum values
+	 * @return The names of enum values as a collection of strings
+	 */
+	public static <E extends Enum<E>> List<String> toSerializedNames(final Collection<E> ens) {
+		return toSerializedNames(ens, true);
+	}
 	
+	/**
+	 * Transforms a set of enums to their string values equivalent.
+	 * @param <E> Enum type
+	 * @param ens The enum values
+	 * @param skipNulls False to keep null elements in resulting collection as result of invalid enum conversion.
+	 * @return The names of enum values as a collection of strings
+	 */
+	public static <E extends Enum<E>> List<String> toSerializedNames(final Collection<E> ens, boolean skipNulls) {
+		if (ens == null) {
+			return null;
+		} else {
+			List<String> strings = new ArrayList<>();
+			for (E en : ens) {
+				final String s = toSerializedName(en);
+				if (!skipNulls || s != null) strings.add(s);
+			}
+			return strings;
+		}
+	}
 	
 	
 	

@@ -33,6 +33,8 @@
 package com.sonicle.commons.net;
 
 import com.sonicle.commons.RegexUtils;
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -57,68 +59,9 @@ public class IPUtils {
 	//private static final Pattern ADDRESS4_PATTERN = Pattern.compile(ADDRESS4);
 	//private static final Pattern CIDR4_PATTERN = Pattern.compile(CIDR4);
 	
-	public static String longToIpV4(long longIp) {
-		int octet3 = (int) ((longIp >> 24) % 256);
-		int octet2 = (int) ((longIp >> 16) % 256);
-		int octet1 = (int) ((longIp >> 8) % 256);
-		int octet0 = (int) ((longIp) % 256);
-		return octet3 + "." + octet2 + "." + octet1 + "." + octet0;
+	public static IPAddress toIPAddress(String ip) {
+		return new IPAddressString(ip).getAddress();
 	}
-	
-	public static long ipV4ToLong(String ip) {
-		String[] octets = ip.split("\\.");
-		return (Long.parseLong(octets[0]) << 24) + (Integer.parseInt(octets[1]) << 16)
-				+ (Integer.parseInt(octets[2]) << 8) + Integer.parseInt(octets[3]);
-	}
-
-	public static boolean isIPv4Private(String ip) {
-		long longIp = ipV4ToLong(ip);
-		return (longIp >= ipV4ToLong("10.0.0.0") && longIp <= ipV4ToLong("10.255.255.255"))
-				|| (longIp >= ipV4ToLong("172.16.0.0") && longIp <= ipV4ToLong("172.31.255.255"))
-				|| longIp >= ipV4ToLong("192.168.0.0") && longIp <= ipV4ToLong("192.168.255.255");
-	}
-
-	public static boolean isIPv4Valid(String address) {
-		return patternIPv4.matcher(address).matches();
-	}
-	
-	public static boolean isIPInRange(String[] cidrs, String clientIP) throws UnknownHostException {
-		InetAddress ia = InetAddress.getByName(clientIP);	
-		if(ia instanceof Inet6Address) { // We are not able to validate an IPv6, so skip check!
-			logger.warn("Request address ({}) seems an IPv6; check skipped!", clientIP);
-			return true;
-		} else { // old-style IPv4
-			SubnetUtils.SubnetInfo subnet = null;
-			String cidr = null;
-			for(int i=0; i<cidrs.length; i++) {
-				cidr = cidrs[i];
-				// Checks for a CIDR that maches all
-				if(cidr.equals("0.0.0.0/0") || cidr.equals("::/0")) {
-					logger.trace("Special CIDR found! All clients are allowed!");
-					return true;
-				}
-				logger.debug("Checking {} against CIDR {}", clientIP, cidr);
-				subnet = (new SubnetUtils(cidr)).getInfo();
-				if(subnet.isInRange(clientIP)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	private static int packDottedString4(String dottedString) {
-		String tokens[] = StringUtils.split(dottedString, ".", 4);
-		if (tokens.length != 4) throw new IllegalArgumentException("Invalid dotted notation [" + dottedString + "]");
-		int addr = 0;
-		for (int i = 1; i <= 4; ++i) {
-			int n = Integer.parseInt(tokens[i]);
-			if (n < 0 && n > 255) throw new IllegalArgumentException("Value out of range: [" + n + "]");
-			addr |= ((n & 0xff) << 8*(4-i));
-		}
-		return addr;
-	}
-	
 	
 	/**
 	 * Converts a netmask (IPv4), in dotted notation format, into number of bits.
@@ -150,5 +93,71 @@ public class IPUtils {
 			long bits = 0xffffffff ^ (1 << 32 - netmask) - 1;
 			return String.format("%d.%d.%d.%d", (bits & 0x0000000000ff000000L) >> 24, (bits & 0x0000000000ff0000) >> 16, (bits & 0x0000000000ff00) >> 8, bits & 0xff);
 		}
+	}
+	
+	public static boolean isIPInRange(String[] cidrs, String clientIP) throws UnknownHostException {
+		InetAddress ia = InetAddress.getByName(clientIP);	
+		if(ia instanceof Inet6Address) { // We are not able to validate an IPv6, so skip check!
+			logger.warn("Request address ({}) seems an IPv6; check skipped!", clientIP);
+			return true;
+		} else { // old-style IPv4
+			SubnetUtils.SubnetInfo subnet = null;
+			String cidr = null;
+			for(int i=0; i<cidrs.length; i++) {
+				cidr = cidrs[i];
+				// Checks for a CIDR that maches all
+				if(cidr.equals("0.0.0.0/0") || cidr.equals("::/0")) {
+					logger.trace("Special CIDR found! All clients are allowed!");
+					return true;
+				}
+				logger.debug("Checking {} against CIDR {}", clientIP, cidr);
+				subnet = (new SubnetUtils(cidr)).getInfo();
+				if(subnet.isInRange(clientIP)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	@Deprecated
+	public static boolean isIPv4Private(String ip) {
+		long longIp = ipV4ToLong(ip);
+		return (longIp >= ipV4ToLong("10.0.0.0") && longIp <= ipV4ToLong("10.255.255.255"))
+				|| (longIp >= ipV4ToLong("172.16.0.0") && longIp <= ipV4ToLong("172.31.255.255"))
+				|| longIp >= ipV4ToLong("192.168.0.0") && longIp <= ipV4ToLong("192.168.255.255");
+	}
+
+	@Deprecated
+	public static boolean isIPv4Valid(String address) {
+		return patternIPv4.matcher(address).matches();
+	}
+	
+	@Deprecated
+	public static String longToIpV4(long longIp) {
+		int octet3 = (int) ((longIp >> 24) % 256);
+		int octet2 = (int) ((longIp >> 16) % 256);
+		int octet1 = (int) ((longIp >> 8) % 256);
+		int octet0 = (int) ((longIp) % 256);
+		return octet3 + "." + octet2 + "." + octet1 + "." + octet0;
+	}
+	
+	@Deprecated
+	public static long ipV4ToLong(String ip) {
+		String[] octets = ip.split("\\.");
+		return (Long.parseLong(octets[0]) << 24) + (Integer.parseInt(octets[1]) << 16)
+				+ (Integer.parseInt(octets[2]) << 8) + Integer.parseInt(octets[3]);
+	}
+	
+	private static int packDottedString4(String dottedString) {
+		String tokens[] = StringUtils.split(dottedString, ".", 4);
+		if (tokens.length != 4) throw new IllegalArgumentException("Invalid dotted notation [" + dottedString + "]");
+		int addr = 0;
+		for (int i = 1; i <= 4; ++i) {
+			int n = Integer.parseInt(tokens[i]);
+			if (n < 0 && n > 255) throw new IllegalArgumentException("Value out of range: [" + n + "]");
+			addr |= ((n & 0xff) << 8*(4-i));
+		}
+		return addr;
 	}
 }
