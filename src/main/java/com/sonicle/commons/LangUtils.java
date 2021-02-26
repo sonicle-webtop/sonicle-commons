@@ -273,7 +273,8 @@ public class LangUtils {
 	 */
 	public static String encodeForHTMLContent(final String str) {
 		if (StringUtils.isBlank(str)) return str;
-		return Encode.forHtmlContent(str);
+		return encodeLineBreaksForHTML(Encode.forHtmlContent(str));
+		//return Encode.forHtmlContent(str);
 	}
 	
 	/**
@@ -285,14 +286,33 @@ public class LangUtils {
 		if (StringUtils.isBlank(str)) return str;
 		return Encode.forHtmlAttribute(str);
 	}
+	
+	/**
+	 * Encodes line-breaks chars (both '\n' and '\r') into HTML '<br>' element.
+	 * @param str The string to encode.
+	 * @return Encoded for use in HTML.
+	 */
+	public static String encodeLineBreaksForHTML(final String str) {
+		return replaceLineBreaks(str, "<br>");
+	}
 
 	/**
-	 * Convenience method for replacing line-breaks control characters
-	 * ('\r\n', '\n' and '\r') from passed string.
+	 * Removes line-breaks control characters ('\r\n', '\n' and '\r') from the passed string.
 	 * @param str The source string.
 	 * @return The cleaned string.
 	 */
 	public static String stripLineBreaks(final String str) {
+		return replaceLineBreaks(str, "");
+	}
+	
+	/**
+	 * Cleanses line-breaks control characters ('\r\n', '\n' and '\r') from
+	 * passed String, replacing them with the specified replacement.
+	 * @param str The source string.
+	 * @param replace The replacement string.
+	 * @return The cleaned string.
+	 */
+	public static String replaceLineBreaks(final String str, final String replace) {
 		String s = StringUtils.replace(str, "\r\n", "");
 		s = StringUtils.replace(s, "\n", "");
 		s = StringUtils.replace(s, "\r", "");
@@ -621,15 +641,43 @@ public class LangUtils {
 		return sb.toString();
 	}
 	
+	/**
+	 * Parses a String into Map entries. Character ',' will be uses as items
+	 * separator and '=' as values separator. Key first (index 0), followed by 
+	 * its associated value (index 1).
+	 * @param str The String value.
+	 * @return The resulting Map.
+	 */
 	public static Map<String, String> parseStringAsKeyValueMap(final String str) {
 		return parseStringAsKeyValueMap(str, 0, 1);
 	}
 	
+	/**
+	 * Parses a String into Map entries using indexes to select which token is 
+	 * the key and which one is the value. Character ',' will be uses as items
+	 * separator and '=' as values separator.
+	 * @param str The String value.
+	 * @param keyIndex The key index.
+	 * @param valueIndex The value index.
+	 * @return The resulting Map.
+	 */
 	public static Map<String, String> parseStringAsKeyValueMap(final String str, final int keyIndex, final int valueIndex) {
-		return parseStringAsKeyValueMap(str, keyIndex, valueIndex, ",", "=");
+		return parseStringAsKeyValueMap(str, keyIndex, valueIndex, ",", "=", true);
 	}
 	
-	public static Map<String, String> parseStringAsKeyValueMap(final String str, final int keyIndex, final int valueIndex, final String itemsSeparator, final String valuesSeparator) {
+	/**
+	 * Parses a String into Map entries using the specified separators to 
+	 * split the source value and indexes to select which token is the key and
+	 * which one is the value.
+	 * @param str The String value.
+	 * @param keyIndex The key index.
+	 * @param valueIndex The value index.
+	 * @param itemsSeparator Separator char between items.
+	 * @param valuesSeparator Separator char between key and value.
+	 * @param trim Controls whether to trim items before adding to map.
+	 * @return The resulting Map.
+	 */
+	public static Map<String, String> parseStringAsKeyValueMap(final String str, final int keyIndex, final int valueIndex, final String itemsSeparator, final String valuesSeparator, final boolean trim) {
 		LinkedHashMap<String, String> map = new LinkedHashMap();
 		if (!StringUtils.isBlank(str)) {
 			int ki = keyIndex >= 0 && keyIndex <= 1 ? keyIndex : 0;
@@ -637,10 +685,51 @@ public class LangUtils {
 			String[] ltokens = StringUtils.split(str, itemsSeparator);
 			for (int i=0; i<ltokens.length; i++) {
 				String[] itokens = StringUtils.split(ltokens[i], valuesSeparator, 2);
-				if (itokens.length == 2) map.put(itokens[ki], itokens[vi]);
+				if (itokens.length == 2) {
+					map.put(trim ? StringUtils.trim(itokens[ki]) : itokens[ki], trim ? StringUtils.trim(itokens[vi]) : itokens[vi]);
+				}
 			}
 		}
 		return map;
+	}
+	
+	/**
+	 * Parses a String into a List of items of the specified type.
+	 * Character ',' will be uses as items separator. Null-items will be ignored.
+	 * @param <T>
+	 * @param str The String value.
+	 * @param type The object type.
+	 * @return The resulting List.
+	 */
+	public static <T> List<T> parseStringAsList(final String str, Class<T> type) {
+		return parseStringAsList(str, ",", true, type);
+	}
+	
+	/**
+	 * Parses a String into a List of items of the specified type, using the 
+	 * provided character as separator between items. Null-items will be ignored.
+	 * @param <T>
+	 * @param str The String value.
+	 * @param separator Separator char between items.
+	 * @param trim Controls whether to trim items before converting them.
+	 * @param type The object type.
+	 * @return The resulting List.
+	 */
+	public static <T> List<T> parseStringAsList(final String str, final String separator, final boolean trim, Class<T> type) {
+		ArrayList<T> list = new ArrayList<>();
+		if (!StringUtils.isBlank(str)) {
+			String[] ltokens = StringUtils.split(str, separator);
+			for (int i=0; i<ltokens.length; i++) {
+				String svalue = trim ? StringUtils.trim(ltokens[i]) : ltokens[i];
+				if (type.isAssignableFrom(String.class)) {
+					if (svalue != null) list.add((T)svalue);
+				} else {
+					T value = value(svalue, null, type);
+					if (value != null) list.add(value);
+				}
+			}
+		}
+		return list;
 	}
 	
 	/**
