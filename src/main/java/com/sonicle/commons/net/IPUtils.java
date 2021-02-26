@@ -33,12 +33,14 @@
 package com.sonicle.commons.net;
 
 import com.sonicle.commons.RegexUtils;
+import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.slf4j.Logger;
@@ -59,8 +61,59 @@ public class IPUtils {
 	//private static final Pattern ADDRESS4_PATTERN = Pattern.compile(ADDRESS4);
 	//private static final Pattern CIDR4_PATTERN = Pattern.compile(CIDR4);
 	
-	public static IPAddress toIPAddress(String ip) {
+	/**
+	 * Parses a string into an IPAddress object.
+	 * @param ip The address String to parse.
+	 * @return The IPAddress object or null if string is not parsable.
+	 */
+	public static IPAddress toIPAddress(final String ip) {
 		return new IPAddressString(ip).getAddress();
+	}
+	
+	/**
+	 * Checks if passed IPAddress is a public address or not.
+	 * @param ip The address to check.
+	 * @return `true` if address is public, `false` otherwise.
+	 */
+	public static boolean isPublicAddress(final IPAddress ip) {
+		return ip == null ? false : !ip.isLocal() && !ip.isLoopback();
+	}
+	
+	/**
+	 * Checks if passed IPAddress is in range of specified CIDRs.
+	 * @param ip The address to check.
+	 * @param cidrs The CIDRs to evaluate address against.
+	 * @return `true` if address is contained in one of CIDRs, `false` otherwise.
+	 */
+	public static boolean isAddressInRange(final IPAddress ip, final String[] cidrs) {
+		Check.notNull(cidrs, "cidrs");
+		if (ip == null) return false;
+		
+		for (String scidr : cidrs) {
+			try {
+				IPAddress cidr = new IPAddressString(scidr).toAddress();
+				if (cidr.contains(ip)) return true;
+			} catch(AddressStringException ex) {
+				logger.error("String '{}' is not a valid CIDR address", scidr, ex);
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if passed IPAddress is in range of specified CIDRs.
+	 * @param ip The address to check.
+	 * @param cidrs The CIDRs to evaluate address against.
+	 * @return `true` if address is contained in one of CIDRs, `false` otherwise.
+	 */
+	public static boolean isAddressInRange(final IPAddress ip, final IPAddress[] cidrs) {
+		Check.notNull(cidrs, "cidrs");
+		if (ip == null) return false;
+		
+		for (IPAddress cidr : cidrs) {
+			if (cidr.contains(ip)) return true;
+		}
+		return false;
 	}
 	
 	/**
