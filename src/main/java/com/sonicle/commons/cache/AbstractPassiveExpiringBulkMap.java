@@ -37,10 +37,13 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * Abstract class that implements a passive expiring Map suitable for building
+ * cache structures that can be recreated in bulk mode; the expiration time 
+ * involves the whole map object.
+ * 
  * @author malbinola
- * @param <K>
- * @param <V>
+ * @param <K> The map key type
+ * @param <V> The map value type
  */
 public abstract class AbstractPassiveExpiringBulkMap<K, V> extends AbstractPassiveExpiringBulkCache {
 	protected Map<K, V> map;

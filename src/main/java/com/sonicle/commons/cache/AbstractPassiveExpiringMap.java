@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Sonicle S.r.l.
+ * Copyright (C) 2021 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,12 +28,12 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2020 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2021 Sonicle S.r.l.".
  */
 package com.sonicle.commons.cache;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,64 +42,69 @@ import java.util.concurrent.TimeUnit;
  * @param <K>
  * @param <V>
  */
-public abstract class AbstractPassiveExpiringMap<K, V> extends AbstractPassiveExpiringBulkCache {
-	protected Map<K, V> map;
+public abstract class AbstractPassiveExpiringMap<K, V> {
+	protected final ExpirationPolicy expiringPolicy;
+	protected final boolean mapNullValues;
+	protected final Map<K, ExpiringObject> map = new ConcurrentHashMap<>();
 	
-	public AbstractPassiveExpiringMap() {
-		super();
+	public AbstractPassiveExpiringMap(final boolean mapNullValues) {
+		this(-1L, mapNullValues);
 	}
 	
-	public AbstractPassiveExpiringMap(final ExpirationPolicy expiringPolicy) {
-		super(expiringPolicy);
+	public AbstractPassiveExpiringMap(final ExpirationPolicy expiringPolicy, final boolean mapNullValues) {
+		this.expiringPolicy = expiringPolicy;
+		this.mapNullValues = mapNullValues;
 	}
 	
-	public AbstractPassiveExpiringMap(final long timeToLiveMillis) {
-		super(timeToLiveMillis);
+	public AbstractPassiveExpiringMap(final long timeToLiveMillis, final boolean mapNullValues) {
+		this(new ConstantTimeToLiveExpirationPolicy(timeToLiveMillis), mapNullValues);
 	}
 	
-	public AbstractPassiveExpiringMap(final long timeToLive, final TimeUnit timeUnit) {
-		super(timeToLive, timeUnit);
+	public AbstractPassiveExpiringMap(final long timeToLive, final TimeUnit timeUnit, final boolean mapNullValues) {
+		this(ConstantTimeToLiveExpirationPolicy.validateAndConvertToMillis(timeToLive, timeUnit), mapNullValues);
 	}
 	
-	protected abstract Map<K, V> internalGetMap();
-	
-	@Override
-	protected void internalBuildCache() {
-		map = internalGetMap();
-	}
-
-	@Override
-	protected void internalCleanupCache() {
-		map = null;
-	}
+	protected abstract V internalGetValue(K key);
 	
 	public V get(K key) {
-		this.internalCheckBeforeGetDoNotLockThis();
-		long stamp = this.readLock();
-		try {
-			return (map != null) ? map.get(key) : null;
-		} finally {
-			this.unlockRead(stamp);
+		ExpiringObject value = map.computeIfAbsent(key, (K k) -> {
+			ExpiringObject eo = new ExpiringObject(k, expiringPolicy);
+			// Perform lookup to init internal value, in case of null result 
+			// and if mapNullValues is false, reject mapping returning null...
+			if (eo.get() == null && !mapNullValues) return null;
+			return eo;
+		});
+		
+		if (value != null) {
+			// We can be here if ExpiringObject was being computed above or if
+			// it wars already on the map. So get value again and eventually 
+			// remove if from the map is null.
+			// This can be improved: map.computeIfAbsent and map.remove(key) are 
+			// not executed together, so with two threads or using an expiring 
+			// value too short could produce unpredictible results.
+			V v = value.get();
+			if (!mapNullValues && v == null) {
+				map.remove(key);
+				return null;
+			} else {
+				return v;
+			}
+		} else {
+			return null;
 		}
 	}
 	
-	public boolean containsKey(K key) {
-		this.internalCheckBeforeGetDoNotLockThis();
-		long stamp = this.readLock();
-		try {
-			return (map != null) ? map.containsKey(key) : false;
-		} finally {
-			this.unlockRead(stamp);
+	private class ExpiringObject extends AbstractPassiveExpiringValue<V> {
+		private final K key;
+		
+		public ExpiringObject(final K key, final ExpirationPolicy expiringPolicy) {
+			super(expiringPolicy);
+			this.key = key;
 		}
-	}
-	
-	public Map<K, V> shallowCopy() {
-		this.internalCheckBeforeGetDoNotLockThis();
-		long stamp = this.readLock();
-		try {
-			return (map != null) ? new HashMap<>(map) : null;
-		} finally {
-			this.unlockRead(stamp);
+		
+		@Override
+		protected V internalGetValue() {
+			return AbstractPassiveExpiringMap.this.internalGetValue(key);
 		}
 	}
 }

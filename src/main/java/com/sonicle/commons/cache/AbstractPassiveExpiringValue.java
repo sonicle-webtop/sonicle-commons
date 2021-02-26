@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Sonicle S.r.l.
+ * Copyright (C) 2021 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,76 +28,53 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2020 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2021 Sonicle S.r.l.".
  */
 package com.sonicle.commons.cache;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
  *
  * @author malbinola
- * @param <K>
  * @param <V>
  */
-public abstract class AbstractPassiveExpiringCache<K, V> extends AbstractPassiveExpiringBulkCache {
-	protected Map<K, V> map;
+public abstract class AbstractPassiveExpiringValue<V> extends AbstractPassiveExpiringBulkCache {
+	private V value;
 	
-	public AbstractPassiveExpiringCache() {
+	public AbstractPassiveExpiringValue() {
 		super();
 	}
 	
-	public AbstractPassiveExpiringCache(final ExpirationPolicy expiringPolicy) {
+	public AbstractPassiveExpiringValue(final ExpirationPolicy expiringPolicy) {
 		super(expiringPolicy);
 	}
 	
-	public AbstractPassiveExpiringCache(final long timeToLiveMillis) {
+	public AbstractPassiveExpiringValue(final long timeToLiveMillis) {
 		super(timeToLiveMillis);
 	}
 	
-	public AbstractPassiveExpiringCache(final long timeToLive, final TimeUnit timeUnit) {
+	public AbstractPassiveExpiringValue(final long timeToLive, final TimeUnit timeUnit) {
 		super(timeToLive, timeUnit);
 	}
 	
-	protected abstract Map<K, V> internalGetCache();
-	
+	protected abstract V internalGetValue();
+
 	@Override
 	protected void internalBuildCache() {
-		map = internalGetCache();
+		value = internalGetValue();
 	}
 
 	@Override
 	protected void internalCleanupCache() {
-		map = null;
+		value = null;
 	}
 	
-	public V get(K key) {
+	public V get() {
 		this.internalCheckBeforeGetDoNotLockThis();
 		long stamp = this.readLock();
 		try {
-			return (map != null) ? map.get(key) : null;
-		} finally {
-			this.unlockRead(stamp);
-		}
-	}
-	
-	public boolean containsKey(K key) {
-		this.internalCheckBeforeGetDoNotLockThis();
-		long stamp = this.readLock();
-		try {
-			return (map != null) ? map.containsKey(key) : false;
-		} finally {
-			this.unlockRead(stamp);
-		}
-	}
-	
-	public Map<K, V> shallowCopy() {
-		this.internalCheckBeforeGetDoNotLockThis();
-		long stamp = this.readLock();
-		try {
-			return (map != null) ? new HashMap<>(map) : null;
+			return value;
 		} finally {
 			this.unlockRead(stamp);
 		}

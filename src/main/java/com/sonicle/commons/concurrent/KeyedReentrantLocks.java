@@ -35,15 +35,62 @@ package com.sonicle.commons.concurrent;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * https://stackoverflow.com/a/36591851
+ * https://github.com/mojgh/JKeyLockManager
+ * https://bitbucket.org/kilaka/kuava/src/master/src/main/java/kilaka/kuava/DynamicKeyLock.java
+ * https://bitbucket.org/kilaka/kuava/src/master/src/main/java/kilaka/kuava/
  * @author malbinola
  * @param <K>
  */
 public class KeyedReentrantLocks<K> {
 	private final ConcurrentMap<K, KeyedLock> key2Lock = new ConcurrentHashMap<>();
 	
+	public KeyedLock acquire(K key) throws InterruptedException {
+		return internalAcquire(key, null);
+	}
+	
+	public KeyedLock tryAcquire(K key, long millis) {
+		try {
+			return internalAcquire(key, millis);
+		} catch(InterruptedException ex) {
+			return null;
+		}
+	}
+	
+	protected KeyedLock internalAcquire(K key, Long millis) throws InterruptedException {
+		final KeyedLock ourLock = new KeyedLock() {
+			@Override
+			public void close() {
+				if (Thread.currentThread().getId() != threadId) {
+					throw new IllegalStateException("Thread mismatch");
+				}
+				if (--lockedCount == 0) {
+					key2Lock.remove(key);
+					mutex.countDown();
+				}
+			}
+		};
+		for (;;) {
+			KeyedLock theirLock = key2Lock.putIfAbsent(key, ourLock);
+			if (theirLock == null) {
+				return ourLock;
+			}
+			if (theirLock.threadId == Thread.currentThread().getId()) {
+				theirLock.lockedCount++;
+				return theirLock;
+			}
+			if (millis != null) {
+				if (!theirLock.mutex.await(millis, TimeUnit.MILLISECONDS)) return null;
+			} else {
+				theirLock.mutex.await();
+			}
+		}
+	}
+	
+	/*
 	public KeyedLock acquire(K key) throws InterruptedException {
 		final KeyedLock ourLock = new KeyedLock() {
 			@Override
@@ -69,6 +116,7 @@ public class KeyedReentrantLocks<K> {
 			theirLock.mutex.await();
 		}
 	}
+	*/
 	
 	public static abstract class KeyedLock implements AutoCloseable {
 		protected final CountDownLatch mutex = new CountDownLatch(1);
