@@ -94,6 +94,10 @@ public abstract class AbstractPassiveExpiringMap<K, V> {
 		}
 	}
 	
+	public boolean remove(K key) {
+		return (map.remove(key) != null);
+	}
+	
 	private class ExpiringObject extends AbstractPassiveExpiringValue<V> {
 		private final K key;
 		

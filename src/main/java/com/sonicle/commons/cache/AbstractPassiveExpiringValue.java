@@ -79,4 +79,13 @@ public abstract class AbstractPassiveExpiringValue<V> extends AbstractPassiveExp
 			this.unlockRead(stamp);
 		}
 	}
+	
+	public boolean isExpired() {
+		long stamp = this.readLock();
+		try {
+			return checkExpired(now(), expirationTime);
+		} finally {
+			this.unlockRead(stamp);
+		}
+	}
 }

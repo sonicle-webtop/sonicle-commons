@@ -69,7 +69,7 @@ public abstract class AbstractPassiveExpiringBulkCache extends AbstractBulkCache
 	protected void internalCheckBeforeGetDoNotLockThis() {
 		long stamp = lock.writeLock();
 		try {
-			if (!isInited() || isExpired(now(), expirationTime)) {
+			if (!isInited() || checkExpired(now(), expirationTime)) {
 				internalInit();
 			}
 		} finally {
@@ -86,7 +86,7 @@ public abstract class AbstractPassiveExpiringBulkCache extends AbstractBulkCache
 		}
 	}
 	
-	protected boolean isExpired(final long now, final Long expirationTime) {
+	protected boolean checkExpired(final long now, final Long expirationTime) {
 		if (expirationTime != null) {
 			return expirationTime >= 0 && now >= expirationTime;
 		}
