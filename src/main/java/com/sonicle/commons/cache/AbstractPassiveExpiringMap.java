@@ -37,11 +37,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * @deprecated use Caffeine instead
  * @author malbinola
  * @param <K>
  * @param <V>
  */
+@Deprecated
 public abstract class AbstractPassiveExpiringMap<K, V> {
 	protected final ExpirationPolicy expiringPolicy;
 	protected final boolean mapNullValues;

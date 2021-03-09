@@ -35,10 +35,11 @@ package com.sonicle.commons.cache;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * @deprecated use Caffeine instead
  * @author malbinola
  * @param <V>
  */
+@Deprecated
 public abstract class AbstractPassiveExpiringValue<V> extends AbstractPassiveExpiringBulkCache {
 	private V value;
 	
