@@ -32,8 +32,8 @@
  */
 package com.sonicle.commons.mail;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
 import org.apache.commons.lang3.StringUtils;
 
 /**

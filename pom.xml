@@ -26,7 +26,7 @@
 		<friendly-id.version>1.1.0</friendly-id.version>
 		<gson.version>2.6.2</gson.version>
 		<httpclient.version>4.5.3</httpclient.version>
-		<javax-mail.version>1.5.6</javax-mail.version>
+		<jakarta-mail.version>2.0.0</jakarta-mail.version>
 		<joda-time.version>2.7</joda-time.version>
 		<jsch.version>0.1.54</jsch.version>
 		<license4j.version>4.7.3</license4j.version>
@@ -118,10 +118,10 @@
 		</dependency>
 		-->
 		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>${javax-mail.version}</version>
-		</dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${jakarta-mail.version}</version>
+        </dependency>		
 		<dependency>
 			<groupId>net.htmlparser.jericho</groupId>
 			<artifactId>jericho-html</artifactId>
