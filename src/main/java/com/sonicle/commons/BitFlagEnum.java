@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Sonicle S.r.l.
+ * Copyright (C) 2021 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,53 +28,31 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2020 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2021 Sonicle S.r.l.".
  */
 package com.sonicle.commons;
+
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
  * @author malbinola
  */
-public class FlagUtils {
+public interface BitFlagEnum {
+	public int value();
+	public String name();
 	
-	/**
-	 * Checks if the flag is set on the source value.
-	 * @param source The source value.
-	 * @param flag The flag which should be set.
-	 * @return `true` wether specified int flag is set, `false` otherwise.
-	 */
-	public static boolean has(int source, int flag) {
-		return (source & flag) == flag;
-	}
-	
-	/**
-	 * Sets the specified flag on the source value.
-	 * @param source The source value.
-	 * @param flag The flag to be set.
-	 * @return The resulting value.
-	 */
-	public static int set(int source, int flag) {
-		return source | flag;
-	}
-	
-	/**
-	 * Un-sets the specified flag on the source value.
-	 * @param source The source value.
-	 * @param flag The flag to be unset.
-	 * @return The resulting value.
-	 */
-	public static int unset(int source, int flag) {
-		return source & ~flag;
-	}
-	
-	/**
-	 * Returns the masked value for specified flag on the source value.
-	 * @param source The source value.
-	 * @param flag The flag for which return the mask.
-	 * @return The resulting mask.
-	 */
-	public static int mask(int source, int flag) {
-		return source & flag;
+	@SuppressWarnings("unchecked")
+	static <E extends Enum> Map<Integer, E> getValues(Class<E> clazz) {
+		Map<Integer, E> map = new LinkedHashMap();
+		Iterator it = EnumSet.allOf(clazz).iterator();
+		while (it.hasNext()) {
+			E e = (E)it.next();
+			map.put(((BitFlagEnum)e).value(), e);
+		}
+		return map;
 	}
 }

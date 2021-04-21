@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Sonicle S.r.l.
+ * Copyright (C) 2021 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,53 +28,68 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2020 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2021 Sonicle S.r.l.".
  */
 package com.sonicle.commons;
+
+import java.util.Map;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  *
  * @author malbinola
+ * @param <E>
  */
-public class FlagUtils {
+public class BitFlag<E extends BitFlagEnum> {
+	private int value;
 	
-	/**
-	 * Checks if the flag is set on the source value.
-	 * @param source The source value.
-	 * @param flag The flag which should be set.
-	 * @return `true` wether specified int flag is set, `false` otherwise.
-	 */
-	public static boolean has(int source, int flag) {
-		return (source & flag) == flag;
+	public BitFlag() {
+		this(0);
 	}
 	
-	/**
-	 * Sets the specified flag on the source value.
-	 * @param source The source value.
-	 * @param flag The flag to be set.
-	 * @return The resulting value.
-	 */
-	public static int set(int source, int flag) {
-		return source | flag;
+	public BitFlag(int value) {
+		this.value = value;
 	}
 	
-	/**
-	 * Un-sets the specified flag on the source value.
-	 * @param source The source value.
-	 * @param flag The flag to be unset.
-	 * @return The resulting value.
-	 */
-	public static int unset(int source, int flag) {
-		return source & ~flag;
+	public boolean has(E flag) {
+		return FlagUtils.has(this.value, flag.value());
 	}
 	
-	/**
-	 * Returns the masked value for specified flag on the source value.
-	 * @param source The source value.
-	 * @param flag The flag for which return the mask.
-	 * @return The resulting mask.
-	 */
-	public static int mask(int source, int flag) {
-		return source & flag;
+	public BitFlag set(E... flags) {
+		for (E bfe : flags) {
+			this.value = FlagUtils.set(this.value, bfe.value());
+		}
+		return this;
+	}
+	
+	public BitFlag unset(E... flags) {
+		for (E bfe : flags) {
+			this.value = FlagUtils.unset(this.value, bfe.value());
+		}
+		return this;
+	}
+	
+	public BitFlag copy() {
+		return new BitFlag(this.value);
+	}
+	
+	public <E extends Enum> String toString(Class<E> clazz) {
+		ToStringBuilder tsb = new ToStringBuilder(this);
+		for (Map.Entry<Integer, E> entry : BitFlagEnum.getValues(clazz).entrySet()) {
+			if (FlagUtils.has(this.value, entry.getKey())) tsb.append(entry.getValue().name());
+		}
+		return tsb.toString();
+	}
+	
+	public static <E extends BitFlagEnum> BitFlag of(E... flags) {
+		int v = 0;
+		for (E f : flags) {
+			v = FlagUtils.set(v, f.value());
+		}
+		return new BitFlag(v);
+	}
+	
+	public static BitFlag none() {
+		return new BitFlag();
 	}
 }
