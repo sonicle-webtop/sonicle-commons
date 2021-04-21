@@ -163,6 +163,10 @@ public class DateTimeUtils {
 		return instant.isAfter(dayFrom) && instant.isBefore(dayTo); // We need to exclude midnight!
 	}
 	
+	public static Days daysBetween(ReadableInstant instant1, ReadableInstant instant2) {
+		return (instant1 != null && instant2 != null) ? Days.daysBetween(instant1, instant2) : null; 
+	}
+	
 	/**
 	 * Returns the difference in days (or dates) not keeping into account the
 	 * real amount of time passed between the two dates.
@@ -337,6 +341,10 @@ public class DateTimeUtils {
 		DateTimeFormatter dtf = DateTimeFormat.forPattern(pattern);
 		return (tz != null) ? dtf.withZone(tz) : dtf;
 	}
+	
+	public static DateTimeZone parseDateTimeZone(String tzid) {
+		return !StringUtils.isBlank(tzid) ? DateTimeZone.forID(tzid) : null;
+	}
 
 	public static DateTime parseYmdHmsWithZone(String date, String time, DateTimeZone tz) {
 		return parseYmdHmsWithZone(date + " " + time, tz);
@@ -349,10 +357,30 @@ public class DateTimeUtils {
 		return fmt.parseDateTime(s);
 	}
 	
+	/**
+	 * @deprecated Use printYmdHms instead
+	 */
+	@Deprecated
 	public static String printYmdHmsWithZone(DateTime dateTime, DateTimeZone tz) {
-		if(dateTime == null) return null;
-		DateTimeFormatter fmt = DateTimeUtils.createYmdHmsFormatter(tz);
-		return fmt.print(dateTime);
+		return printYmdHms(dateTime, tz);
+	}
+	
+	public static String printYmdHms(DateTime dateTime, DateTimeZone tz) {
+		if (dateTime == null) return null;
+		return DateTimeUtils.createYmdHmsFormatter(tz).print(dateTime);
+	}
+	
+	public static String printYmd(DateTime dateTime, DateTimeZone tz) {
+		if (dateTime == null) return null;
+		return DateTimeUtils.createYmdFormatter(tz).print(dateTime);
+	}
+	
+	public static String print(DateTimeFormatter formatter, ReadablePartial rp) {
+		return (rp == null) ? null : formatter.print(rp);
+	}
+	
+	public static String print(DateTimeFormatter formatter, ReadableInstant ri) {
+		return (ri == null) ? null : formatter.print(ri);
 	}
 	
 	//event.setRecurrence(orec.getRule(), orec.getLocalStartDate(event.getDateTimeZone()));
@@ -363,14 +391,6 @@ public class DateTimeUtils {
 	
 	public static LocalDate parseLocalDate(DateTimeFormatter formatter, String s) {
 		return StringUtils.isBlank(s) ? null : formatter.parseLocalDate(s);
-	}
-	
-	public static String print(DateTimeFormatter formatter, ReadablePartial rp) {
-		return (rp == null) ? null : formatter.print(rp);
-	}
-	
-	public static String print(DateTimeFormatter formatter, ReadableInstant ri) {
-		return (ri == null) ? null : formatter.print(ri);
 	}
 	
 	/**

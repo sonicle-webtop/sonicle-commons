@@ -43,7 +43,7 @@ public class DateTimeRange {
 	public final DateTime to;
 	
 	public DateTimeRange(DateTime from, DateTime to) {
-		if (from.isAfter(to)) {
+		if ((from != null) && (to != null) && from.isAfter(to)) {
 			this.from = to;
 			this.to = from;
 		} else {
