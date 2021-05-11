@@ -35,9 +35,10 @@ package com.sonicle.commons.time;
 import org.joda.time.LocalDate;
 
 /**
- *
+ * @deprecated
  * @author malbinola
  */
+@Deprecated
 public class DateRange {
 	public final LocalDate from;
 	public final LocalDate to;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Sonicle S.r.l.
+ * Copyright (C) 2021 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,28 +28,50 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2019 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2021 Sonicle S.r.l.".
  */
 package com.sonicle.commons.time;
 
 import org.joda.time.DateTime;
 
 /**
- * @deprecated 
+ *
  * @author malbinola
  */
-@Deprecated
-public class DateTimeRange {
-	public final DateTime from;
-	public final DateTime to;
+public class InstantRange {
+	protected DateTime start;
+	protected DateTime end;
 	
-	public DateTimeRange(DateTime from, DateTime to) {
-		if ((from != null) && (to != null) && from.isAfter(to)) {
-			this.from = to;
-			this.to = from;
-		} else {
-			this.from = from;
-			this.to = to;
+	public InstantRange() {
+		this(null, null);
+	}
+	
+	public InstantRange(DateTime start, DateTime end) {
+		this.start = start;
+		this.end = end;
+	}
+	
+	public DateTime getStart() {
+		return start;
+	}
+	
+	public DateTime getEnd() {
+		return end;
+	}
+	
+	public InstantRange withStart(DateTime start) {
+		this.start = start;
+		if ((start != null) && (end != null) && end.isBefore(start)) {
+			end = start;
 		}
+		return this;
+	}
+	
+	public InstantRange withEnd(DateTime end) {
+		this.end = end;
+		if ((start != null) && (end != null) && start.isAfter(end)) {
+			start = end;
+		}
+		return this;
 	}
 }
