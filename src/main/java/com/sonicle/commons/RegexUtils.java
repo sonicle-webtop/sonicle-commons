@@ -90,6 +90,17 @@ public class RegexUtils {
 	public static final String MATCH_URI = "(" + MATCH_SCHEME + "):" + MATCH_AUTHORITY + "(?:(" + MATCH_USERINFO + ")@)?(" + MATCH_HOST + ")(?::(" + MATCH_PORT + "))?";
 	
 	/**
+	 * Pattern that matches URLs in non trivial situations.
+	 * There are numerous examples online but not all pass rigoruous test: 
+	 *		https://mathiasbynens.be/demo/url-regex
+	 * The only one that looks to be comprehensive and bulletproof is this one:
+	 *		https://gist.github.com/dperini/729294
+	 *		(which requires inclusion of a copyright header )
+	 */
+	public static final String MATCH_SIMPLE_URL = "(?:http:\\/\\/|https:\\/\\/|ftp:\\/\\/|\\/\\/)(?:[-a-zA-Z0-9@:%_\\+.~#?&\\/=])+";
+	
+	/**
+	 * @deprecated the above one seems simplest!
 	 * Matches any URIs inside a block of text.
 	 * https://stackoverflow.com/questions/30847/regex-to-validate-uris
 	 * https://snipplr.com/view/6889/regular-expressions-for-uri-validationparsing
@@ -103,7 +114,7 @@ public class RegexUtils {
 	 * ________________________________________________________________________________
 	 * 
 	 */
-	public static final String MATCH_URI_IN_TEXT = "([a-z0-9+.-]+):(?:\\/\\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\\d*))?(\\/(?:[a-z0-9-._~!$&'()*+,;=:@\\/]|%[0-9A-F]{2})*)?|(\\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\\/]|%[0-9A-F]{2})*)?)(?:\\?((?:[a-z0-9-._~!$&'()*+,;=:\\/?@]|%[0-9A-F]{2})*))?(?:#((?:[a-z0-9-._~!$&'()*+,;=:\\/?@]|%[0-9A-F]{2})*))?";
+	//public static final String MATCH_URI_IN_TEXT = "([a-z0-9+.-]+):(?:\\/\\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\\d*))?(\\/(?:[a-z0-9-._~!$&'()*+,;=:@\\/]|%[0-9A-F]{2})*)?|(\\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\\/]|%[0-9A-F]{2})*)?)(?:\\?((?:[a-z0-9-._~!$&'()*+,;=:\\/?@]|%[0-9A-F]{2})*))?(?:#((?:[a-z0-9-._~!$&'()*+,;=:\\/?@]|%[0-9A-F]{2})*))?";
 	
 	public static final String MATCH_NETMASK4 = "(((255\\.){3}(255|254|252|248|240|224|192|128|0+))|((255\\.){2}(255|254|252|248|240|224|192|128|0+)\\.0)|((255\\.)(255|254|252|248|240|224|192|128|0+)(\\.0+){2})|((255|254|252|248|240|224|192|128|0+)(\\.0+){3}))";
 	
