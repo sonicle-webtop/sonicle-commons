@@ -1008,6 +1008,15 @@ public class LangUtils {
 	}
 	
 	/**
+	 * Obtains Throwable's message.
+	 * @param t The throwable to get the message.
+	 * @return 
+	 */
+	public static String getThrowableMessage(Throwable t) {
+		return ExceptionUtils.getMessage(t);
+	}
+	
+	/**
 	 * Introspects the Throwable to obtain the deepest (root) cause.
 	 * @param t The throwable to get the root cause for, may be null.
 	 * @return The deepest cause or throwable itself
