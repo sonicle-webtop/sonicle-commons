@@ -25,7 +25,7 @@
 		<commons-net.version>3.1</commons-net.version>
 		<friendly-id.version>1.1.0</friendly-id.version>
 		<gson.version>2.6.2</gson.version>
-		<httpclient.version>4.5.3</httpclient.version>
+		<httpclient.version>4.5.13</httpclient.version>
 		<jakarta-mail.version>2.0.0</jakarta-mail.version>
 		<joda-time.version>2.7</joda-time.version>
 		<jsch.version>0.1.54</jsch.version>
