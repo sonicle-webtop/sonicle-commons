@@ -47,6 +47,8 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.internet.MimeUtility;
 import jakarta.mail.internet.ParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
@@ -68,6 +70,33 @@ public class MailUtils {
 		html2text_TagsWithNewline.add("br");
 		html2text_TagsWithNewline.add("table");
 		html2text_TagsWithNewline.add("td");
+	}
+	
+	// Regex for matching downlevel-revealed comments: see https://en.wikipedia.org/wiki/Conditional_comment
+	// This kind of syntax often causes HTML validation errors due to presence 
+	// of uncommented tags only valid for IE browsers.
+	// (https://www.sitepoint.com/internet-explorer-conditional-comments/)
+	public static final String MATCH_DOWNLEVEL_REVEALED = "<\\!(\\[if .+?\\])>|<\\!(\\[endif\\])>"; // Non-greedy match (please note ? char)
+	public static final Pattern PATTERN_DOWNLEVEL_REVEALED = Pattern.compile(MATCH_DOWNLEVEL_REVEALED, Pattern.MULTILINE);
+	
+	/**
+	 * Sanitizes a string, generally an HTML body, transforming downlevel-revealed
+	 * comments in order to hide them to browsers different from IE.
+	 * @param s The String to be sanitized
+	 * @return The sanitized String
+	 */
+	public static String sanitizeDownlevelRevealedComments(String s) {
+		Matcher matcher = PATTERN_DOWNLEVEL_REVEALED.matcher(s);
+		StringBuffer sb = new StringBuffer(s.length());
+		while (matcher.find()) {
+			if (StringUtils.containsIgnoreCase(matcher.group(1), "endif")) {
+				matcher.appendReplacement(sb, Matcher.quoteReplacement("<!--<!" + matcher.group(1) + "-->"));
+			} else {
+				matcher.appendReplacement(sb, Matcher.quoteReplacement("<!--" + matcher.group(1) + "><!-->"));
+			}
+		}
+		matcher.appendTail(sb);
+		return sb.toString();
 	}
 	
 	public static void closeQuietly(Folder folder, boolean expunge) {
