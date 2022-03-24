@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -306,17 +307,39 @@ public class LangUtils {
 	}
 	
 	/**
-	 * Cleanses line-breaks control characters ('\r\n', '\n' and '\r') from
-	 * passed String, replacing them with the specified replacement.
+	 * Cleanses line-breaks characters ('\r\n', '\n' and '\r') from passed
+	 * String, replacing them with the specified replacement. 
+	 * Multiple line-breaks will be replaced with a set of replacement String 
+	 * of same cardinality.
 	 * @param str The source string.
 	 * @param replace The replacement string.
 	 * @return The cleaned string.
 	 */
 	public static String replaceLineBreaks(final String str, final String replace) {
-		String s = StringUtils.replace(str, "\r\n", "");
-		s = StringUtils.replace(s, "\n", "");
-		s = StringUtils.replace(s, "\r", "");
-		return s;
+		return StringUtils.isBlank(str) ? str : str.replaceAll("\\R", replace);
+	}
+	
+	/**
+	 * Flattens line-breaks characters ('\r\n', '\n' and '\r') from passed 
+	 * String, replacing them with a white-space. Consecutive line-breaks will 
+	 * be replaced only with a single white-space.
+	 * @param str The source string.
+	 * @return The flattened string.
+	 */
+	public static String flattenLineBreaks(final String str) {
+		return flattenLineBreaks(str, " ");
+	}
+	
+	/**
+	 * Flattens line-breaks characters ('\r\n', '\n' and '\r') from passed 
+	 * String, replacing them with the specified replacement. Consecutive 
+	 * line-breaks will be replaced only with one occurence of replacement String.
+	 * @param str The source string.
+	 * @param replace The replacement string.
+	 * @return The flattened string.
+	 */
+	public static String flattenLineBreaks(final String str, final String replace) {
+		return StringUtils.isBlank(str) ? str : str.replaceAll("\\R+", replace);
 	}
 	
 	/**
@@ -796,6 +819,10 @@ public class LangUtils {
 		throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.classForNameQuietly instead
+	 */
+	@Deprecated
 	public static boolean classForNameQuietly(String className) {
 		try {
 			Class.forName(className);
@@ -805,35 +832,63 @@ public class LangUtils {
 		}
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.joinClassPackages instead
+	 */
+	@Deprecated
 	public static String joinClassPackages(String packageName1, String packageName2) {
 		return StringUtils.removeEnd(packageName1, ".") + "." + StringUtils.removeStart(packageName2, ".");
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.buildClassName instead
+	 */
+	@Deprecated
 	public static String buildClassName(String packageName, String className) {
 		return StringUtils.removeEnd(packageName, ".") + "." + StringUtils.removeStart(className, ".");
 		//return MessageFormat.format("{0}.{1}", packageName, className);
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.getClassName instead
+	 */
+	@Deprecated
 	public static String getClassSimpleName(String className) {
 		int lastDot = StringUtils.lastIndexOf(className, ".");
 		if(lastDot < 0) return className;
 		return StringUtils.substring(className, lastDot+1);
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.getClassPackageName instead
+	 */
+	@Deprecated
 	public static String getClassPackageName(Class clazz) {
 		return getClassPackageName(clazz.getCanonicalName());
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.getClassPackageName instead
+	 */
+	@Deprecated
 	public static String getClassPackageName(String className) {
 		int lastDot = StringUtils.lastIndexOf(className, ".");
 		if(lastDot < 0) return className;
 		return StringUtils.substring(className, 0, lastDot);
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.classPackageAsPath instead
+	 */
+	@Deprecated
 	public static String packageToPath(String pkg) {
 		return StringUtils.lowerCase(StringUtils.replace(pkg, ".", "/"));
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.pathAsClassPackage instead
+	 */
+	@Deprecated
 	public static String pathToPackage(String path) {
 		return StringUtils.lowerCase(StringUtils.replace(path, "/", "."));
 	}
@@ -846,6 +901,10 @@ public class LangUtils {
 		return StringUtils.join(parts, "/");
 	}
 	
+	/**
+	 * @deprecated Use ClassUtils.getClassLoaderOf instead
+	 */
+	@Deprecated
 	public static ClassLoader findClassLoader(Class clazz) {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if(cl == null) cl = clazz.getClassLoader();
