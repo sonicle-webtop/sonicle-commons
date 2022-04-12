@@ -79,8 +79,8 @@ public class RegexUtils {
     
     public static final Pattern SPECIAL_REGEX_CHARS = Pattern.compile("([^a-zA-z0-9])");
 	
-	public static final String MATCH_URL = "(http|https|ftp)\\://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?";
-	public static final String MATCH_WWW_URL = "(^|\\s)(www\\.[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3})(\\S*)?";
+	public static final String MATCH_URL = "(http|https|ftp)\\://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,20}(/\\S*)?";
+	public static final String MATCH_WWW_URL = "(^|\\s)(www\\.[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,20})(\\S*)?";
 
 	/**
 	 * Matches a URI
