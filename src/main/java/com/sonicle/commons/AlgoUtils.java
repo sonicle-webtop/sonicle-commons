@@ -34,10 +34,14 @@ package com.sonicle.commons;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.Charsets;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -101,5 +105,32 @@ public class AlgoUtils {
 			dat[i] = (byte)(dat[i] ^ (i % 254 + 1));
 		}
 		return Base64.getEncoder().encodeToString(dat);
+	}
+	
+	public static class MD5HashBuilder {
+		private String s = "";
+		
+		private void append(String string) {
+			s += ("|" + string);
+		}
+		
+		public String build() {
+			return StringUtils.isBlank(s) ? null : md5Hex(s.substring(1));
+		}
+		
+		public MD5HashBuilder append(Object obj) {
+			if (obj instanceof Collection) {
+				Collection ocoll = (Collection)obj;
+				Iterator it = ocoll.iterator();
+				while (it.hasNext()) append(String.valueOf(it.next()));
+			} else if (obj instanceof Map) {
+				Map omap = (Map)obj;
+				Iterator it = omap.keySet().iterator();
+				while (it.hasNext()) append(String.valueOf(it.next()));
+			} else {
+				append(String.valueOf(obj));
+			}
+			return this;
+		}
 	}
 }

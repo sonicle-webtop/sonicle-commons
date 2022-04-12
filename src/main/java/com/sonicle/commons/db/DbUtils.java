@@ -32,7 +32,9 @@
  */
 package com.sonicle.commons.db;
 
+import com.sonicle.commons.LangUtils;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -69,6 +71,57 @@ public class DbUtils {
 		if (con != null) {
 			if (rollbackOnClose) rollbackQuietly(con);
 			try { con.close(); } catch(Exception ex) { /* Do nothing... */ }
+		}
+	}
+	
+	public static void closeQuietly(final PreparedStatement stmt) {
+		if (stmt != null) try { stmt.close(); } catch(SQLException ex) { /* Do nothing... */ }
+	}
+	
+	public static void closeQuietly(final ResultSet rs) {
+		if (rs != null) try { rs.close(); } catch(SQLException ex) { /* Do nothing... */ }
+	}
+	
+	public static String escapeSQLIdentifier(final String identifierName) {
+		if (identifierName != null) {
+			String s = identifierName;
+			s = LangUtils.replaceLineBreaks(s, ""); // \n \r \r\n -> removed
+			s = s.replace("\\x00", ""); // \x00 -> removed
+			s = s.replace("\\x1a", ""); // \x1a -> removed
+			s = s.replace("\"", ""); // "" -> removed
+			return s;
+		} else {
+			return identifierName;
+		}
+	}
+	
+	/**
+	 * Escapes reserved characters (% and _) in SQL-LIKE pattern using default backslash (\).
+	 * @param likePattern The LIKE operand pattern to be escaped.
+	 * @return 
+	 */
+	public static String escapeSQLLikePattern(final String likePattern) {
+		// Backslash (\) is the default escape character for like patterns
+		return escapeSQLLikePattern(likePattern, "\\");
+	}
+	
+	/**
+	 * Escapes reserved characters (% and _) in SQL-LIKE pattern using provided escape String.
+	 * https://www.ibm.com/docs/en/informix-servers/12.10?topic=condition-like-operator
+	 * @param likePattern The LIKE operand pattern to be escaped.
+	 * @param escapeChar The replacement.
+	 * @return 
+	 */
+	public static String escapeSQLLikePattern(final String likePattern, final String escapeChar) {
+		if (likePattern != null) {
+			String s = likePattern;
+			s = s.replace("%", escapeChar + "%");
+			s = s.replace("_", escapeChar + "_");
+			s = s.replace(escapeChar, escapeChar + escapeChar);
+			//TODO: check if there are other chararters to escape!
+			return s;
+		} else {
+			return likePattern;
 		}
 	}
 	
