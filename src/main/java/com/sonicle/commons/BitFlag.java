@@ -81,12 +81,12 @@ public class BitFlag<E extends BitFlagEnum> {
 		return tsb.toString();
 	}
 	
-	public static <E extends BitFlagEnum> BitFlag of(E... flags) {
+	public static <E extends BitFlagEnum> BitFlag<E> of(E... flags) {
 		int v = 0;
 		for (E f : flags) {
 			v = FlagUtils.set(v, f.value());
 		}
-		return new BitFlag(v);
+		return new BitFlag<>(v);
 	}
 	
 	public static BitFlag none() {
