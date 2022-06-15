@@ -86,6 +86,17 @@ public class ClassUtils {
 	}
 	
 	/**
+	 * Gets the Class name of the specified Class. This will not work for
+	 * anonymous classes due to getCanonicalName is null for that kind of Objects.
+	 * @param clazz The Class for which get the name.
+	 * @return The Class name
+	 */
+	public static String getSimpleClassName(final Class clazz) {
+		Check.notNull(clazz, "clazz");
+		return getSimpleClassName(clazz.getCanonicalName());
+	}
+	
+	/**
 	 * Extracts the Class name from a fully-qualified className: the part 
 	 * after the last dot in the passed String. This will return the passed 
 	 * String itself if no dot is found.
@@ -180,5 +191,43 @@ public class ClassUtils {
 		if (clazz == null) return false;
 		if (interfaceClass == null) return false;
 		return interfaceClass.isAssignableFrom(clazz);
+	}
+	
+	/**
+	 * Returns `true` if the Object is an instance of the specified Class.
+	 * @param object The instance under investigations.
+	 * @param clazz The Class under investigations.
+	 * @return 
+	 */
+	public static boolean isInstanceOf(final Object object, final Class clazz) {
+		if (object == null) return false;
+		if (clazz == null) return false;
+		return clazz.getClass().isInstance(object);
+	}
+	
+	/**
+	 * Returns `true` if the Object has the specified type.
+	 * @param object The instance under investigations.
+	 * @param type The Class type required.
+	 * @return 
+	 */
+	public static boolean hasStrictlyType(final Object object, final Class type) {
+		if (object == null) return false;
+		return hasStrictlyType(object.getClass(), type);
+	}
+	
+	/**
+	 * Returns `true` if the Class has the specified type.
+	 * @param clazz The Class under investigations.
+	 * @param type The Class type required.
+	 * @return 
+	 */
+	public static boolean hasStrictlyType(final Class clazz, final Class type) {
+		if (clazz == null) return false;
+		if (type == null) return false;
+		// The checks described here (https://stackoverflow.com/questions/16688655/check-if-an-object-is-an-instance-of-a-class-but-not-an-instance-of-its-subclas)
+		// are applicable: comparing classes with equals only work if equals() method is overridden in both classes.
+		// So, for now we simply check class names if the strict comparison in requested
+		return isClassInheritingFromParent(clazz, type) && getSimpleClassName(clazz).equals(getSimpleClassName(type));
 	}
 }
