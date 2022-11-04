@@ -37,6 +37,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
+import java.util.Collection;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -45,6 +47,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class InternetAddressUtils {
 	private static final Pattern EMAIL_PATTERN = Pattern.compile(RegexUtils.MATCH_EMAIL_ADDRESS);
+	private static final Pattern COMMA_DELIMITER_PATTERN = Pattern.compile("(@.*?>?)\\s*[,;]");
+	private static final Pattern TRAILING_TOKEN_DELIMITER_PATTERN = Pattern.compile("<\\|>$");
+	private static final Pattern TOKEN_DELIMITER_PATTERN = Pattern.compile("\\s*<\\|>\\s*");
 	
 	public static boolean isAddressValid(String address) {
 		if(StringUtils.isBlank(address)) return false;
@@ -132,5 +137,31 @@ public class InternetAddressUtils {
 		} catch(AddressException ex) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Recognizes the tails of each address entry, so it can replace the [';] 
+	 * delimiters, thereby disambiguating the delimiters, since they can 
+	 * appear in names as well (making it difficult to split on [,;] delimiters.
+	 * @param emailAddressList The delimited list of addresses (or single address) optionally including the name.
+	 * @return Array of address entries optionally including the names, trimmed for spaces or trailing delimiters.
+	 */
+	public static String[] extractEmailAddresses(final String emailAddressList) {
+		Check.notNull(emailAddressList, "emailAddressList");
+		// recognize value tails and replace the delimiters there, disambiguating delimiters
+		final String unambiguousDelimitedList = COMMA_DELIMITER_PATTERN.matcher(emailAddressList).replaceAll("$1<|>");
+		final String withoutTrailingDelimeter = TRAILING_TOKEN_DELIMITER_PATTERN.matcher(unambiguousDelimitedList).replaceAll("");
+		return TOKEN_DELIMITER_PATTERN.split(withoutTrailingDelimeter, 0);
+	}
+	
+	public static boolean isInList(final InternetAddress address, final Collection<InternetAddress> list) {
+		Check.notNull(list, "list");
+		if (address != null) {
+			for (InternetAddress ia : list) {
+				if (ia == null) continue;
+				if (StringUtils.equalsIgnoreCase(address.getAddress(), ia.getAddress())) return true;
+			}
+		}
+		return false;
 	}
 }

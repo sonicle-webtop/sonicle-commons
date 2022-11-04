@@ -37,7 +37,10 @@ import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -50,58 +53,113 @@ public class EnumUtils {
 		.serializeNulls()
 		.create();
 	
-	public static <E extends Enum<E>> E getEnum(String enumName, Class<E> enumClass) {
-		if(enumName == null) return null;
+	/**
+	 * Gets an Enum by its name.
+	 * @param <E>
+	 * @param name The name value to look for.
+	 * @param clazz The enum class.
+	 * @return The matching enum if found, null otherwise
+	 */
+	public static <E extends Enum<E>> E forName(String name, Class<E> clazz) {
+		if (name == null) return null;
 		try {
-			return Enum.valueOf(enumClass, enumName);
+			return Enum.valueOf(clazz, name);
 		} catch(IllegalArgumentException ex) {
 			return null;
 		}
 	}
 	
-	public static <E extends Enum<E>> String getName(Enum<E> en) {
+	/**
+	 * Returns the name of passed Enum.
+	 * @param <E>
+	 * @param en The Enum.
+	 * @return Enum's name.
+	 */
+	public static <E extends Enum> String getName(E en) {
 		return (en == null) ? null : en.name();
 	}
 	
-	public static <E extends Enum<E>> boolean equals(Enum<E> en1, Enum<E> en2) {
-		if(en1 == null) return false;
-		return en1.equals(en2);
-	}
-	
-	
-	
-	
 	/**
-	 * Convenience method for getting the enum from its string value representation.
-	 * The enum's toString() method will be used for getting the value, so if you
-	 * need to change the default return you need to override properly toString() 
-	 * method in the enum class.
+	 * Convenience method for getting the enum from its toString value.
+	 * The enum's toString() method will be used for getting the value, 
+	 * so if you need to change the default return you need to override 
+	 * properly toString() method in the enum class.
 	 * 
 	 * Example:
 	 * 
 	 * public enum MyEnum {
-	 *		VAL_1("val1"), VAL_2("val2");
-	 *		private final String value;
-	 *		private MyEnum(String value) { this.value = value; }
+	 *		NAME_1("altName1"), NAME_2("altName2");
+	 *		private final String altName;
+	 *		private MyEnum(String altName) { this.altName = altName; }
 	 *		@Override
-	 *		public String toString() { return value; }
+	 *		public String toString() { return altName; }
 	 * }
-	 * 
 	 * @param <E>
-	 * @param value The String value
-	 * @param enumClass The enum class
+	 * @param toString The toString value to look for.
+	 * @param clazz The enum class.
 	 * @return The matching enum if found, null otherwise
 	 */
-	public static <E extends Enum<E>> E forValue(String value, Class<E> enumClass) {
-		if (value == null) return null;
-		for (E e : EnumSet.allOf(enumClass)) {
-			if (value.equals(e.toString())) return e;
+	public static <E extends Enum> E forString(String toString, Class<E> clazz) {
+		if (toString == null) return null;
+		Iterator it = EnumSet.allOf(clazz).iterator();
+		while (it.hasNext()) {
+			E e = (E)it.next();
+			if (toString.equals(e.toString())) return e;
 		}
 		return null;
 	}
 	
-	public static <E extends Enum<E>> String getValue(E en) {
+	/**
+	 * Returns the toString value of passed Enum.
+	 * @param <E>
+	 * @param en The Enum.
+	 * @return Enum's toString value.
+	 */
+	public static <E extends Enum> String getString(E en) {
 		return (en == null) ? null : en.toString();
+	}
+	
+	/**
+	 * Returns a list of Enum types of the specified Enum class.
+	 * @param <E>
+	 * @param clazz The enum class.
+	 * @return Available Enum types list
+	 */
+	public static <E extends Enum> List<E> allTypesOf(Class<E> clazz) {
+		List<E> list = new ArrayList();
+		Iterator it = EnumSet.allOf(clazz).iterator();
+		while (it.hasNext()) {
+			list.add((E)it.next());
+		}
+		return list;
+	}
+	
+	/**
+	 * Returns a list of Enum names of the specified Enum class.
+	 * @param <E>
+	 * @param clazz The enum class.
+	 * @return Available Enum types names list
+	 */
+	public static <E extends Enum> Set<String> allNamesOf(Class<E> clazz) {
+		Set<String> set = new LinkedHashSet();
+		Iterator it = EnumSet.allOf(clazz).iterator();
+		while (it.hasNext()) {
+			E e = (E)it.next();
+			set.add(e.name());
+		}
+		return set;
+	}
+	
+	public static <E extends Enum> boolean contains(Collection<E> set, E value) {
+		for (E e : set) {
+			if (e.equals(value)) return true;
+		}
+		return false;
+	}
+	
+	public static <E extends Enum<E>> boolean equals(Enum<E> en1, Enum<E> en2) {
+		if (en1 == null) return false;
+		return en1.equals(en2);
 	}
 	
 	/**
@@ -187,10 +245,36 @@ public class EnumUtils {
 		}
 	}
 	
-	
+	/**
+	 * @deprecated use forString instead
+	 */
+	@Deprecated
+	public static <E extends Enum<E>> E forValue(String value, Class<E> enumClass) {
+		if (value == null) return null;
+		for (E e : EnumSet.allOf(enumClass)) {
+			if (value.equals(e.toString())) return e;
+		}
+		return null;
+	}
 	
 	/**
-	 * @deprecated use getEnum instead
+	 * @deprecated use getString instead
+	 */
+	@Deprecated
+	public static <E extends Enum<E>> String getValue(E en) {
+		return (en == null) ? null : en.toString();
+	}
+	
+	/**
+	 * @deprecated use forName instead
+	 */
+	@Deprecated
+	public static <E extends Enum<E>> E getEnum(String name, Class<E> clazz) {
+		return forName(name, clazz);
+	}
+	
+	/**
+	 * @deprecated use forName instead
 	 */
 	@Deprecated
 	public static <E extends Enum<E>> E getEnum(Class<E> enumClass, String enumName) {

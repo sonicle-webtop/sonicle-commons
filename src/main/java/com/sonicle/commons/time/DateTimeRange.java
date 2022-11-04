@@ -35,7 +35,7 @@ package com.sonicle.commons.time;
 import org.joda.time.DateTime;
 
 /**
- * @deprecated 
+ * @deprecated use DateTimeRange2 instead
  * @author malbinola
  */
 @Deprecated

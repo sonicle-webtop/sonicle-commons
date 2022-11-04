@@ -59,7 +59,9 @@ public class MailUtils {
 	public static final String MTYPE_OCTET_STREAM = "application/octet-stream";
 	public static final String MTYPE_MAIL_MESSAGE = "message/rfc822";
 	
+	//@Deprecated
 	private static final boolean encodeFileName = PropUtil.getBooleanSystemProperty("mail.mime.encodefilename", false);
+	//@Deprecated
 	private static final boolean decodeTextStrict = PropUtil.getBooleanSystemProperty("mail.mime.decodetext.strict", true);
 	
 	private static final ArrayList<String> html2text_TagsWithNewline=new ArrayList<String>();
@@ -76,15 +78,15 @@ public class MailUtils {
 	// This kind of syntax often causes HTML validation errors due to presence 
 	// of uncommented tags only valid for IE browsers.
 	// (https://www.sitepoint.com/internet-explorer-conditional-comments/)
+	@Deprecated
 	public static final String MATCH_DOWNLEVEL_REVEALED = "<\\!(\\[if .+?\\])>|<\\!(\\[endif\\])>"; // Non-greedy match (please note ? char)
+	@Deprecated
 	public static final Pattern PATTERN_DOWNLEVEL_REVEALED = Pattern.compile(MATCH_DOWNLEVEL_REVEALED, Pattern.MULTILINE);
 	
 	/**
-	 * Sanitizes a string, generally an HTML body, transforming downlevel-revealed
-	 * comments in order to hide them to browsers different from IE.
-	 * @param s The String to be sanitized
-	 * @return The sanitized String
+	 * @deprecated use MimeUtils.sanitizeDownlevelRevealedComments instead
 	 */
+	@Deprecated
 	public static String sanitizeDownlevelRevealedComments(String s) {
 		Matcher matcher = PATTERN_DOWNLEVEL_REVEALED.matcher(s);
 		StringBuffer sb = new StringBuffer(s.length());
@@ -99,45 +101,18 @@ public class MailUtils {
 		return sb.toString();
 	}
 	
-	public static void closeQuietly(Folder folder, boolean expunge) {
-		if (folder != null) try { if (folder.isOpen()) folder.close(expunge); } catch (MessagingException ex) { /* Do nothing... */ }
-	}
-	
-	public static void closeQuietly(Store store) {
-		if (store != null) try { store.close(); } catch (MessagingException ex) { /* Do nothing... */ }
-	}
-	
 	/**
-	 * Returns the decoded (as per RFC 822) text value, if an exception is 
-	 * thrown during operation, the raw text is simply returned.
-	 * @param text The possibly encoded value
-	 * @return The decoded text
+	 * @deprecated use MimeUtils.getFilename(part, false) instead
 	 */
-	public static String quietlyDecodeText(String text) {
-		try {
-			return MimeUtility.decodeText(text);
-		} catch(UnsupportedEncodingException ex) {
-			return text;
-		}
-	}
-	
-	/**
-	 * Extracts the filename from a message Part. If necessary filename will be decoded.
-	 * @param part The message Part.
-	 * @return The filename.
-	 * @throws MessagingException 
-	 */
+	@Deprecated
 	public static String getPartFilename(Part part) throws MessagingException {
 		return getPartFilename(part, false);
 	}
 	
 	/**
-	 * Extracts the filename from a message Part. If necessary filename will be decoded.
-	 * @param part The message Part.
-	 * @param fallbackOnSubType True to use contentType subType in case of missing filename in common headers.
-	 * @return The filename.
-	 * @throws MessagingException 
+	 * @deprecated use MimeUtils.getFilename instead
 	 */
+	@Deprecated
 	public static String getPartFilename(Part part, boolean fallbackOnSubType) throws MessagingException {
 		if (part == null) return null;
 		
@@ -169,32 +144,7 @@ public class MailUtils {
 	}
 	
 	/**
-	 * Returns message Part's contentType in form "type/subType", 
-	 * skipping any trailing parameters.
-	 * @param part The message Part.
-	 * @return Sanitized content type
-	 * @throws MessagingException 
-	 */
-	public static String getPartMediaType(Part part) throws MessagingException {
-		ContentType ctype = getPartContentType(part);
-		return (ctype != null) ? ctype.getBaseType() : null;
-	}
-	
-	/**
-	 * Extract the ContentType object from a message Part.
-	 * @param part The message Part.
-	 * @return The ContentType object.
-	 * @throws MessagingException 
-	 */
-	public static ContentType getPartContentType(Part part) throws MessagingException {
-		if (part == null) return null;
-		
-		String ctype = part.getContentType();
-		return (ctype != null) ? new ContentType(ctype) : null;
-	}
-	
-	/**
-	 * @deprecated use getPartContentType instead
+	 * @deprecated use MimeUtils.getContentTypeStrict instead
 	 */
 	@Deprecated
 	public static String getMediaTypeFromHeader(String contentTypeHeader) throws ParseException {

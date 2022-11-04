@@ -32,12 +32,16 @@
  */
 package com.sonicle.commons.time;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 /**
- *
+ * @deprecated use DateTimeRange instead
  * @author malbinola
  */
+@Deprecated
 public class InstantRange {
 	protected DateTime start;
 	protected DateTime end;
@@ -73,5 +77,24 @@ public class InstantRange {
 			start = end;
 		}
 		return this;
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(start != null ? start.getMillis() : 0)
+			.append(end != null ? end.getMillis() : 0)
+			.toHashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof InstantRange == false) return false;
+		if (this == obj) return true;
+		final InstantRange otherObject = (InstantRange)obj;
+		return new EqualsBuilder()
+			.append(start != null ? start.getMillis() : 0, otherObject.start != null ? otherObject.start.getMillis() : 0)
+			.append(end != null ? end.getMillis() : 0, otherObject.end != null ? otherObject.end.getMillis() : 0)
+			.isEquals();
 	}
 }

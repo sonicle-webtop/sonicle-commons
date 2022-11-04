@@ -77,4 +77,44 @@ public class FlagUtils {
 	public static int mask(int source, int flag) {
 		return source & flag;
 	}
+	
+	/**
+	 * Checks if the flag is set on the source value.
+	 * @param source The source value.
+	 * @param flag The flag which should be set.
+	 * @return `true` wether specified int flag is set, `false` otherwise.
+	 */
+	public static boolean has(long source, long flag) {
+		return (source & flag) == flag;
+	}
+	
+	/**
+	 * Sets the specified flag on the source value.
+	 * @param source The source value.
+	 * @param flag The flag to be set.
+	 * @return The resulting value.
+	 */
+	public static long set(long source, long flag) {
+		return source | flag;
+	}
+	
+	/**
+	 * Un-sets the specified flag on the source value.
+	 * @param source The source value.
+	 * @param flag The flag to be unset.
+	 * @return The resulting value.
+	 */
+	public static long unset(long source, long flag) {
+		return source & ~flag;
+	}
+	
+	/**
+	 * Returns the masked value for specified flag on the source value.
+	 * @param source The source value.
+	 * @param flag The flag for which return the mask.
+	 * @return The resulting mask.
+	 */
+	public static long mask(long source, long flag) {
+		return source & flag;
+	}
 }

@@ -36,11 +36,10 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- *
- * @author malbinola
- * @param <E>
+ * @deprecated use flags.BaseBitFlag instead
  */
-public class BitFlag<E extends BitFlagEnum> {
+@Deprecated
+public class BitFlag <E extends BitFlagEnum> {
 	private int value;
 	
 	public BitFlag() {
@@ -51,31 +50,51 @@ public class BitFlag<E extends BitFlagEnum> {
 		this.value = value;
 	}
 	
-	public boolean has(E flag) {
+	public final int getValue() {
+		return value;
+	}
+	
+	public final boolean has(E flag) {
 		return FlagUtils.has(this.value, flag.value());
 	}
 	
-	public BitFlag set(E... flags) {
-		for (E bfe : flags) {
-			this.value = FlagUtils.set(this.value, bfe.value());
-		}
+	public BitFlag<E> set(E flag) {
+		this.value = FlagUtils.set(this.value, flag.value());
 		return this;
 	}
 	
-	public BitFlag unset(E... flags) {
-		for (E bfe : flags) {
-			this.value = FlagUtils.unset(this.value, bfe.value());
-		}
+	public BitFlag<E> set(E... flags) {
+		for (E bfe : flags) set(bfe);
 		return this;
 	}
 	
-	public BitFlag copy() {
+	public BitFlag<E> set(BitFlag<E> bitFlag) {
+		this.value = FlagUtils.set(value, bitFlag.value);
+		return this;
+	}
+	
+	public BitFlag<E> set(BitFlag<E>... bitFlags) {
+		for (BitFlag<E> bf : bitFlags) set(bf);
+		return this;
+	}
+	
+	public BitFlag<E> unset(E flag) {
+		this.value = FlagUtils.unset(this.value, flag.value());
+		return this;
+	}
+	
+	public BitFlag<E> unset(E... flags) {
+		for (E bfe : flags) unset(bfe);
+		return this;
+	}
+	
+	public BitFlag<E> copy() {
 		return new BitFlag(this.value);
 	}
 	
 	public <E extends Enum> String toString(Class<E> clazz) {
 		ToStringBuilder tsb = new ToStringBuilder(this);
-		for (Map.Entry<Integer, E> entry : BitFlagEnum.getValues(clazz).entrySet()) {
+		for (Map.Entry<Integer, E> entry : BitFlagEnum.allFlagsOf(clazz).entrySet()) {
 			if (FlagUtils.has(this.value, entry.getKey())) tsb.append(entry.getValue().name());
 		}
 		return tsb.toString();
@@ -83,11 +102,20 @@ public class BitFlag<E extends BitFlagEnum> {
 	
 	public static <E extends BitFlagEnum> BitFlag<E> of(E... flags) {
 		int v = 0;
-		for (E f : flags) {
-			v = FlagUtils.set(v, f.value());
-		}
+		for (E bfe : flags) v = FlagUtils.set(v, bfe.value());
 		return new BitFlag<>(v);
 	}
+	
+	/*
+	TODO: find a way to get all values for E
+	public static <E extends BitFlagEnum> BitFlag<E> all() {
+		return new BitFlag<>();
+	}
+	
+	public static <E extends BitFlagEnum> BitFlag<E> none() {
+		return new BitFlag<>();
+	}
+	*/
 	
 	public static BitFlag none() {
 		return new BitFlag();

@@ -38,15 +38,22 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- *
- * @author malbinola
+ * @deprecated use flags.BitFlagsEnum instead
  */
+@Deprecated
 public interface BitFlagEnum {
 	public int value();
 	public String name();
 	
+	/**
+	 * Returns a Map (<value, flag>) of flags belonging to the specified BitFlag Class.
+	 * @param <E>
+	 * @param clazz The BitFlag enum class.
+	 * @return 
+	 */
 	@SuppressWarnings("unchecked")
-	static <E extends Enum> Map<Integer, E> getValues(Class<E> clazz) {
+	@Deprecated
+	static <E extends Enum> Map<Integer, E> allFlagsOf(Class<E> clazz) {
 		Map<Integer, E> map = new LinkedHashMap();
 		Iterator it = EnumSet.allOf(clazz).iterator();
 		while (it.hasNext()) {

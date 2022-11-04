@@ -157,6 +157,7 @@ public class DbUtils {
 	
 	public static boolean isIntegrityConstraintViolation(SQLException ex) {
 		String state = ex.getSQLState();
+		if (StringUtils.isBlank(state)) return false;
 		String class1 = StringUtils.substring(state, 0, 2);
 		String class2 = StringUtils.substring(state, 2);
 		return class1.equals("23");

@@ -36,9 +36,10 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author malbinola
+ * @deprecated use com.sonicle.mail.TransportProtocol (from sonicle-mail library) instead
  */
+@Deprecated
 public enum TransportProtocol {
 	SMTP {
 		@Override

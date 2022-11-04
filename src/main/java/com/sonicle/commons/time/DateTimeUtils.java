@@ -34,10 +34,12 @@ package com.sonicle.commons.time;
 
 import java.text.DateFormatSymbols;
 import java.util.Locale;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
+import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableInstant;
@@ -214,13 +216,74 @@ public class DateTimeUtils {
 		return (time1.compareTo(time2) > 0) ? time1 : time2;
 	}
 	
-	public static boolean between(ReadablePartial value, ReadablePartial rp1, ReadablePartial rp2) {
-		return ((value.compareTo(rp1) >= 0) && (value.compareTo(rp2) <= 0));
+	/**
+	 * Returns a new DateTime properly rounded according to choosen nearestMinute.
+	 * @param dateTime The DateTime object to round.
+	 * @param nearestMinutes The nearest minute to round value to.
+	 * @return 
+	 */
+	public static DateTime roundToNearestMinute(DateTime dateTime, final int nearestMinutes) {
+		Check.notNull(dateTime, "dateTime");
+		Check.stateIsTrue(!(nearestMinutes < 1 || 60 % nearestMinutes != 0), "nearestMinutes must be a divider of 60");
+		final DateTime hour = dateTime.hourOfDay().roundFloorCopy();
+		final long millisSinceHour = new Duration(hour, dateTime).getMillis();
+		final int roundedMinutes = ((int)Math.round(millisSinceHour / 60000.0 / nearestMinutes)) * nearestMinutes;
+		return hour.plusMinutes(roundedMinutes);
+	}
+	
+	/**
+	 * Evaluates if an Instant is between start/end bounds, with start bound included and end excluded.
+	 * @param partial The Partial value to check.
+	 * @param start The start bound.
+	 * @param end The end bound.
+	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 */
+	public static boolean between(final ReadablePartial partial, final ReadablePartial start, final ReadablePartial end) {
+		return between(partial, start, end, true, false);
+	}
+	
+	/**
+	 * Evaluates if an Instant is between start/end bounds.
+	 * @param partial The Partial value to check.
+	 * @param start The start bound.
+	 * @param end The end bound.
+	 * @param inclusiveStart Set to `true` to make start check inclusive, `false` otherwise.
+	 * @param inclusiveEnd Set to `true` to make end check inclusive, `false` otherwise.
+	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 */
+	public static boolean between(final ReadablePartial partial, final ReadablePartial start, final ReadablePartial end, final boolean inclusiveStart, final boolean inclusiveEnd) {
+		if (partial == null || start == null || end == null) return false;
+		return (inclusiveStart ? partial.compareTo(start) >= 0 : partial.compareTo(start) > 0) && (inclusiveEnd ? partial.compareTo(end) <= 0 : partial.compareTo(end) < 0);
 	}
 	
 	public static boolean between(ReadableInstant value, ReadableInstant ri1, ReadableInstant ri2) {
 		return ((value.compareTo(ri1) >= 0) && (value.compareTo(ri2) <= 0));
 	}
+	
+	/**
+	 * Evaluates if an Instant is between start/end bounds, with start bound included and end excluded.
+	 * @param instant The Instant value to check.
+	 * @param start The start bound.
+	 * @param end The end bound.
+	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 */
+	//public static boolean between(final ReadableInstant instant, final ReadableInstant start, final ReadableInstant end) {
+	//	return between(instant, start, end, true, false);
+	//}
+	
+	/**
+	 * Evaluates if an Instant is between start/end bounds.
+	 * @param instant The Instant value to check.
+	 * @param start The start bound.
+	 * @param end The end bound.
+	 * @param inclusiveStart Set to `true` to make start check inclusive, `false` otherwise.
+	 * @param inclusiveEnd Set to `true` to make end check inclusive, `false` otherwise.
+	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 */
+	//public static boolean between(final ReadableInstant instant, final ReadableInstant start, final ReadableInstant end, final boolean inclusiveStart, final boolean inclusiveEnd) {
+	//	if (instant == null || start == null || end == null) return false;
+	//	return (inclusiveStart ? instant.compareTo(start) >= 0 : instant.compareTo(start) > 0) && (inclusiveEnd ? instant.compareTo(end) <= 0 : instant.compareTo(end) < 0);
+	//}
 	
 	/**
 	 * Compares the standard offset (regard to UTC) of the two passed timezones.
@@ -375,12 +438,20 @@ public class DateTimeUtils {
 		return DateTimeUtils.createYmdFormatter(tz).print(dateTime);
 	}
 	
-	public static String print(DateTimeFormatter formatter, ReadablePartial rp) {
-		return (rp == null) ? null : formatter.print(rp);
+	public static String print(final DateTimeFormatter formatter, final ReadablePartial rp) {
+		return print(formatter, rp, null);
 	}
 	
-	public static String print(DateTimeFormatter formatter, ReadableInstant ri) {
-		return (ri == null) ? null : formatter.print(ri);
+	public static String print(final DateTimeFormatter formatter, final ReadablePartial rp, final String defaultString) {
+		return (rp == null) ? defaultString : formatter.print(rp);
+	}
+	
+	public static String print(final DateTimeFormatter formatter, final ReadableInstant ri) {
+		return print(formatter, ri, null);
+	}
+	
+	public static String print(final DateTimeFormatter formatter, final ReadableInstant ri, final String defaultString) {
+		return (ri == null) ? defaultString : formatter.print(ri);
 	}
 	
 	//event.setRecurrence(orec.getRule(), orec.getLocalStartDate(event.getDateTimeZone()));

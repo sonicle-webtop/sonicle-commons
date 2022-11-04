@@ -35,6 +35,7 @@ package com.sonicle.commons;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,6 +49,7 @@ import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,10 +57,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -519,6 +525,15 @@ public class LangUtils {
 	
 	public static <T>T value(T value, T defaultValue, Class<T> type) {
 		return (value != null) ? value : defaultValue;
+	}
+	
+	// Returns an array containing all elements of a collection, without having 
+	// to explicitly instantiare the new array.
+	public static <T> T[] toArray(final Class<T[]> arrayType, final Collection<T> items) {
+		if (items == null) return null;
+		// https://stackoverflow.com/questions/529085/how-to-create-a-generic-array-in-java/4221845#4221845
+		final T[] newArray = arrayType.cast(Array.newInstance(arrayType.getComponentType(), items.size()));
+		return items.toArray(newArray);
 	}
 	
 	/**
@@ -1094,6 +1109,19 @@ public class LangUtils {
 	public static String getDeepestCauseMessage(Throwable t) {
 		String s = ExceptionUtils.getRootCauseMessage(t);
 		return StringUtils.isBlank(s) ? null : s;	
+	}
+	
+	public static <T extends Comparable<T>> List<T> quickSort(List<T> items) {
+		if (items == null || items.isEmpty()) {
+			return Collections.emptyList();
+		} else {
+			T pivot = items.get(0);
+			Map<Integer, List<T>> grouped = items.stream()
+				.collect(Collectors.groupingBy(pivot::compareTo));
+			return Stream.of(quickSort(grouped.get(1)), grouped.get(0), quickSort(grouped.get(-1)))
+				.flatMap(Collection::stream)
+				.collect(Collectors.toList());
+		}
 	}
 	
 	public static <T>CollectionChangeSet getCollectionChanges(Collection<T> fromCollection, Collection<T> toCollection) {

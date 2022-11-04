@@ -37,9 +37,11 @@ import jakarta.mail.PasswordAuthentication;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- *
+ * 
  * @author malbinola
+ * @deprecated use com.sonicle.mail.PasswordAuthenticator (from sonicle-mail library) instead 
  */
+@Deprecated
 public class PasswordAuthenticator extends Authenticator {
 	protected final String username;
 	protected final String password;

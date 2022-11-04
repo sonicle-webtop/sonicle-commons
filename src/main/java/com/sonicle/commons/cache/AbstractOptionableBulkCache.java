@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Sonicle S.r.l.
+ * Copyright (C) 2022 Sonicle S.r.l.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -28,84 +28,85 @@
  * version 3, these Appropriate Legal Notices must retain the display of the
  * Sonicle logo and Sonicle copyright notice. If the display of the logo is not
  * reasonably feasible for technical reasons, the Appropriate Legal Notices must
- * display the words "Copyright (C) 2020 Sonicle S.r.l.".
+ * display the words "Copyright (C) 2022 Sonicle S.r.l.".
  */
-package com.sonicle.commons.mail;
+package com.sonicle.commons.cache;
+
+import java.util.concurrent.locks.StampedLock;
 
 /**
+ *
  * @author malbinola
- * @deprecated use com.sonicle.mail.StoreHostDefinition (from sonicle-mail library) instead
+ * @param <O>
  */
-@Deprecated
-public class StoreHostDefinition {
-	private String host;
-	private int port;
-	private StoreProtocol protocol;
-	private String username;
-	private String password;
-	private boolean trustHost = false;
+public abstract class AbstractOptionableBulkCache <O> {
+	private static final long serialVersionUID = 1L;
+	protected final StampedLock lock = new StampedLock();
+	private int initCount = 0;
 	
-	public StoreHostDefinition() {}
+	protected abstract void internalBuildCache(final O options);
+	protected abstract void internalCleanupCache(final O options);
 	
-	public StoreHostDefinition(String host, int port, StoreProtocol protocol, String username, String password) {
-		this.host = host;
-		this.port = port;
-		this.protocol = protocol;
-		this.username = username;
-		this.password = password;
-	}
-
-	public String getHost() {
-		return host;
+	public void init() {
+		init(null);
 	}
 	
-	public int getPort() {
-		return port;
+	public final void init(final O options) {
+		long stamp = lock.writeLock();
+		try {
+			internalInit(options);
+		} finally {
+			lock.unlockWrite(stamp);
+		}
 	}
 	
-	public StoreProtocol getProtocol() {
-		return protocol;
+	public final void clear() {
+		clear(null);
 	}
 	
-	public String getUsername() {
-		return username;
+	public final void clear(final O options) {
+		long stamp = lock.writeLock();
+		try {
+			internalClear(options);
+		} finally {
+			lock.unlockWrite(stamp);
+		}
 	}
 	
-	public String getPassword() {
-		return password;
+	public boolean isInited() {
+		return initCount > 0;
 	}
 	
-	public boolean getTrustHost() {
-		return trustHost;
+	public int getInitCount() {
+		return initCount;
 	}
 	
-	public StoreHostDefinition withHost(String host) {
-		this.host = host;
-		return this;
+	public final long readLock() {
+		return lock.readLock();
 	}
 	
-	public StoreHostDefinition withPort(int port) {
-		this.port = port;
-		return this;
+	public final void unlockRead(final long stamp) {
+		lock.unlockRead(stamp);
 	}
 	
-	public StoreHostDefinition withProtocol(StoreProtocol protocol) {
-		this.protocol = protocol;
-		return this;
+	public final long writeLock() {
+		return lock.writeLock();
 	}
 	
-	public StoreHostDefinition withUsername(String username) {
-		this.username = username;
-		return this;
+	public final void unlockWrite(final long stamp) {
+		lock.unlockWrite(stamp);
 	}
 	
-	public StoreHostDefinition withPassword(String password) {
-		this.password = password;
-		return this;
+	protected void internalInit(final O options) {
+		internalBuildCache(options);
+		initCount++;
 	}
 	
-	public StoreHostDefinition withTrustHost(boolean trustHost) {
-		this.trustHost = trustHost;
-		return this;
+	protected void internalClear(final O options) {
+		internalCleanupCache(options);
+	}
+	
+	protected void internalCheckBeforeGetDoNotLockThis() {
+		// This may be useful for subclasses, do nothing for now...
 	}
 }
