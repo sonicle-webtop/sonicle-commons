@@ -54,6 +54,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -65,6 +66,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -1124,6 +1126,50 @@ public class LangUtils {
 		}
 	}
 	
+	public static <T>ChangeSet computeChangeSet(Collection<T> fromCollection, Collection<T> toCollection) {
+		Set<T> added = new LinkedHashSet<>(toCollection);
+		added.removeAll(fromCollection);
+		Set<T> updated = new LinkedHashSet<>(toCollection);
+		updated.retainAll(fromCollection);
+		Set<T> removed = new LinkedHashSet<>(fromCollection);
+		removed.removeAll(toCollection);
+		return new ChangeSet<>(added, updated, removed);
+	}
+	
+	public static class ChangeSet<T> {
+		private final Set<T> added;
+		private final Set<T> updated;
+		private final Set<T> removed;
+		
+		public ChangeSet(Set<T> added, Set<T> updated, Set<T> removed) {
+			this.added = (added == null) ? new LinkedHashSet<>(): added;
+			this.updated = (updated == null) ? new LinkedHashSet<>(): updated;
+			this.removed = (removed == null) ? new LinkedHashSet<>(): removed;
+		}
+		
+		public Set<T> getAdded() {
+			return Collections.unmodifiableSet(added);
+		}
+		
+		public Set<T> getUpdated() {
+			return Collections.unmodifiableSet(updated);
+		}
+		
+		public Set<T> getRemoved() {
+			return Collections.unmodifiableSet(removed);
+		}
+		
+		public Set<T> getMoved() {
+			Set<T> set = new LinkedHashSet<>(added);
+			set.addAll(removed);
+			return Collections.unmodifiableSet(set);
+		}
+	}
+	
+	/**
+	 * @deprecated use computeChangeSet instead
+	 */
+	@Deprecated
 	public static <T>CollectionChangeSet getCollectionChanges(Collection<T> fromCollection, Collection<T> toCollection) {
 		List<T> created = new ArrayList<>(toCollection);
 		created.removeAll(fromCollection);
@@ -1134,6 +1180,7 @@ public class LangUtils {
 		return new CollectionChangeSet<>(created, updated, deleted);
 	}
 	
+	@Deprecated
 	public static class CollectionChangeSet<T> {
 		public List<T> inserted;
 		public List<T> updated;
