@@ -38,7 +38,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 /**
- * @deprecated use DateTimeRange instead
+ * @deprecated use DateTimeRange2 instead
  * @author malbinola
  */
 @Deprecated

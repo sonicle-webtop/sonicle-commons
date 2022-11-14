@@ -48,7 +48,7 @@ public class TimeRange {
 	private final LocalTime start;
 	private final LocalTime end;
 	
-	private TimeRange(LocalTime start, LocalTime end) {
+	protected TimeRange(LocalTime start, LocalTime end) {
 		this.start = start;
 		this.end = end;
 	}
@@ -90,6 +90,15 @@ public class TimeRange {
 			.append(DateTimeUtils.print(FMT, start, NULL), DateTimeUtils.print(FMT, otherObject.start, NULL))
 			.append(DateTimeUtils.print(FMT, end, NULL), DateTimeUtils.print(FMT, otherObject.end, NULL))
 			.isEquals();
+	}
+	
+	@Override
+	public String toString() {
+		return toString(DateTimeUtils.createFormatter("HH:mm:ss", DateTimeZone.getDefault()), "00:00:00");
+	}
+	
+	private String toString(DateTimeFormatter formatter, String nullValue) {
+		return "(" + DateTimeUtils.print(formatter, start, nullValue) + " -> " + DateTimeUtils.print(formatter, end, nullValue) + ")";
 	}
 	
 	public static Builder builder() {

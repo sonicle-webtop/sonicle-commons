@@ -48,7 +48,7 @@ public class DateTimeRange2 {
 	private final DateTime start;
 	private final DateTime end;
 	
-	private DateTimeRange2(DateTime start, DateTime end) {
+	protected DateTimeRange2(DateTime start, DateTime end) {
 		this.start = start;
 		this.end = end;
 	}
@@ -90,6 +90,15 @@ public class DateTimeRange2 {
 			.append(DateTimeUtils.print(FMT, start, NULL), DateTimeUtils.print(FMT, otherObject.start, NULL))
 			.append(DateTimeUtils.print(FMT, end, NULL), DateTimeUtils.print(FMT, otherObject.end, NULL))
 			.isEquals();
+	}
+
+	@Override
+	public String toString() {
+		return toString(DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", DateTimeZone.getDefault()), "0000-00-00 00:00:00");
+	}
+	
+	private String toString(DateTimeFormatter formatter, String nullValue) {
+		return "(" + DateTimeUtils.print(formatter, start, nullValue) + " -> " + DateTimeUtils.print(formatter, end, nullValue) + ")";
 	}
 	
 	public static Builder builder() {
