@@ -78,6 +78,10 @@ public final class BitFlags<E extends Enum<E> & BitFlagsEnum<E>> extends BaseBit
 		return new BitFlags<>(enumType, valueFrom.getValue());
 	}
 	
+	public static <E extends Enum<E> & BitFlagsEnum<E>, T extends BaseBitFlags<E>> BitFlags<E> newFrom(final Class<E> enumType, long value) {
+		return new BitFlags<>(enumType, value);
+	}
+	
 	public static <E extends Enum<E> & BitFlagsEnum<E>, T extends BaseBitFlags<E>> BitFlags<E> allOf(final Class<E> enumType) {
 		return BitFlagsUtils.allOf(BitFlags.class, enumType);
 	}

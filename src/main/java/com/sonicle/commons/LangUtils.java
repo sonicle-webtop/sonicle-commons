@@ -800,6 +800,40 @@ public class LangUtils {
 		return items;
 	}
 	
+	public static <T> Set<T> defaultSet(List<T> list, Set<T> defaultSet) {
+		return list != null ? new LinkedHashSet<>(list) : defaultSet;
+	}
+	
+	public static <T> Set<T> defaultSet(Set<T> set, Set<T> defaultSet) {
+		return set != null ? set : defaultSet;
+	}
+	
+	public static <T> Set<T> defaultEmptySet(List<T> list) {
+		return list != null ? new LinkedHashSet<>(list) : new LinkedHashSet<>();
+	}
+	
+	public static <T> Set<T> defaultEmptySet(Set<T> set) {
+		return set != null ? set : new LinkedHashSet<>();
+	}
+	
+	public static <T> List<T> defaultList(Set<T> set, List<T> defaultList) {
+		return set != null ? new ArrayList<>(set) : defaultList;
+	}
+	
+	public static <T> List<T> defaultList(List<T> list, List<T> defaultList) {
+		return list != null ? list : defaultList;
+	}
+	
+	public static <T> List<T> defaultEmptyList(List<T> list) {
+		return list != null ? list : new ArrayList<>();
+	}
+	
+	/*
+	public static boolean isStringBlank(String s) {
+		
+	}
+	*/
+	
 	public static String[] listPackageFiles(Class clazz, String path) throws URISyntaxException, IOException {
 		ClassLoader cl = findClassLoader(clazz);
 		URL dirURL = cl.getResource(path);
@@ -1127,6 +1161,7 @@ public class LangUtils {
 	}
 	
 	public static <T>ChangeSet computeChangeSet(Collection<T> fromCollection, Collection<T> toCollection) {
+		if (fromCollection == null || toCollection == null) return null;
 		Set<T> added = new LinkedHashSet<>(toCollection);
 		added.removeAll(fromCollection);
 		Set<T> updated = new LinkedHashSet<>(toCollection);
