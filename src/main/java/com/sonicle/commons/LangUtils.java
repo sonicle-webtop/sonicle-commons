@@ -382,6 +382,14 @@ public class LangUtils {
 		return false;
 	}
 	
+	public static String value(char[] value, String defaultValue) {
+		return (value != null) ? value(new String(value), defaultValue) : defaultValue;
+	}
+	
+	public static char[] value(String value, char[] defaultValue) {
+		return (value != null) ? value.toCharArray() : defaultValue;
+	}
+	
 	/**
 	 * Returns the String value of the passed string.
 	 * In case of empty value, default value is returned.
@@ -517,8 +525,26 @@ public class LangUtils {
 		return (value != null) ? value : defaultValue;
 	}
 	
+	public static Short value(Integer value, Short defaultValue) {
+		// Keep as is with explicit IF, otherwise you get a NPE on value.shortValue() !!!
+		if (value != null) {
+			return value.shortValue();
+		} else {
+			return defaultValue;
+		}
+	}
+	
 	public static Integer value(Integer value, Integer defaultValue) {
 		return (value != null) ? value : defaultValue;
+	}
+	
+	public static Integer value(Short value, Integer defaultValue) {
+		// Keep as is with explicit IF, otherwise you get a NPE on value.intValue() !!!
+		if (value != null) {
+			return value.intValue();
+		} else {
+			return defaultValue;
+		}
 	}
 	
 	public static Long value(Long value, Long defaultValue) {
@@ -1128,23 +1154,55 @@ public class LangUtils {
 	
 	/**
 	 * Introspects the Throwable to obtain the deepest (root) cause.
-	 * @param t The throwable to get the root cause for, may be null.
+	 * @param throwable The throwable to get the root cause for, may be null.
 	 * @return The deepest cause or throwable itself
 	 */
-	public static Throwable getDeepestCause(Throwable t) {
-		Throwable deepest = ExceptionUtils.getRootCause(t);
-		return (deepest == null) ? t : deepest;
+	public static Throwable getDeepestCause(final Throwable throwable) {
+		Throwable deepest = ExceptionUtils.getRootCause(throwable);
+		return (deepest == null) ? throwable : deepest;
 	}
 	
 	/**
 	 * Introspects the Throwable to obtain the deepest (root) cause message.
 	 * The message returned is of the form {ClassNameWithoutPackage}: {ThrowableMessage}.
-	 * @param t The throwable to get the root cause for, may be null.
+	 * @param throwable The throwable to get the root cause for, may be null.
 	 * @return The deepest cause message, or null if the initial input is null
 	 */
-	public static String getDeepestCauseMessage(Throwable t) {
-		String s = ExceptionUtils.getRootCauseMessage(t);
+	public static String getDeepestCauseMessage(final Throwable throwable) {
+		String s = ExceptionUtils.getRootCauseMessage(throwable);
 		return StringUtils.isBlank(s) ? null : s;	
+	}
+	
+	/**
+	 * Checks if the causes of the specified Throwable follow the specified 
+	 * sequence of Class types.
+	 * @param throwable The throwable which causes needs inspection, may be null.
+	 * @param causeTypes The required cause chain Class types.
+	 * @return 
+	 */
+	public static boolean hasFollowingCauseChain(final Throwable throwable, final Class<? extends Throwable>... causeTypes) {
+		Check.notEmpty(causeTypes, "causeTypes");
+		if (throwable != null) {
+			int i = 0;
+			Throwable cause = throwable.getCause();
+			while (cause != null) {
+				if ((i < causeTypes.length) && ClassUtils.hasStrictlyType(cause, causeTypes[i])) {
+					if ((i+1) == causeTypes.length) {
+						return true;
+					} else {
+						cause = cause.getCause();
+						i++;
+					}
+				} else {
+					break;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static <T> Set<T> asSet(T... values) {
+		return Stream.of(values).collect(Collectors.toSet());
 	}
 	
 	public static <T extends Comparable<T>> List<T> quickSort(List<T> items) {

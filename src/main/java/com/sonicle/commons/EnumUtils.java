@@ -70,13 +70,36 @@ public class EnumUtils {
 	}
 	
 	/**
-	 * Returns the name of passed Enum.
+	 * Gets an Enum by other Enum's name.
+	 * @param <E>
+	 * @param <SE>
+	 * @param en The other Enum.
+	 * @param clazz The target enum class.
+	 * @return The matching enum if found, null otherwise
+	 */
+	public static <E extends Enum<E>, SE extends Enum> E forName(SE en, Class<E> clazz) {
+		return forName(getName(en), clazz);
+	}
+	
+	/**
+	 * Returns the name of passed Enum or NULL if undefined.
 	 * @param <E>
 	 * @param en The Enum.
 	 * @return Enum's name.
 	 */
-	public static <E extends Enum> String getName(E en) {
-		return (en == null) ? null : en.name();
+	public static <E extends Enum> String getName(final E en) {
+		return getName(en, null);
+	}
+	
+	/**
+	 * Returns the name of passed Enum.
+	 * @param <E>
+	 * @param en The Enum.
+	 * @param defaultName The value to return when enum is NULL.
+	 * @return Enum's name.
+	 */
+	public static <E extends Enum> String getName(final E en, final String defaultName) {
+		return (en != null) ? en.name() : defaultName;
 	}
 	
 	/**
