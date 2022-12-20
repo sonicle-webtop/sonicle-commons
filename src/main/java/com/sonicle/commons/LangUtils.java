@@ -1201,8 +1201,16 @@ public class LangUtils {
 		return false;
 	}
 	
-	public static <T> Set<T> asSet(T... values) {
+	public static <T> Set<T> asSet(final T... values) {
 		return Stream.of(values).collect(Collectors.toSet());
+	}
+	
+	public static <T> Set<T> asSet(final Collection<T> collection) {
+		return (collection != null) ? new LinkedHashSet<>(collection) : new LinkedHashSet<>(0);
+	}
+	
+	public static boolean isNotEmpty(final Collection<?> collection) {
+		return (collection != null) && !collection.isEmpty();
 	}
 	
 	public static <T extends Comparable<T>> List<T> quickSort(List<T> items) {
