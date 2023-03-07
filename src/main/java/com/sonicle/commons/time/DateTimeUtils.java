@@ -124,11 +124,11 @@ public class DateTimeUtils {
 		return l1.isBefore(l2) && (Days.daysBetween(l1, l2).getDays() == 1);
 	}
 	
-	private DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz) {
+	public static DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz) {
 		return toDateTime(ld, lt, dtz, true);
 	}
 	
-	private DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz, boolean pushForwardAtGap) {
+	public static DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz, boolean pushForwardAtGap) {
 		// https://stackoverflow.com/questions/34617172/handling-time-zone-offset-transition-and-daylight-savings-time-with-joda
 		try {
 			return ld.toDateTime(lt, dtz);
