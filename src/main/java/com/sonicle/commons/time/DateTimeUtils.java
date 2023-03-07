@@ -40,6 +40,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.joda.time.Duration;
+import org.joda.time.IllegalInstantException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableInstant;
@@ -121,6 +122,20 @@ public class DateTimeUtils {
 	
 	public static boolean isDayBefore(LocalDate l1, LocalDate l2) {
 		return l1.isBefore(l2) && (Days.daysBetween(l1, l2).getDays() == 1);
+	}
+	
+	private DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz) {
+		return toDateTime(ld, lt, dtz, true);
+	}
+	
+	private DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz, boolean pushForwardAtGap) {
+		// https://stackoverflow.com/questions/34617172/handling-time-zone-offset-transition-and-daylight-savings-time-with-joda
+		try {
+			return ld.toDateTime(lt, dtz);
+		} catch (IllegalInstantException ex) {
+			if (!pushForwardAtGap) throw ex;
+			return ld.toDateTime(lt.plusHours(1), dtz);
+		}
 	}
 	
 	public static DateTime withTimeAtStartOfDay(DateTime dt) {
