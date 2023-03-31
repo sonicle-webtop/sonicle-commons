@@ -35,7 +35,9 @@ package com.sonicle.commons.cache;
 import java.util.concurrent.locks.StampedLock;
 
 /**
- *
+ * Abstract class suitable for managing cache structures that are populated in bulk-mode.
+ * Data structure management is completely delegated to implementing classes
+ * throught hook-points (see below).
  * @author malbinola
  */
 public abstract class AbstractBulkCache {
@@ -43,7 +45,14 @@ public abstract class AbstractBulkCache {
 	protected final StampedLock lock = new StampedLock();
 	private int buildsCount = 0;
 	
+	/**
+	 * Hook-point: load you data. Implement you custom logic here!
+	 */
 	protected abstract void internalBuildCache();
+	
+	/**
+	 * Hook-point: clear you data. Implement you custom logic here!
+	 */
 	protected abstract void internalCleanupCache();
 	
 	/**
@@ -54,6 +63,9 @@ public abstract class AbstractBulkCache {
 		return buildsCount;
 	}
 	
+	/**
+	 * Forcibly issue an initialization: this will call {@link #internalBuildCache() internalBuildCache}.
+	 */
 	public final void init() {
 		long stamp = lock.writeLock();
 		try {
@@ -63,6 +75,9 @@ public abstract class AbstractBulkCache {
 		}
 	}
 	
+	/**
+	 * Clears data: this will call {@link #internalCleanupCache() internalCleanupCache}.
+	 */
 	public final void clear() {
 		long stamp = lock.writeLock();
 		try {
@@ -72,27 +87,53 @@ public abstract class AbstractBulkCache {
 		}
 	}
 	
+	/**
+	 * Returns the number of rebuild counts.
+	 * @return 
+	 */
 	public final int getBuildsCount() {
 		return buildsCount;
 	}
 	
+	/**
+	 * Returns if this cache needs an initialization, typically when builds-count is less than 1.
+	 * @return 
+	 */
 	public final boolean isInitialized() {
 		return buildsCount > 0;
 	}
 	
+	/**
+	 * Internal method that performs cache building.
+	 */
 	protected void internalBuild() {
 		internalBuildCache();
 		buildsCount++;
 	}
 	
+	/**
+	 * Internal method that performs cache clearing.
+	 */
 	protected void internalClear() {
 		internalCleanupCache();
 	}
 	
+	/**
+	 * Internal method used to determine if a rebuild is necessary.
+	 * Can be overrided by implementing classes to support their own logic.
+	 * @return 
+	 */
 	protected boolean internalShouldBuild() {
 		return buildsCount <= 0;
 	}
 	
+	/**
+	 * Method that needs to be called by implementing classes before any cache access operation.
+	 * This method takes care of checking if the cache is already being built, 
+	 * otherwise the initial lock (read) will be upgraded to write and the 
+	 * initialization will be performed.
+	 * As alse stated by method name, do NOT call this method in a synchronized/mutualexclusion section; it can cause deadlocks.
+	 */
 	protected void internalCheckBeforeGetDoNotLockThis() {
 		long stamp = lock.readLock();
 		try {
