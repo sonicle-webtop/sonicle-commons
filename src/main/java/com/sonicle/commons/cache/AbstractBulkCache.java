@@ -41,15 +41,23 @@ import java.util.concurrent.locks.StampedLock;
 public abstract class AbstractBulkCache {
 	private static final long serialVersionUID = 1L;
 	protected final StampedLock lock = new StampedLock();
-	private int initCount = 0;
+	private int buildsCount = 0;
 	
 	protected abstract void internalBuildCache();
 	protected abstract void internalCleanupCache();
 	
+	/**
+	 * @deprecated use getBuildCount instead.
+	 */
+	@Deprecated
+	public int getInitCount() {
+		return buildsCount;
+	}
+	
 	public final void init() {
 		long stamp = lock.writeLock();
 		try {
-			internalInit();
+			internalBuild();
 		} finally {
 			lock.unlockWrite(stamp);
 		}
@@ -64,40 +72,62 @@ public abstract class AbstractBulkCache {
 		}
 	}
 	
-	public boolean isInited() {
-		return initCount > 0;
+	public final int getBuildsCount() {
+		return buildsCount;
 	}
 	
-	public int getInitCount() {
-		return initCount;
+	public final boolean isInitialized() {
+		return buildsCount > 0;
 	}
 	
-	public final long readLock() {
-		return lock.readLock();
-	}
-	
-	public final void unlockRead(long stamp) {
-		lock.unlockRead(stamp);
-	}
-	
-	public final long writeLock() {
-		return lock.writeLock();
-	}
-	
-	public final void unlockWrite(long stamp) {
-		lock.unlockWrite(stamp);
-	}
-	
-	protected void internalInit() {
+	protected void internalBuild() {
 		internalBuildCache();
-		initCount++;
+		buildsCount++;
 	}
 	
 	protected void internalClear() {
 		internalCleanupCache();
 	}
 	
+	protected boolean internalShouldBuild() {
+		return buildsCount <= 0;
+	}
+	
 	protected void internalCheckBeforeGetDoNotLockThis() {
-		// This may be useful for subclasses, do nothing for now...
+		long stamp = lock.readLock();
+		try {
+			if (internalShouldBuild()) {
+				stamp = upgradeToWriteLock(stamp);
+				internalBuild();
+			}
+		} finally {
+			lock.unlock(stamp);
+		}
+	}
+	
+	protected final long readLock() {
+		return lock.readLock();
+	}
+	
+	protected final void unlockRead(long stamp) {
+		lock.unlockRead(stamp);
+	}
+	
+	protected final long writeLock() {
+		return lock.writeLock();
+	}
+	
+	protected final void unlockWrite(long stamp) {
+		lock.unlockWrite(stamp);
+	}
+	
+	protected long upgradeToWriteLock(long rstamp) {
+		long wstamp = lock.tryConvertToWriteLock(rstamp);
+		if (wstamp == 0L) {
+			lock.unlockRead(rstamp);
+			return lock.writeLock();
+		} else {
+			return wstamp;
+		}
 	}
 }

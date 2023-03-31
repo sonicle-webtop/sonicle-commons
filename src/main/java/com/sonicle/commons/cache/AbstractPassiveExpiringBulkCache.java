@@ -60,21 +60,14 @@ public abstract class AbstractPassiveExpiringBulkCache extends AbstractBulkCache
 	}
 	
 	@Override
-	protected void internalInit() {
-		super.internalInit();
+	protected void internalBuild() {
+		super.internalBuild();
 		expirationTime = expiringPolicy.expirationTime();
 	}
 	
 	@Override
-	protected void internalCheckBeforeGetDoNotLockThis() {
-		long stamp = lock.writeLock();
-		try {
-			if (!isInited() || checkExpired(now(), expirationTime)) {
-				internalInit();
-			}
-		} finally {
-			lock.unlockWrite(stamp);
-		}
+	protected boolean internalShouldBuild() {
+		return super.internalShouldBuild() || checkExpired(now(), expirationTime);
 	}
 	
 	public void forceExpire() {
