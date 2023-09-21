@@ -971,9 +971,12 @@ public class LangUtils {
 	}
 	
 	public static String joinPaths(String... paths) {
-		ArrayList<String> parts = new ArrayList<>();
-		for(String path : paths) {
-			parts.add(StringUtils.removeStart(path, "/"));
+		ArrayList<String> parts = new ArrayList<>(paths.length);
+		for (int i = 0; i < paths.length; i++) {
+			String path = paths[i];
+			if (i > 0) path = StringUtils.removeStart(path, "/");
+			if (i < paths.length) path = StringUtils.removeEnd(path, "/");
+			parts.add(path);
 		}
 		return StringUtils.join(parts, "/");
 	}
