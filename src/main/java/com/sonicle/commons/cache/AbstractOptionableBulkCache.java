@@ -35,35 +35,61 @@ package com.sonicle.commons.cache;
 import java.util.concurrent.locks.StampedLock;
 
 /**
- *
+ * Abstract class suitable for managing cache structures that are populated in bulk-mode.
+ * Data structure management is completely delegated to implementing classes
+ * throught hook-points (see below).
+ * Note that this implementation does NOT support initialization upon first use.
  * @author malbinola
  * @param <O>
  */
-public abstract class AbstractOptionableBulkCache <O> {
+public abstract class AbstractOptionableBulkCache<O> {
 	private static final long serialVersionUID = 1L;
 	protected final StampedLock lock = new StampedLock();
-	private int initCount = 0;
+	private int buildsCount = 0;
 	
+	/**
+	 * Hook-point: load you data.Implement you custom logic here!
+	 * @param options
+	 */
 	protected abstract void internalBuildCache(final O options);
+	
+	/**
+	 * Hook-point: clear you data.Implement you custom logic here!
+	 * @param options
+	 */
 	protected abstract void internalCleanupCache(final O options);
 	
+	/**
+	 * Forcibly issue an initialization (with no options): this will call {@link #internalBuildCache() internalBuildCache}.
+	 */
 	public void init() {
 		init(null);
 	}
 	
+	/**
+	 * Forcibly issue an initialization (with options): this will call {@link #internalBuildCache() internalBuildCache}.
+	 * @param options 
+	 */
 	public final void init(final O options) {
 		long stamp = lock.writeLock();
 		try {
-			internalInit(options);
+			internalBuild(options);
 		} finally {
 			lock.unlockWrite(stamp);
 		}
 	}
 	
+	/**
+	 * Clears data (with no options): this will call {@link #internalCleanupCache() internalCleanupCache}.
+	 */
 	public final void clear() {
 		clear(null);
 	}
 	
+	/**
+	 * Clears data (with options): this will call {@link #internalCleanupCache() internalCleanupCache}.
+	 * @param options
+	 */
 	public final void clear(final O options) {
 		long stamp = lock.writeLock();
 		try {
@@ -73,40 +99,79 @@ public abstract class AbstractOptionableBulkCache <O> {
 		}
 	}
 	
-	public boolean isInited() {
-		return initCount > 0;
+	/**
+	 * Returns the number of rebuild counts.
+	 * @return 
+	 */
+	public final int getBuildsCount() {
+		return buildsCount;
 	}
 	
-	public int getInitCount() {
-		return initCount;
+	/**
+	 * Returns if this cache needs an initialization, typically when builds-count is less than 1.
+	 * @return 
+	 */
+	public final boolean isInitialized() {
+		return buildsCount > 0;
 	}
 	
-	public final long readLock() {
-		return lock.readLock();
-	}
-	
-	public final void unlockRead(final long stamp) {
-		lock.unlockRead(stamp);
-	}
-	
-	public final long writeLock() {
-		return lock.writeLock();
-	}
-	
-	public final void unlockWrite(final long stamp) {
-		lock.unlockWrite(stamp);
-	}
-	
-	protected void internalInit(final O options) {
+	/**
+	 * Internal method that performs cache building.
+	 * @param options
+	 */
+	protected void internalBuild(final O options) {
 		internalBuildCache(options);
-		initCount++;
+		buildsCount++;
 	}
 	
+	/**
+	 * Internal method that performs cache clearing.
+	 * @param options
+	 */
 	protected void internalClear(final O options) {
 		internalCleanupCache(options);
 	}
 	
+	/**
+	 * Internal method used to determine if a rebuild is necessary.
+	 * Can be overrided by implementing classes to support their own logic.
+	 * @param options
+	 * @return 
+	 */
+	protected boolean internalShouldBuild(final O options) {
+		return buildsCount <= 0;
+	}
+	
+	/**
+	 * Method that needs to be called by implementing classes before any cache access operation.
+	 */
 	protected void internalCheckBeforeGetDoNotLockThis() {
 		// This may be useful for subclasses, do nothing for now...
+	}
+	
+	protected final long readLock() {
+		return lock.readLock();
+	}
+	
+	protected final void unlockRead(long stamp) {
+		lock.unlockRead(stamp);
+	}
+	
+	protected final long writeLock() {
+		return lock.writeLock();
+	}
+	
+	protected final void unlockWrite(long stamp) {
+		lock.unlockWrite(stamp);
+	}
+	
+	protected long upgradeToWriteLock(long rstamp) {
+		long wstamp = lock.tryConvertToWriteLock(rstamp);
+		if (wstamp == 0L) {
+			lock.unlockRead(rstamp);
+			return lock.writeLock();
+		} else {
+			return wstamp;
+		}
 	}
 }
