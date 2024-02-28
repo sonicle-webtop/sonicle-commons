@@ -471,6 +471,20 @@ public class LangUtils {
 	}
 	
 	/**
+	 * Returns the Double value of the passed string.
+	 * In case of empty value, default value is returned.
+	 * During conversion Double.valueOf method is used!
+	 * @param value The value
+	 * @param defaultValue The dafault value
+	 * @return The Double value
+	 */
+	public static Double value(String value, Double defaultValue) {
+		if(StringUtils.isEmpty(value)) return defaultValue;
+		Double valueof = Double.valueOf(value);
+		return (valueof != null) ? valueof : defaultValue;
+	}
+	
+	/**
 	 * Returns the Type value of the passed string.
 	 * During conversion Type.valueOf method is used!
 	 * @param <T> The Type
