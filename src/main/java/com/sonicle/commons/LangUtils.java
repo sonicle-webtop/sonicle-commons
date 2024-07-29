@@ -52,6 +52,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -733,6 +734,17 @@ public class LangUtils {
 	}
 	
 	/**
+	 * Parses a String into Map entries. Character ',' will be uses as items
+	 * separator. Key first (index 0), followed by its associated value (index 1).
+	 * @param str The String value.
+	 * @param valuesSeparator Separator char between key and value.
+	 * @return The resulting Map.
+	 */
+	public static Map<String, String> parseStringAsKeyValueMap(final String str, final String valuesSeparator) {
+		return parseStringAsKeyValueMap(str, 0, 1, ",", valuesSeparator, true);
+	}
+	
+	/**
 	 * Parses a String into Map entries using indexes to select which token is 
 	 * the key and which one is the value. Character ',' will be uses as items
 	 * separator and '=' as values separator.
@@ -775,7 +787,7 @@ public class LangUtils {
 	
 	/**
 	 * Parses a String into a List of items of the specified type.
-	 * Character ',' will be uses as items separator. Null-items will be ignored.
+	 * Character ',' will be uses as items separator. Null-string will be ignored.
 	 * @param <T>
 	 * @param str The String value.
 	 * @param type The object type.
@@ -787,7 +799,7 @@ public class LangUtils {
 	
 	/**
 	 * Parses a String into a List of items of the specified type, using the 
-	 * provided character as separator between items. Null-items will be ignored.
+	 * provided character as separator between items. Null-string will be ignored.
 	 * @param <T>
 	 * @param str The String value.
 	 * @param separator Separator char between items.
@@ -810,6 +822,35 @@ public class LangUtils {
 			}
 		}
 		return list;
+	}
+	
+	/**
+	 * Parses a String into a Set of items of the specified type.
+	 * Character ',' will be uses as items separator. Null-string will be ignored.
+	 * @param str The String value.
+	 * @return 
+	 */
+	public static HashSet<String> parseStringAsSet(final String str) {
+		return parseStringAsSet(str, ",", true);
+	}
+	
+	/**
+	 * Parses a String into a Set of items of the specified type, using the 
+	 * provided character as separator between items. Null-string will be ignored.
+	 * @param str The String value.
+	 * @param separator Separator char between items.
+	 * @param trim Controls whether to trim items before converting them.
+	 * @return 
+	 */
+	public static HashSet<String> parseStringAsSet(final String str, final String separator, final boolean trim) {
+		LinkedHashSet<String> set = new LinkedHashSet<>();
+		if (!StringUtils.isBlank(str)) {
+			String[] ltokens = StringUtils.split(str, separator);
+			for (int i=0; i<ltokens.length; i++) {
+				set.add(trim ? StringUtils.trim(ltokens[i]) : ltokens[i]);
+			}
+		}
+		return set;
 	}
 	
 	/**
