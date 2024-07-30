@@ -37,6 +37,9 @@ package com.sonicle.commons.l4j;
  * @author gabriele.bulfon
  */
 public abstract class AbstractProduct {
+	
+	public static final String LQT_USERS = "users";
+	
 	private final String hardwareId;
 	
 	public AbstractProduct(String hardwareId) {
@@ -45,6 +48,14 @@ public abstract class AbstractProduct {
 	
 	public String getHardwareId() {
 		return hardwareId;
+	}
+	
+	public String getLicenseQuantityType() {
+		return LQT_USERS;
+	}
+	
+	public boolean isLicenseQuantityTypeUsers() {
+		return getLicenseQuantityType()==LQT_USERS;
 	}
 	
 	public abstract String getProductCode();
