@@ -78,6 +78,10 @@ public class DbUtils {
 		if (stmt != null) try { stmt.close(); } catch(SQLException ex) { /* Do nothing... */ }
 	}
 	
+	public static void closeQuietly(final Statement stmt) {
+		if (stmt != null) try { stmt.close(); } catch(SQLException ex) { /* Do nothing... */ }
+	}
+	
 	public static void closeQuietly(final ResultSet rs) {
 		if (rs != null) try { rs.close(); } catch(SQLException ex) { /* Do nothing... */ }
 	}
