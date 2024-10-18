@@ -1164,13 +1164,13 @@ public class LangUtils {
 		final String sanitizedSeparator = StringUtils.defaultString(separator);
 		final StringBuilder result = new StringBuilder();
 		final Iterator<String> it = Arrays.asList(strings).iterator();
+		int tokens = 0;
 		while (it.hasNext()) {
 			final String value = it.next();
 			if (!StringUtils.isBlank(StringUtils.trim(value))) {
+				if (tokens > 0) result.append(sanitizedSeparator);
 				result.append(value);
-				if (it.hasNext()) {
-					result.append(sanitizedSeparator);
-				}
+				tokens++;
 			}
 		}
 		return result.toString();

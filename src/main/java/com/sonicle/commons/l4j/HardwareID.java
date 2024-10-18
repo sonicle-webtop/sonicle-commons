@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,7 @@ public class HardwareID {
 		return getHardwareIDFromEthernetAddress(false);
 	}
 	
-	public static String getHardwareIDFromEthernetAddress(boolean useFirstOnly) {
+	public static String getHardwareIDFromEthernetAddress(final boolean useFirstOnly) {
 		try {
 			String s = null;
 			if (OS.isWindows()) {
@@ -97,6 +98,16 @@ public class HardwareID {
 			LOGGER.error("MSG146", ex);
 		}
 		return null;
+	}
+	
+	public static String getHardwareIDFromUUIDString(final String uuid) {
+		String s = null;
+		if (StringUtils.length(uuid) == 36) {
+			s = uuid;
+		} else if (StringUtils.length(uuid) == 32) {
+			s = uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20);
+		}
+		return (s != null) ? "5" + UUID.nameUUIDFromBytes(s.getBytes(StandardCharsets.UTF_8)).toString() : null;
 	}
 	
 	private static String generateStringFromPhysicalNetInterfaceMACs(int limit) throws SocketException {
@@ -126,7 +137,7 @@ public class HardwareID {
 		return sb.length() > 0 ? sb.toString() : null;
 	}
 	
-	private static Boolean isLinuxVirtualInterface(String name) {
+	private static Boolean isLinuxVirtualInterface(final String name) {
 		Path file = Paths.get("/sys/class/net/" + name);
 		if (Files.exists(file) && Files.isSymbolicLink(file)) {
 			if (LOGGER.isDebugEnabled()) LOGGER.debug("Evaluating target for symlink '{}'", file.toString());
