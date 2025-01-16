@@ -1,0 +1,5 @@
+- Assert.java, ComparisonNode.java, ComparisonOperator.java, LogicalNode.java
+  Removed "cz.jirutka.rsql.parser.ast.StringUtils" class in favor of "org.apache.commons.lang3.StringUtils" use.
+- RSQLParser.java, AndNode.java, ComparisonNode.java, ComparisonOperator.java, NodesFactory.java, OrNode.java
+  Removed "net.jcip.annotations.Immutable" import in favor of "javax.annotation.concurrent.Immutable".
+- Update "RSQLParser.jj" file fixing generation package name
