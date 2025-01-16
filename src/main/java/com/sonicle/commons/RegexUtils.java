@@ -120,6 +120,33 @@ public class RegexUtils {
 	
 	public static final String MATCH_NETMASK4 = "(((255\\.){3}(255|254|252|248|240|224|192|128|0+))|((255\\.){2}(255|254|252|248|240|224|192|128|0+)\\.0)|((255\\.)(255|254|252|248|240|224|192|128|0+)(\\.0+){2})|((255|254|252|248|240|224|192|128|0+)(\\.0+){3}))";
 	
+	/**
+	 * Matches a UUID.
+	 * This NOT performs a semantic match: only format is checked. Version and 
+	 * constraint of 4th group (89ab) are ignored.
+	 * Pattern includes lowercase letters only, use insensitive option if desired.
+	 * https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex
+	 * 
+	 * Examples:
+	 * 09375b47-046d-419d-8264-0656156749a5
+	 */
+	public static final String MATCH_UUID_SIMPLE = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+	
+	/**
+	 * Matches a UUID taking into account its version.
+	 * This NOT performs a semantic match: only format is checked.
+	 * Pattern includes lowercase letters only, use insensitive option if desired.
+	 * https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex
+	 * 
+	 * Examples:
+	 * 09375b47-046d-419d-8264-0656156749a5
+	 */
+	public static final String MATCH_UUID_V1 = "[0-9a-f]{8}-[0-9a-f]{4}-[1][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+	public static final String MATCH_UUID_V2 = "[0-9a-f]{8}-[0-9a-f]{4}-[2][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+	public static final String MATCH_UUID_V3 = "[0-9a-f]{8}-[0-9a-f]{4}-[3][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+	public static final String MATCH_UUID_V4 = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+	public static final String MATCH_UUID_V5 = "[0-9a-f]{8}-[0-9a-f]{4}-[5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+	
 	@Deprecated
 	public static Pattern matchStartEnd(String pattern) {
 		return match(pattern);

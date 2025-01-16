@@ -223,6 +223,24 @@ public class EnumUtils {
 	}
 	
 	/**
+	 * Transforms a string name to enum value equivalent representation.
+	 * Firstly this method will look for a match using Enum's name, then the 
+	 * serialized-name will be used as fallback method.
+	 * @param <E> Enum type
+	 * @param s The string representing the Enum
+	 * @param enumClass The enum class The Enum class type
+	 * @param caseInsensitiveName Set to `true` to perform an insensitive match on name.
+	 * @return 
+	 */
+	public static <E extends Enum<E>> E forString(final String s, final Class<E> enumClass, final boolean caseInsensitiveName) {
+		E parsed = EnumUtils.forName(caseInsensitiveName ? StringUtils.upperCase(s) : s, enumClass);
+		if (parsed == null) {
+			parsed = EnumUtils.forSerializedName(s, enumClass);
+		}
+		return parsed;
+	}
+	
+	/**
 	 * Transforms an enum to its string value equivalent.
 	 * @param <E> Enum type
 	 * @param en The enum value

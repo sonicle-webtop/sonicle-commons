@@ -1301,9 +1301,9 @@ public class LangUtils {
 		private final Set<T> removed;
 		
 		public ChangeSet(Set<T> added, Set<T> updated, Set<T> removed) {
-			this.added = (added == null) ? new LinkedHashSet<>(): added;
-			this.updated = (updated == null) ? new LinkedHashSet<>(): updated;
-			this.removed = (removed == null) ? new LinkedHashSet<>(): removed;
+			this.added = (added == null) ? new LinkedHashSet<>(0): added;
+			this.updated = (updated == null) ? new LinkedHashSet<>(0): updated;
+			this.removed = (removed == null) ? new LinkedHashSet<>(0): removed;
 		}
 		
 		public Set<T> getAdded() {

@@ -33,7 +33,12 @@
 package com.sonicle.commons.beans;
 
 import com.google.gson.annotations.SerializedName;
+import com.sonicle.commons.EnumUtils;
+import java.text.ParseException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import net.sf.qualitycheck.Check;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -68,7 +73,6 @@ public class SortInfo {
 	public int hashCode() {
 		return new HashCodeBuilder()
 			.append(getField())
-			.append(getDirection())
 			.toHashCode();
 	}
 	
@@ -79,20 +83,35 @@ public class SortInfo {
 		final SortInfo otherObject = (SortInfo)obj;
 		return new EqualsBuilder()
 			.append(getField(), otherObject.getField())
-			.append(getDirection(), otherObject.getDirection())
 			.isEquals();
 	}
 	
-	public static SortInfo asc(String field) {
+	public static SortInfo asc(final String field) {
 		return new SortInfo(field, Direction.ASC);
 	}
 	
-	public static SortInfo desc(String field) {
+	public static SortInfo desc(final String field) {
 		return new SortInfo(field, Direction.DESC);
 	}
 	
 	public static enum Direction {
 		@SerializedName("ASC") ASC,
 		@SerializedName("DESC") DESC
+	}
+	
+	public static Set<SortInfo> parseCollection(final Set<String> collection) throws ParseException {
+		LinkedHashSet<SortInfo> sortInfo = new LinkedHashSet<>();
+		if (collection != null) {
+			for (String s : collection) {
+				sortInfo.add(SortInfo.parse(s));
+			}
+		}
+		return sortInfo;
+	}
+	
+	public static SortInfo parse(final String sortInfo) throws ParseException {
+		String[] tokens = StringUtils.split(sortInfo, " ");
+		if (tokens.length == 0 || StringUtils.isBlank(tokens[0])) throw new ParseException(sortInfo, 0);
+		return new SortInfo(tokens[0], EnumUtils.forSerializedName(tokens.length == 1 ? null : tokens[1], Direction.ASC, Direction.class));
 	}
 }
