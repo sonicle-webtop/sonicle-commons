@@ -175,6 +175,15 @@ public class QBuilder<T extends QBuilder<T>> implements Partial<T> {
         self().current.getChildren().add(node);
         return new ConditionDelegate(self());
     }
+	
+	/**
+	 * No-Op method to create a Condition based on current query tree.
+	 * 
+	 * @return A {@link Condition} that can be used as starting point for subsequent compositions.
+	 */
+	protected final Condition<T> selfCondition() {
+		return new ConditionDelegate(self());
+	}
 
 
     /**

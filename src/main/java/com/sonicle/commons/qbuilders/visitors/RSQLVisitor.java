@@ -38,14 +38,20 @@ public class RSQLVisitor extends AbstractVoidContextNodeVisitor<String> {
 
     @Override
     protected String visit(AndNode node) {
-        String body = node.getChildren().stream().map(this::visitAny).collect(joining(";"));
+        String body = node.getChildren().stream()
+			.map(this::visitAny)
+			.filter((s) -> { return !emptyExpressionBlock(s); }) // Ignore empty blocks
+			.collect(joining(";"));
         return nodeBelongsToParentExpression(node) ? "(" + body + ")" : body;
     }
 
     @Override
     protected String visit(OrNode node) {
-        String body = node.getChildren().stream().map(this::visitAny).collect(joining(","));
-        return nodeBelongsToParentExpression(node) ? "(" + body + ")" : body;
+        String body = node.getChildren().stream()
+			.map(this::visitAny)
+			.filter((s) -> { return !emptyExpressionBlock(s); }) // Ignore empty blocks
+			.collect(joining(","));
+		return nodeBelongsToParentExpression(node) ? "(" + body + ")" : body;
     }
 
     @Override
@@ -57,6 +63,10 @@ public class RSQLVisitor extends AbstractVoidContextNodeVisitor<String> {
             return single(node, "==");
         } else if(ComparisonOperator.NE.equals(operator)) {
             return single(node, "!=");
+        } else if(ComparisonOperator.LIKE.equals(operator)) {
+            return single(node, "=like=");
+        } else if(ComparisonOperator.NLIKE.equals(operator)) {
+            return single(node, "=nlike=");
         } else if (ComparisonOperator.EX.equals(operator)) {
             return single(node, "=ex=");
         } else if (ComparisonOperator.GT.equals(operator)) {
@@ -79,6 +89,11 @@ public class RSQLVisitor extends AbstractVoidContextNodeVisitor<String> {
 
         throw new UnsupportedOperationException("This visitor does not support the operator " + operator + ".");
     }
+	
+	protected boolean emptyExpressionBlock(String s) {
+		// Empty blocks may be introduced by using .selfCondition() (see com.sonicle.commons.qbuilders.builders.QBuilder)
+		return "()".equals(s) || "".equals(s);
+	}
 
     protected boolean nodeBelongsToParentExpression(AbstractNode node) {
         return node.getParent() != null;

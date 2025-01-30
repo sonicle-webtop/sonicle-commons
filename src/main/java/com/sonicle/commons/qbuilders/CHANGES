@@ -1,0 +1,11 @@
+- QBuilder.java
+  Add new selfCondition method
+- RSQLVisitor.java
+  Skip empty blocks in RSQL serialization
+  Add support to LIKE, NLIKE operators
+- StringProperty.java
+  Add support to like and notLike conditions
+- StringPropertyDelegate.java
+  Add implementation of like and notLike interface
+- ComparisonOperator.java
+  Add LIKE and NLIKE operators

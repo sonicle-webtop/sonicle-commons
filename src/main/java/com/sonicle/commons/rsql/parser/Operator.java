@@ -44,7 +44,7 @@ import java.util.Set;
  */
 public enum Operator {
 	EQ(RSQLOperators.EQUAL),
-	NEQ(RSQLOperators.NOT_EQUAL),
+	NE(RSQLOperators.NOT_EQUAL),
 	LIKE(new ComparisonOperator("=like=", false)),
 	NLIKE(new ComparisonOperator("=nlike=", false)),
 	GT(RSQLOperators.GREATER_THAN),

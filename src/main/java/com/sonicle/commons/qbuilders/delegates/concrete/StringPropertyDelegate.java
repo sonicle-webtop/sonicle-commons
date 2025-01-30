@@ -28,24 +28,38 @@ public final class StringPropertyDelegate<T extends QBuilder<T>>
         super(field, canonical);
     }
 
+	@Override
     public final Condition<T> lexicallyAfter(String value) {
         return condition(getField(), ComparisonOperator.GT, Collections.singletonList(value));
     }
 
+	@Override
     public final Condition<T> lexicallyBefore(String value) {
         return condition(getField(), ComparisonOperator.LT, Collections.singletonList(value));
     }
 
+	@Override
     public final Condition<T> lexicallyNotAfter(String value) {
         return condition(getField(), ComparisonOperator.LTE, Collections.singletonList(value));
     }
 
+	@Override
     public final Condition<T> lexicallyNotBefore(String value) {
         return condition(getField(), ComparisonOperator.GTE, Collections.singletonList(value));
     }
 
+	@Override
     public Condition<T> pattern(String pattern) {
         return condition(getField(), ComparisonOperator.RE, Collections.singletonList(pattern));
     }
 
+	@Override
+	public Condition<T> like(String value) {
+		return condition(getField(), ComparisonOperator.LIKE, Collections.singletonList(value));
+	}
+
+	@Override
+	public Condition<T> notLike(String value) {
+		return condition(getField(), ComparisonOperator.NLIKE, Collections.singletonList(value));
+	}
 }

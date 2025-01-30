@@ -72,4 +72,18 @@ public interface StringProperty<T extends QBuilder<T>> extends EquitableProperty
      * @return The logically complete condition.
      */
     Condition<T> pattern(String pattern);
+	
+	/**
+	 * Specifies that the value of the field must like to the provided value.
+	 * @param value The value that the field must like to.
+	 * @return The logically complete condition.
+	 */
+	Condition<T> like(String value);
+	
+	/**
+	 * Specifies that the value of the field must not like to the provided value.
+	 * @param value The value that the field must not like to.
+	 * @return The logically complete condition.
+	 */
+	Condition<T> notLike(String value);
 }

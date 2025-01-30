@@ -24,6 +24,8 @@ public final class ComparisonOperator {
 
     public static final ComparisonOperator EQ = new ComparisonOperator("EQ");
     public static final ComparisonOperator NE = new ComparisonOperator("NE");
+	public static final ComparisonOperator LIKE = new ComparisonOperator("LIKE");
+	public static final ComparisonOperator NLIKE = new ComparisonOperator("NLIKE");
     public static final ComparisonOperator GT = new ComparisonOperator("GT");
     public static final ComparisonOperator LT = new ComparisonOperator("LT");
     public static final ComparisonOperator GTE = new ComparisonOperator("GTE");
