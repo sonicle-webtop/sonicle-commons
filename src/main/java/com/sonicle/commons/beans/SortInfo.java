@@ -35,6 +35,7 @@ package com.sonicle.commons.beans;
 import com.google.gson.annotations.SerializedName;
 import com.sonicle.commons.EnumUtils;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import net.sf.qualitycheck.Check;
@@ -113,5 +114,48 @@ public class SortInfo {
 		String[] tokens = StringUtils.split(sortInfo, " ");
 		if (tokens.length == 0 || StringUtils.isBlank(tokens[0])) throw new ParseException(sortInfo, 0);
 		return new SortInfo(tokens[0], EnumUtils.forSerializedName(tokens.length == 1 ? null : tokens[1], Direction.ASC, Direction.class));
+	}
+	
+	public static class Builder {
+		private Set<SortInfo> items;
+		
+		public Builder() {
+			this(new LinkedHashSet<SortInfo>());
+		}
+		
+		public Builder(Set<SortInfo> items) {
+			this.items = items;
+		}
+		
+		public Builder asc(String field) {
+			items.add(SortInfo.asc(field));
+			return this;
+		}
+		
+		public Builder asc(String field, String... moreFields) {
+			items.add(SortInfo.asc(field));
+			for (String moreField : moreFields) items.add(SortInfo.asc(moreField));
+			return this;
+		}
+		
+		public Builder desc(String field) {
+			items.add(SortInfo.desc(field));
+			return this;
+		}
+		
+		public Builder desc(String field, String... moreFields) {
+			items.add(SortInfo.desc(field));
+			for (String moreField : moreFields) items.add(SortInfo.desc(moreField));
+			return this;
+		}
+		
+		public Builder field(String field, Direction direction) {
+			items.add(new SortInfo(field, direction));
+			return this;
+		}
+		
+		public Set<SortInfo> build() {
+			return Collections.unmodifiableSet(items);
+		}
 	}
 }
