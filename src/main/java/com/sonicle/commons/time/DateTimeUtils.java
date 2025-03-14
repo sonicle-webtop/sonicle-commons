@@ -53,6 +53,9 @@ import org.joda.time.format.DateTimeFormatter;
  * @author malbinola
  */
 public class DateTimeUtils {
+	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter("yyyy-MM-dd");
+	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter("HH:mm:ss");
+	public static final DateTimeFormatter ISO_DATEDIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", DateTimeZone.UTC);
 	public static final LocalTime TIME_AT_STARTOFDAY = new LocalTime(0, 0, 0, 0);
 	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
 	
