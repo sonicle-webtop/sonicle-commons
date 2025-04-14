@@ -36,18 +36,6 @@
 		<ipaddress.version>4.3.3</ipaddress.version><!-- Do not use version 5.3.3 otherwise you get "getting Invalid byte tag in constant pool : 19" errors -->
 	</properties>
 	
-	<repositories>
-		<repository>
-			<id>license4j-releases</id>
-			<url>https://www.license4j.com/maven/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<checksumPolicy>ignore</checksumPolicy>
-			</releases>
-		</repository>
-	</repositories>
-	
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
