@@ -59,128 +59,180 @@ public class DateTimeUtils {
 	public static final LocalTime TIME_AT_STARTOFDAY = new LocalTime(0, 0, 0, 0);
 	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
 	
-	public static String[] getDayNamesShort(Locale locale) {
-		return new DateFormatSymbols(locale).getShortWeekdays();
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getDayNamesShort
+	 */
+	@Deprecated public static String[] getDayNamesShort(Locale locale) {
+		return JavaTimeUtils.getDayNamesShort(locale);
 	}
 	
-	public static String getDayNameShort(int day, Locale locale) {
-		return getDayNamesShort(locale)[day];
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getDayNameShort
+	 */
+	@Deprecated public static String getDayNameShort(int day, Locale locale) {
+		return JavaTimeUtils.getDayNameShort(day, locale);
 	}
 	
-	public static String[] getDayNamesLong(Locale locale) {
-		return new DateFormatSymbols(locale).getWeekdays();
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getDayNamesLong
+	 */
+	@Deprecated public static String[] getDayNamesLong(Locale locale) {
+		return JavaTimeUtils.getDayNamesLong(locale);
 	}
 	
-	public static String getDayNameLong(int day, Locale locale) {
-		return getDayNamesLong(locale)[day];
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getDayNameLong
+	 */
+	@Deprecated public static String getDayNameLong(int day, Locale locale) {
+		return JavaTimeUtils.getDayNameLong(day, locale);
 	}
 	
-	public static String[] getMonthNamesShort(Locale locale) {
-		return new DateFormatSymbols(locale).getShortMonths();
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getMonthNamesShort
+	 */
+	@Deprecated public static String[] getMonthNamesShort(Locale locale) {
+		return JavaTimeUtils.getMonthNamesShort(locale);
 	}
 	
-	public static String getMonthNameShort(int month, Locale locale) {
-		return getMonthNamesShort(locale)[month-1];
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getMonthNameShort
+	 */
+	@Deprecated public static String getMonthNameShort(int month, Locale locale) {
+		return JavaTimeUtils.getMonthNameShort(month, locale);
 	}
 	
-	public static String[] getMonthNamesLong(Locale locale) {
-		return new DateFormatSymbols(locale).getMonths();
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getMonthNamesLong
+	 */
+	@Deprecated public static String[] getMonthNamesLong(Locale locale) {
+		return JavaTimeUtils.getMonthNamesLong(locale);
 	}
 	
-	public static String getMonthNameLong(int month, Locale locale) {
-		return getMonthNamesLong(locale)[month-1];
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.getMonthNameLong
+	 */
+	@Deprecated public static String getMonthNameLong(int month, Locale locale) {
+		return JavaTimeUtils.getMonthNameLong(month, locale);
 	}
 	
-	public static DateTime now() {
-		return now(false);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.now
+	 */
+	@Deprecated public static DateTime now() {
+		return JodaTimeUtils.now();
 	}
 	
-	public static DateTime now(boolean exact) {
-		if(exact) {
-			return DateTime.now(DateTimeZone.UTC);
-		} else {
-			return DateTime.now(DateTimeZone.UTC).withMillisOfSecond(0);
-		}
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.now
+	 */
+	@Deprecated public static DateTime now(boolean exact) {
+		return JodaTimeUtils.now(exact);
 	}
 	
-	public static boolean isMidnight(DateTime dt) {
-		return (dt.compareTo(dt.withTimeAtStartOfDay()) == 0);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.isMidnight
+	 */
+	@Deprecated public static boolean isMidnight(DateTime dt) {
+		return JodaTimeUtils.isMidnight(dt);
 	}
 	
-	public static boolean isEndOfDay(DateTime dt) {
-		return isEndOfDay(dt, false);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.isEndOfDay
+	 */
+	@Deprecated public static boolean isEndOfDay(DateTime dt) {
+		return JodaTimeUtils.isEndOfDay(dt);
 	}
 	
-	public static boolean isEndOfDay(DateTime dt, boolean relaxed) {
-		if (relaxed) {
-			return ((dt.getHourOfDay() == 23) && (dt.getMinuteOfHour() == 59));
-		} else {
-			return (dt.compareTo(withTimeAtEndOfDay(dt)) == 0);
-		}	
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.isEndOfDay
+	 */
+	@Deprecated public static boolean isEndOfDay(DateTime dt, boolean relaxed) {
+		return JodaTimeUtils.isEndOfDay(dt, relaxed);
 	}
 	
-	public static boolean isDayBefore(DateTime dt1, DateTime dt2) {
-		return isDayBefore(dt1.toLocalDate(), dt2.toLocalDate());
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.isDayBefore
+	 */
+	@Deprecated public static boolean isDayBefore(DateTime dt1, DateTime dt2) {
+		return JodaTimeUtils.isDayBefore(dt1, dt2);
 	}
 	
-	public static boolean isDayBefore(LocalDate l1, LocalDate l2) {
-		return l1.isBefore(l2) && (Days.daysBetween(l1, l2).getDays() == 1);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.isDayBefore
+	 */
+	@Deprecated public static boolean isDayBefore(LocalDate l1, LocalDate l2) {
+		return JodaTimeUtils.isDayBefore(l1, l2);
 	}
 	
-	public static DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz) {
-		return toDateTime(ld, lt, dtz, true);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.toDateTime
+	 */
+	@Deprecated public static DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz) {
+		return JodaTimeUtils.toDateTime(ld, lt, dtz, true);
 	}
 	
-	public static DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz, boolean pushForwardAtGap) {
-		// https://stackoverflow.com/questions/34617172/handling-time-zone-offset-transition-and-daylight-savings-time-with-joda
-		try {
-			return ld.toDateTime(lt, dtz);
-		} catch (IllegalInstantException ex) {
-			if (!pushForwardAtGap) throw ex;
-			return ld.toDateTime(lt.plusHours(1), dtz);
-		}
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.toDateTime
+	 */
+	@Deprecated public static DateTime toDateTime(LocalDate ld, LocalTime lt, DateTimeZone dtz, boolean pushForwardAtGap) {
+		return JodaTimeUtils.toDateTime(ld, lt, dtz, pushForwardAtGap);
 	}
 	
-	public static DateTime withTimeAtStartOfDay(DateTime dt) {
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.toDateTime
+	 */
+	@Deprecated public static DateTime withTimeAtStartOfDay(DateTime dt) {
 		if (dt == null) return null;
 		return dt.withTimeAtStartOfDay();
 	}
 	
-	public static DateTime withTimeAtStartOfDay(LocalDate ld, DateTimeZone tz) {
-		if (ld == null) return null;
-		return ld.toDateTimeAtStartOfDay(tz);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.withTimeAtStartOfDay
+	 */
+	@Deprecated public static DateTime withTimeAtStartOfDay(LocalDate ld, DateTimeZone tz) {
+		return JodaTimeUtils.withTimeAtStartOfDay(ld, tz);
 	}
 	
-	public static DateTime withTimeAtMidday(DateTime dt) {
-		if (dt == null) return null;
-		return dt.withTime(12, 0, 0, 0);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.withTimeAtMidday
+	 */
+	@Deprecated public static DateTime withTimeAtMidday(DateTime dt) {
+		return JodaTimeUtils.withTimeAtMidday(dt);
 	}
 	
-	public static DateTime withTimeAtEndOfDay(LocalDate ld, DateTimeZone tz) {
-		if (ld == null) return null;
-		return withTimeAtEndOfDay(withTimeAtStartOfDay(ld, tz));
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.withTimeAtEndOfDay
+	 */
+	@Deprecated public static DateTime withTimeAtEndOfDay(LocalDate ld, DateTimeZone tz) {
+		return JodaTimeUtils.withTimeAtEndOfDay(ld, tz);
 	}
 	
-	public static DateTime withTimeAtEndOfDay(DateTime dt) {
-		if (dt == null) return null;
-		return dt.withTime(23, 59, 59, 0);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.withTimeAtEndOfDay
+	 */
+	@Deprecated public static DateTime withTimeAtEndOfDay(DateTime dt) {
+		return JodaTimeUtils.withTimeAtEndOfDay(dt);
 	}
 	
-	public static DateTime ceilTimeAtEndOfDay(DateTime dt) {
-		return (isEndOfDay(dt, true)) ? withTimeAtEndOfDay(dt) : dt;
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.ceilTimeAtEndOfDay
+	 */
+	@Deprecated public static DateTime ceilTimeAtEndOfDay(DateTime dt) {
+		return JodaTimeUtils.ceilTimeAtEndOfDay(dt);
 	}
 	
-	
-	public static boolean startsInDay(DateTime day, ReadableInstant instant) {
-		DateTime dayFrom = day.withTimeAtStartOfDay();
-		DateTime dayTo = dayFrom.plusDays(1);
-		return (instant.compareTo(dayFrom) >= 0) && instant.isBefore(dayTo);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.startsInDay
+	 */
+	@Deprecated public static boolean startsInDay(DateTime day, ReadableInstant instant) {
+		return JodaTimeUtils.startsInDay(day, instant);
 	}
 	
-	public static boolean endsInDay(DateTime day, ReadableInstant instant) {
-		DateTime dayFrom = day.withTimeAtStartOfDay();
-		DateTime dayTo = dayFrom.plusDays(1);
-		return instant.isAfter(dayFrom) && instant.isBefore(dayTo); // We need to exclude midnight!
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.endsInDay
+	 */
+	@Deprecated public static boolean endsInDay(DateTime day, ReadableInstant instant) {
+		return JodaTimeUtils.endsInDay(day, instant);
 	}
 	
 	public static Days daysBetween(ReadableInstant instant1, ReadableInstant instant2) {
@@ -404,23 +456,17 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * Instantiates the formatter using specified pattern and default timezone.
-	 * @param pattern
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatter
 	 */
-	public static DateTimeFormatter createFormatter(String pattern) {
-		return createFormatter(pattern, null);
+	@Deprecated public static DateTimeFormatter createFormatter(String pattern) {
+		return JodaTimeUtils.createFormatter(pattern);
 	}
 	
 	/**
-	 * Instantiates the formatter using specified pattern and timezone.
-	 * @param pattern Desired pattern.
-	 * @param tz Desired formatter timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatter
 	 */
-	public static DateTimeFormatter createFormatter(String pattern, DateTimeZone tz) {
-		DateTimeFormatter dtf = DateTimeFormat.forPattern(pattern);
-		return (tz != null) ? dtf.withZone(tz) : dtf;
+	@Deprecated public static DateTimeFormatter createFormatter(String pattern, DateTimeZone tz) {
+		return JodaTimeUtils.createFormatter(pattern, tz);
 	}
 	
 	public static DateTimeZone parseDateTimeZone(String tzid) {
@@ -496,12 +542,18 @@ public class DateTimeUtils {
 	
 	// ---------- Conversions java.time <-> JodaTime
 	
-	public static java.time.ZoneId toZoneId(DateTimeZone timezone) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.toZoneId
+	 */
+	@Deprecated public static java.time.ZoneId toZoneId(DateTimeZone timezone) {
 		if (timezone == null) return null;
 		return java.time.ZoneId.of(timezone.getID());
 	}
 	
-	public static DateTimeZone toDateTimeZone(java.time.ZoneId zone) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.toDateTimeZone
+	 */
+	@Deprecated public static DateTimeZone toDateTimeZone(java.time.ZoneId zone) {
 		if (zone == null) return null;
 		if (java.time.ZoneOffset.UTC.getId().equals(zone.getId())) {
 			return DateTimeZone.UTC;
@@ -511,7 +563,10 @@ public class DateTimeUtils {
 		}
 	}
 	
-	public static DateTime toDateTime(java.time.ZonedDateTime dateTime) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.toDateTime
+	 */
+	@Deprecated public static DateTime toDateTime(java.time.ZonedDateTime dateTime) {
 		if (dateTime == null) return null;
 		DateTimeZone timezone = toDateTimeZone(dateTime.getZone());
 		return new DateTime(dateTime.toInstant().toEpochMilli(), timezone);
@@ -519,49 +574,79 @@ public class DateTimeUtils {
 	
 	// ---------- java.time utilities
 	
-	public static java.time.LocalDate parseLocalDate(String isoLocalDate) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseISOLocalDate
+	 */
+	@Deprecated public static java.time.LocalDate parseLocalDate(String isoLocalDate) {
 		return parseLocalDate(isoLocalDate, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
 	}
 	
-	public static java.time.LocalDate parseLocalDate(String date, java.time.format.DateTimeFormatter formatter) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseLocalDate
+	 */
+	@Deprecated public static java.time.LocalDate parseLocalDate(String date, java.time.format.DateTimeFormatter formatter) {
 		if (StringUtils.isBlank(date)) return null;
 		return java.time.LocalDate.parse(date, formatter);
 	}
 	
-	public static java.time.LocalTime parseLocalTime(String isoLocalTime) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseISOLocalTime
+	 */
+	@Deprecated public static java.time.LocalTime parseLocalTime(String isoLocalTime) {
 		return parseLocalTime(isoLocalTime, java.time.format.DateTimeFormatter.ISO_LOCAL_TIME);
 	}
 	
-	public static java.time.LocalTime parseLocalTime(String time, java.time.format.DateTimeFormatter formatter) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseLocalTime
+	 */
+	@Deprecated public static java.time.LocalTime parseLocalTime(String time, java.time.format.DateTimeFormatter formatter) {
 		if (StringUtils.isBlank(time)) return null;
 		return java.time.LocalTime.parse(time, formatter);
 	}
 	
-	public static java.time.ZonedDateTime parseDateTime(String isoDateTime, java.time.ZoneId zone) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseISODateTime
+	 */
+	@Deprecated public static java.time.ZonedDateTime parseDateTime(String isoDateTime, java.time.ZoneId zone) {
 		return parseDateTime(isoDateTime, java.time.format.DateTimeFormatter.ISO_DATE_TIME.withZone(zone));
 	}
 	
-	public static java.time.ZonedDateTime parseDateTime(String dateTime, java.time.format.DateTimeFormatter formatter) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseDateTime
+	 */
+	@Deprecated public static java.time.ZonedDateTime parseDateTime(String dateTime, java.time.format.DateTimeFormatter formatter) {
 		if (StringUtils.isBlank(dateTime)) return null;
 		return java.time.ZonedDateTime.parse(dateTime, formatter);
 	}
 	
-	public static java.time.Instant toInstant(java.time.LocalDate date, java.time.ZoneId zone) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.toInstant
+	 */
+	@Deprecated public static java.time.Instant toInstant(java.time.LocalDate date, java.time.ZoneId zone) {
 		if (date == null) return null;
 		return date.atStartOfDay((zone == null) ? java.time.ZoneId.systemDefault() : zone).toInstant();
 	}
 	
-	public static java.time.Instant toInstant(java.time.LocalTime time, java.time.ZoneId zone) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.toInstant
+	 */
+	@Deprecated public static java.time.Instant toInstant(java.time.LocalTime time, java.time.ZoneId zone) {
 		if (time == null) return null;
 		return time.atDate(java.time.LocalDate.ofEpochDay(0)).atZone((zone == null) ? java.time.ZoneId.systemDefault() : zone).toInstant();
 	}
 	
-	public static java.time.Instant toInstant(java.time.ZonedDateTime dateTime) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.toInstant
+	 */
+	@Deprecated public static java.time.Instant toInstant(java.time.ZonedDateTime dateTime) {
 		if (dateTime == null) return null;
 		return dateTime.toInstant();
 	}
 	
-	public static java.time.ZonedDateTime toZonedDateTime(java.time.Instant instant, java.time.ZoneId zone) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.toZonedDateTime
+	 */
+	@Deprecated public static java.time.ZonedDateTime toZonedDateTime(java.time.Instant instant, java.time.ZoneId zone) {
 		if (instant == null) return null;
 		return instant.atZone((zone == null) ? java.time.ZoneId.systemDefault() : zone);
 	}
