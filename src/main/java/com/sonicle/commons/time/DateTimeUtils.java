@@ -222,6 +222,13 @@ public class DateTimeUtils {
 	}
 	
 	/**
+	 * @deprecated Moved! Use JodaTimeUtils.roundToNearestMinute
+	 */
+	@Deprecated public static DateTime roundToNearestMinute(DateTime dateTime, final int nearestMinutes) {
+		return JodaTimeUtils.roundToNearestMinute(dateTime, nearestMinutes);
+	}
+	
+	/**
 	 * @deprecated Moved! Use JodaTimeUtils.startsInDay
 	 */
 	@Deprecated public static boolean startsInDay(DateTime day, ReadableInstant instant) {
@@ -235,99 +242,60 @@ public class DateTimeUtils {
 		return JodaTimeUtils.endsInDay(day, instant);
 	}
 	
-	public static Days daysBetween(ReadableInstant instant1, ReadableInstant instant2) {
-		return (instant1 != null && instant2 != null) ? Days.daysBetween(instant1, instant2) : null; 
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.daysBetween
+	 */
+	@Deprecated public static Days daysBetween(ReadableInstant instant1, ReadableInstant instant2) {
+		return JodaTimeUtils.daysBetween(instant1, instant2);
 	}
 	
 	/**
-	 * Returns the difference in days (or dates) not keeping into account the
-	 * real amount of time passed between the two dates.
-	 * To avoid wrong calculations, the two dates must be in same TimeZone.
-	 * @param dt1 The first dateTime
-	 * @param dt2 The second dateTime.
-	 * @return 
+	 * @deprecated Moved! Use JodaTimeUtils.datesBetween
 	 */
-	public static int datesBetween(DateTime dt1, DateTime dt2) {
-		return datesBetween(dt1, dt2, false);
+	@Deprecated public static int datesBetween(DateTime dt1, DateTime dt2) {
+		return JodaTimeUtils.calendarDaysBetween(dt1, dt2);
 	}
 	
 	/**
-	 * Returns the difference in days (or dates) not keeping into account the
-	 * real amount of time passed between the two dates.
-	 * To avoid wrong calculations, the two dates must be in same TimeZone.
-	 * @param dt1 The first dateTime
-	 * @param dt2 The second dateTime.
-	 * @param midnightAsDayBefore If 'true' and dt2 is at midnight, dt2 will be set at the day before.
-	 * @return 
+	 * @deprecated Moved! Use JodaTimeUtils.datesBetween
 	 */
-	public static int datesBetween(DateTime dt1, DateTime dt2, boolean midnightAsDayBefore) {
-		LocalDate ld1 = dt1.toLocalDate();
-		LocalDate ld2 = (midnightAsDayBefore && DateTimeUtils.isMidnight(dt2)) ? dt2.minusDays(1).toLocalDate() : dt2.toLocalDate();
-		return Days.daysBetween(ld1, ld2).getDays();
+	@Deprecated public static int datesBetween(DateTime dt1, DateTime dt2, boolean midnightAsDayBefore) {
+		return JodaTimeUtils.calendarDaysBetween(dt1, dt2, midnightAsDayBefore);
 	}
 	
 	/**
-	 * Compares two times and returns the youngest one.
-	 * @param time1 Time instance 1.
-	 * @param time2 Time instance 2.
-	 * @return Youngest time instance.
+	 * @deprecated Moved! Use JodaTimeUtils.min
 	 */
-	public static LocalTime min(LocalTime time1, LocalTime time2) {
-		return (time1.compareTo(time2) < 0) ? time1 : time2;
+	@Deprecated public static LocalTime min(LocalTime time1, LocalTime time2) {
+		return JodaTimeUtils.min(time1, time2);
 	}
 	
 	/**
-	 * Compares two times and returns the older one.
-	 * @param time1 Time instance 1.
-	 * @param time2 Time instance 2.
-	 * @return Oldest time instance.
+	 * @deprecated Moved! Use JodaTimeUtils.max
 	 */
-	public static LocalTime max(LocalTime time1, LocalTime time2) {
-		return (time1.compareTo(time2) > 0) ? time1 : time2;
+	@Deprecated public static LocalTime max(LocalTime time1, LocalTime time2) {
+		return JodaTimeUtils.max(time1, time2);
 	}
 	
 	/**
-	 * Returns a new DateTime properly rounded according to choosen nearestMinute.
-	 * @param dateTime The DateTime object to round.
-	 * @param nearestMinutes The nearest minute to round value to.
-	 * @return 
+	 * @deprecated Moved! Use JodaTimeUtils.between
 	 */
-	public static DateTime roundToNearestMinute(DateTime dateTime, final int nearestMinutes) {
-		Check.notNull(dateTime, "dateTime");
-		Check.stateIsTrue(!(nearestMinutes < 1 || 60 % nearestMinutes != 0), "nearestMinutes must be a divider of 60");
-		final DateTime hour = dateTime.hourOfDay().roundFloorCopy();
-		final long millisSinceHour = new Duration(hour, dateTime).getMillis();
-		final int roundedMinutes = ((int)Math.round(millisSinceHour / 60000.0 / nearestMinutes)) * nearestMinutes;
-		return hour.plusMinutes(roundedMinutes);
+	@Deprecated public static boolean between(final ReadablePartial partial, final ReadablePartial start, final ReadablePartial end) {
+		return JodaTimeUtils.between(partial, start, end, true, false);
 	}
 	
 	/**
-	 * Evaluates if an Instant is between start/end bounds, with start bound included and end excluded.
-	 * @param partial The Partial value to check.
-	 * @param start The start bound.
-	 * @param end The end bound.
-	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 * @deprecated Moved! Use JodaTimeUtils.between
 	 */
-	public static boolean between(final ReadablePartial partial, final ReadablePartial start, final ReadablePartial end) {
-		return between(partial, start, end, true, false);
+	@Deprecated public static boolean between(final ReadablePartial partial, final ReadablePartial start, final ReadablePartial end, final boolean inclusiveStart, final boolean inclusiveEnd) {
+		return JodaTimeUtils.between(partial, start, end, inclusiveStart, inclusiveEnd);
 	}
 	
 	/**
-	 * Evaluates if an Instant is between start/end bounds.
-	 * @param partial The Partial value to check.
-	 * @param start The start bound.
-	 * @param end The end bound.
-	 * @param inclusiveStart Set to `true` to make start check inclusive, `false` otherwise.
-	 * @param inclusiveEnd Set to `true` to make end check inclusive, `false` otherwise.
-	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 * @deprecated Moved! Use JodaTimeUtils.between
 	 */
-	public static boolean between(final ReadablePartial partial, final ReadablePartial start, final ReadablePartial end, final boolean inclusiveStart, final boolean inclusiveEnd) {
-		if (partial == null || start == null || end == null) return false;
-		return (inclusiveStart ? partial.compareTo(start) >= 0 : partial.compareTo(start) > 0) && (inclusiveEnd ? partial.compareTo(end) <= 0 : partial.compareTo(end) < 0);
-	}
-	
-	public static boolean between(ReadableInstant value, ReadableInstant ri1, ReadableInstant ri2) {
-		return ((value.compareTo(ri1) >= 0) && (value.compareTo(ri2) <= 0));
+	@Deprecated public static boolean between(ReadableInstant value, ReadableInstant ri1, ReadableInstant ri2) {
+		return JodaTimeUtils.between(value, ri1, ri2);
 	}
 	
 	/**
@@ -356,103 +324,80 @@ public class DateTimeUtils {
 	//}
 	
 	/**
-	 * Compares the standard offset (regard to UTC) of the two passed timezones.
-	 * If the offset is the same, the two timezones are considered compatible.
-	 * @param tz1 TimeZone instance 1.
-	 * @param tz2 TimeZone instance 2.
-	 * @param dt The reference date for checking the offset.
-	 * @return True if compatible, false otherwise.
+	 * @deprecated Moved! Use JodaTimeUtils.isTimeZoneCompatible
 	 */
-	public static boolean isTimeZoneCompatible(DateTimeZone tz1, DateTimeZone tz2, DateTime dt) {
-		long instant = dt.withZone(DateTimeZone.UTC).getMillis();
-		int utcOff1 = tz1.getStandardOffset(instant);
-		int utcOff2 = tz2.getStandardOffset(instant);
-		return utcOff1 == utcOff2;
+	@Deprecated public static boolean isTimeZoneCompatible(DateTimeZone tz1, DateTimeZone tz2, DateTime dt) {
+		return JodaTimeUtils.isTimeZoneCompatible(tz1, tz2, dt);
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "yyyy-MM-dd HH:mm" and specified timezone.
-	 * @param tz Desired formatter timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterYMDHM
 	 */
-	public static DateTimeFormatter createYmdHmFormatter(DateTimeZone tz) {
-		return createFormatter("yyyy-MM-dd HH:mm", tz);
+	@Deprecated public static DateTimeFormatter createYmdHmFormatter(DateTimeZone tz) {
+		return JodaTimeUtils.createFormatterYMDHM(tz);
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "yyyy-MM-dd HH:mm" and default timezone.
-	 * @return Formatter instance.
+	 * @deprecated Use JodaTimeUtils.createFormatterYMDHM
 	 */
-	public static DateTimeFormatter createYmdHmFormatter() {
-		return createYmdHmFormatter(null);
+	@Deprecated public static DateTimeFormatter createYmdHmFormatter() {
+		return JodaTimeUtils.createFormatterYMDHM(null);
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "yyyy-MM-dd HH:mm:ss" and specified timezone.
-	 * @param tz Desired formatter timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterYMDHMS
 	 */
-	public static DateTimeFormatter createYmdHmsFormatter(DateTimeZone tz) {
-		return createFormatter("yyyy-MM-dd HH:mm:ss", tz);
+	@Deprecated public static DateTimeFormatter createYmdHmsFormatter(DateTimeZone tz) {
+		return JodaTimeUtils.createFormatterYMDHMS(tz);
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "yyyy-MM-dd HH:mm:ss" and default timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterYMDHMS
 	 */
-	public static DateTimeFormatter createYmdHmsFormatter() {
-		return createYmdHmsFormatter(null);
+	@Deprecated public static DateTimeFormatter createYmdHmsFormatter() {
+		return JodaTimeUtils.createFormatterYMDHMS();
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "yyyy-MM-dd" and specified timezone.
-	 * @param tz Desired formatter timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterYMD
 	 */
-	public static DateTimeFormatter createYmdFormatter(DateTimeZone tz) {
-		return createFormatter("yyyy-MM-dd", tz);
+	@Deprecated public static DateTimeFormatter createYmdFormatter(DateTimeZone tz) {
+		return JodaTimeUtils.createFormatterYMD(tz);
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "yyyy-MM-dd" and default timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterYMD
 	 */
-	public static DateTimeFormatter createYmdFormatter() {
-		return createYmdFormatter(null);
+	@Deprecated public static DateTimeFormatter createYmdFormatter() {
+		return JodaTimeUtils.createFormatterYMD();
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "HH:mm:ss" and specified timezone.
-	 * @param tz Desired formatter timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterHMS
 	 */
-	public static DateTimeFormatter createHmsFormatter(DateTimeZone tz) {
-		return createFormatter("HH:mm:ss", tz);
+	@Deprecated public static DateTimeFormatter createHmsFormatter(DateTimeZone tz) {
+		return JodaTimeUtils.createFormatterHMS(tz);
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "HH:mm:ss" and default timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterHMS
 	 */
-	public static DateTimeFormatter createHmsFormatter() {
-		return createHmsFormatter(null);
+	@Deprecated public static DateTimeFormatter createHmsFormatter() {
+		return JodaTimeUtils.createFormatterHMS();
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "HH:mm" and specified timezone.
-	 * @param tz Desired formatter timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterHM
 	 */
-	public static DateTimeFormatter createHmFormatter(DateTimeZone tz) {
-		return createFormatter("HH:mm", tz);
+	@Deprecated public static DateTimeFormatter createHmFormatter(DateTimeZone tz) {
+		return JodaTimeUtils.createFormatterHM(tz);
 	}
 	
 	/**
-	 * Instantiates the formatter using pattern "HH:mm" and default timezone.
-	 * @return Formatter instance.
+	 * @deprecated Moved! Use JodaTimeUtils.createFormatterHM
 	 */
-	public static DateTimeFormatter createHmFormatter() {
-		return createHmFormatter(null);
+	@Deprecated public static DateTimeFormatter createHmFormatter() {
+		return JodaTimeUtils.createFormatterHM();
 	}
 	
 	/**
@@ -502,29 +447,35 @@ public class DateTimeUtils {
 		return DateTimeUtils.createYmdFormatter(tz).print(dateTime);
 	}
 	
-	public static String print(final DateTimeFormatter formatter, final ReadablePartial rp) {
+	@Deprecated public static String print(final DateTimeFormatter formatter, final ReadablePartial rp) {
 		return print(formatter, rp, null);
 	}
 	
-	public static String print(final DateTimeFormatter formatter, final ReadablePartial rp, final String defaultString) {
+	@Deprecated public static String print(final DateTimeFormatter formatter, final ReadablePartial rp, final String defaultString) {
 		return (rp == null) ? defaultString : formatter.print(rp);
 	}
 	
-	public static String print(final DateTimeFormatter formatter, final ReadableInstant ri) {
+	@Deprecated public static String print(final DateTimeFormatter formatter, final ReadableInstant ri) {
 		return print(formatter, ri, null);
 	}
 	
-	public static String print(final DateTimeFormatter formatter, final ReadableInstant ri, final String defaultString) {
+	@Deprecated public static String print(final DateTimeFormatter formatter, final ReadableInstant ri, final String defaultString) {
 		return (ri == null) ? defaultString : formatter.print(ri);
 	}
 	
 	//event.setRecurrence(orec.getRule(), orec.getLocalStartDate(event.getDateTimeZone()));
 	
-	public static DateTime parseDateTime(DateTimeFormatter formatter, String s) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseDateTime
+	 */
+	@Deprecated public static DateTime parseDateTime(DateTimeFormatter formatter, String s) {
 		return StringUtils.isBlank(s) ? null : formatter.parseDateTime(s);
 	}
 	
-	public static LocalDate parseLocalDate(DateTimeFormatter formatter, String s) {
+	/**
+	 * @deprecated Moved! Use JavaTimeUtils.parseLocalDate
+	 */
+	@Deprecated public static LocalDate parseLocalDate(DateTimeFormatter formatter, String s) {
 		return StringUtils.isBlank(s) ? null : formatter.parseLocalDate(s);
 	}
 	

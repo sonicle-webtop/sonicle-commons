@@ -32,14 +32,17 @@
  */
 package com.sonicle.commons.time;
 
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
+import org.joda.time.Duration;
 import org.joda.time.IllegalInstantException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -48,11 +51,29 @@ import org.joda.time.format.DateTimeFormatter;
  * @author malbinola
  */
 public class JodaTimeUtils {
-	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter("yyyy-MM-dd");
-	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter("HH:mm:ss");
+	public static final String ISO_DATE_PATTERN = "yyyy-MM-dd";
+	public static final String ISO_TIME_PATTERN = "HH:mm:ss";
+	public static final String HHMM_PATTERN = "HH:mm";
+	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter(ISO_DATE_PATTERN);
+	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter(ISO_TIME_PATTERN);
 	public static final DateTimeFormatter ISO_DATEDIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", DateTimeZone.UTC);
 	public static final LocalTime TIME_AT_STARTOFDAY = new LocalTime(0, 0, 0, 0);
 	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
+	
+	/**
+	 * Compares the standard offset (regard to UTC) of the two passed timezones.
+	 * If the offset is the same, the two timezones are considered compatible.
+	 * @param timezone1 TimeZone instance 1.
+	 * @param timezone2 TimeZone instance 2.
+	 * @param reference The reference date for checking the offset.
+	 * @return True if compatible, false otherwise.
+	 */
+	public static boolean isTimeZoneCompatible(final DateTimeZone timezone1, final DateTimeZone timezone2, final DateTime reference) {
+		long instant = reference.withZone(DateTimeZone.UTC).getMillis();
+		int utcOff1 = timezone1.getStandardOffset(instant);
+		int utcOff2 = timezone2.getStandardOffset(instant);
+		return utcOff1 == utcOff2;
+	}
 	
 	public static DateTime now() {
 		return now(false);
@@ -131,6 +152,101 @@ public class JodaTimeUtils {
 		return (isEndOfDay(dt, true)) ? withTimeAtEndOfDay(dt) : dt;
 	}
 	
+	/**
+	 * Returns a new DateTime properly rounded according to choosen nearestMinute.
+	 * @param dateTime The DateTime object to round.
+	 * @param nearestMinutes The nearest minute to round value to.
+	 * @return 
+	 */
+	public static DateTime roundToNearestMinute(final DateTime dateTime, final int nearestMinutes) {
+		Check.notNull(dateTime, "dateTime");
+		Check.stateIsTrue(!(nearestMinutes < 1 || 60 % nearestMinutes != 0), "nearestMinutes must be a divider of 60");
+		final DateTime hour = dateTime.hourOfDay().roundFloorCopy();
+		final long millisSinceHour = new Duration(hour, dateTime).getMillis();
+		final int roundedMinutes = ((int)Math.round(millisSinceHour / 60000.0 / nearestMinutes)) * nearestMinutes;
+		return hour.plusMinutes(roundedMinutes);
+	}
+	
+	/**
+	 * Compares two times and returns the youngest one.
+	 * @param time1 Time instance 1.
+	 * @param time2 Time instance 2.
+	 * @return Youngest time instance.
+	 */
+	public static LocalTime min(LocalTime time1, LocalTime time2) {
+		return (time1.compareTo(time2) < 0) ? time1 : time2;
+	}
+	
+	/**
+	 * Compares two times and returns the older one.
+	 * @param time1 Time instance 1.
+	 * @param time2 Time instance 2.
+	 * @return Oldest time instance.
+	 */
+	public static LocalTime max(LocalTime time1, LocalTime time2) {
+		return (time1.compareTo(time2) > 0) ? time1 : time2;
+	}
+	
+	/**
+	 * Evaluates if an Instant is between start/end bounds, with start bound included and end excluded.
+	 * @param value The Partial value to check.
+	 * @param partial1 The start bound.
+	 * @param partial2 The end bound.
+	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 */
+	public static boolean between(final ReadablePartial value, final ReadablePartial partial1, final ReadablePartial partial2) {
+		return between(value, partial1, partial2, true, false);
+	}
+	
+	/**
+	 * Evaluates if an Instant is between start/end bounds.
+	 * @param value The Partial value to check.
+	 * @param partial1 The start bound.
+	 * @param partial2 The end bound.
+	 * @param inclusiveStart Set to `true` to make start check inclusive, `false` otherwise.
+	 * @param inclusiveEnd Set to `true` to make end check inclusive, `false` otherwise.
+	 * @return `true` if Instant is contained in bounds, `false` otherwise or if any parameter is null.
+	 */
+	public static boolean between(final ReadablePartial value, final ReadablePartial partial1, final ReadablePartial partial2, final boolean inclusiveStart, final boolean inclusiveEnd) {
+		if (value == null || partial1 == null || partial2 == null) return false;
+		return (inclusiveStart ? value.compareTo(partial1) >= 0 : value.compareTo(partial1) > 0) && (inclusiveEnd ? value.compareTo(partial2) <= 0 : value.compareTo(partial2) < 0);
+	}
+	
+	public static boolean between(ReadableInstant value, ReadableInstant instant1, ReadableInstant instant2) {
+		return ((value.compareTo(instant1) >= 0) && (value.compareTo(instant2) <= 0));
+	}
+	
+	public static Days daysBetween(ReadableInstant instant1, ReadableInstant instant2) {
+		return (instant1 != null && instant2 != null) ? Days.daysBetween(instant1, instant2) : null; 
+	}
+	
+	/**
+	 * Returns the difference in days not keeping into account the
+	 * real amount of time passed between the two dates.
+	 * To avoid wrong calculations, the two dates must be in same TimeZone.
+	 * @param dateTime1 The first dateTime
+	 * @param dateTime2 The second dateTime.
+	 * @return 
+	 */
+	public static int calendarDaysBetween(DateTime dateTime1, DateTime dateTime2) {
+		return calendarDaysBetween(dateTime1, dateTime2, false);
+	}
+	
+	/**
+	 * Returns the difference in days not keeping into account the
+	 * real amount of time passed between the two dates.
+	 * To avoid wrong calculations, the two dates must be in same TimeZone.
+	 * @param dateTime1 The first dateTime
+	 * @param dateTime2 The second dateTime.
+	 * @param midnightAsDayBefore If 'true' and dt2 is at midnight, dt2 will be set at the day before.
+	 * @return 
+	 */
+	public static int calendarDaysBetween(DateTime dateTime1, DateTime dateTime2, boolean midnightAsDayBefore) {
+		LocalDate ld1 = dateTime1.toLocalDate();
+		LocalDate ld2 = (midnightAsDayBefore && DateTimeUtils.isMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
+		return Days.daysBetween(ld1, ld2).getDays();
+	}
+	
 	// ---------- Formatting
 	
 	/**
@@ -153,15 +269,148 @@ public class JodaTimeUtils {
 		return (tz != null) ? dtf.withZone(tz) : dtf;
 	}
 	
-	// ---------- Parse
-	
-	public static LocalDate parseISOLocalDate(final String isoLocalDate) {
-		return parseLocalDate(isoLocalDate, ISO_LOCALDATE_FMT);
+	/**
+	 * Instantiates a ISO date-time ("yyyy-MM-dd HH:mm:ss") formatter using in the local (Java default) timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterYMDHMS() {
+		return createFormatterYMDHMS(null);
 	}
 	
-	public static LocalDate parseLocalDate(final String date, final DateTimeFormatter formatter) {
+	/**
+	 * Instantiates a ISO date-time ("yyyy-MM-dd HH:mm:ss") formatter using specified timezone.
+	 * @param tz Desired formatter timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterYMDHMS(final DateTimeZone tz) {
+		return createFormatter(ISO_DATE_PATTERN + " " + ISO_TIME_PATTERN, tz);
+	}
+	
+	/**
+	 * Instantiates a ISO date-time ("yyyy-MM-dd HH:mm") formatter using specified timezone.
+	 * @param tz Desired formatter timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterYMDHM(final DateTimeZone tz) {
+		return createFormatter(ISO_DATE_PATTERN + " " + HHMM_PATTERN, tz);
+	}
+	
+	/**
+	 * Instantiates "yyyy-MM-dd" formatter (ISO date) using in the local (Java default) timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterYMD() {
+		return createFormatterYMD(null);
+	}
+	
+	/**
+	 * Instantiates "yyyy-MM-dd" formatter (ISO date) using specified timezone.
+	 * @param tz Desired formatter timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterYMD(final DateTimeZone tz) {
+		return createFormatter(ISO_DATE_PATTERN, tz);
+	}
+	
+	/**
+	 * Instantiates a ISO time ("HH:mm:ss") formatter using in the local (Java default) timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterHMS() {
+		return createFormatterHMS(null);
+	}
+	
+	/**
+	 * Instantiates a ISO time ("HH:mm:ss") formatter using specified timezone.
+	 * @param tz Desired formatter timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterHMS(final DateTimeZone tz) {
+		return createFormatter(ISO_TIME_PATTERN, tz);
+	}
+	
+	/**
+	 * Instantiates a "HH:mm" formatter using in the local (Java default) timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterHM() {
+		return createFormatterHM(null);
+	}
+	
+	/**
+	 * Instantiates a "HH:mm" formatter using specified timezone.
+	 * @param tz Desired formatter timezone.
+	 * @return Formatter instance.
+	 */
+	public static DateTimeFormatter createFormatterHM(final DateTimeZone tz) {
+		return createFormatter(HHMM_PATTERN, tz);
+	}
+	
+	// ---------- Parse
+	
+	public static LocalDate parseLocalDateYMD(final String date) {
+		return parseLocalDate(ISO_LOCALDATE_FMT, date);
+	}
+	
+	public static LocalDate parseLocalDate(final DateTimeFormatter formatter, final String date) {
 		if (StringUtils.isBlank(date)) return null;
 		return formatter.parseLocalDate(date);
+	}
+	
+	public static LocalTime parseLocalTimeHMS(final String time) {
+		return parseLocalTime(ISO_LOCALTIME_FMT, time);
+	}
+	
+	public static LocalTime parseLocalTime(final DateTimeFormatter formatter, final String time) {
+		if (StringUtils.isBlank(time)) return null;
+		return formatter.parseLocalTime(time);
+	}
+	
+	public static DateTime parseDateTimeISO(final String datetime) {
+		return parseDateTime(ISO_DATEDIME_FMT, datetime);
+	}
+	
+	public static DateTime parseDateTimeYMDHMS(final DateTimeZone tz, final String datetime) {
+		return parseDateTime(createFormatterYMDHMS(tz), datetime);
+	}
+	
+	public static DateTime parseDateTime(final DateTimeFormatter formatter, final String datetime) {
+		if (StringUtils.isBlank(datetime)) return null;
+		return formatter.parseDateTime(datetime);
+	}
+	
+	// ---------- Parse
+	
+	public static String printISO(final DateTime dateTime) {
+		return printISO( dateTime, null);
+	}
+	
+	public static String printISO(final DateTime dateTime, final String defaultString) {
+		return print(ISO_DATEDIME_FMT, dateTime, defaultString);
+	}
+	
+	public static String printYMDHMS(final DateTimeZone tz, final DateTime dateTime) {
+		return printYMDHMS(tz, dateTime, null);
+	}
+	
+	public static String printYMDHMS(final DateTimeZone tz, final DateTime dateTime, final String defaultString) {
+		return print(createFormatterYMDHMS(tz), dateTime, defaultString);
+	}
+	
+	public static String print(final DateTimeFormatter formatter, final ReadablePartial partial) {
+		return print(formatter, partial, null);
+	}
+	
+	public static String print(final DateTimeFormatter formatter, final ReadablePartial partial, final String defaultString) {
+		return (partial == null) ? defaultString : formatter.print(partial);
+	}
+	
+	public static String print(final DateTimeFormatter formatter, final ReadableInstant instant) {
+		return print(formatter, instant, null);
+	}
+	
+	public static String print(final DateTimeFormatter formatter, final ReadableInstant instant, final String defaultString) {
+		return (instant == null) ? defaultString : formatter.print(instant);
 	}
 	
 	// ---------- Transforms
