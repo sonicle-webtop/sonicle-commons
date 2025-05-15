@@ -348,6 +348,38 @@ public class JodaTimeUtils {
 	
 	// ---------- Parse
 	
+	/**
+	 * Parses passes String as Timezone ID. A null value is returned in case
+	 * of empty input String and IllegalArgumentException is thrown in case of no-match.
+	 * @param tzid The Timezone ID to be parsed.
+	 * @return 
+	 */
+	public static DateTimeZone parseTimezone(final String tzid) {
+		return parseTimezone(tzid, null, false);
+	}
+	
+	/**
+	 * Parses passes String as Timezone ID.
+	 * This may throw a IllegalArgumentException according to silent parameter, 
+	 * otherwise specified default value is returned in case of no-match.
+	 * @param tzid The Timezone ID to be parsed.
+	 * @param defaultTimezone The Timezone to return in case of missing match.
+	 * @param silent Specifies whether to suppress Exceptions or not.
+	 * @return 
+	 */
+	public static DateTimeZone parseTimezone(final String tzid, final DateTimeZone defaultTimezone, final boolean silent) {
+		if (StringUtils.isBlank(tzid)) return defaultTimezone;
+		if (silent) {
+			try {
+				return DateTimeZone.forID(tzid);
+			} catch (IllegalArgumentException ex) {
+				return defaultTimezone;
+			}
+		} else {
+			return DateTimeZone.forID(tzid);
+		}
+	}
+	
 	public static LocalDate parseLocalDateYMD(final String date) {
 		return parseLocalDate(ISO_LOCALDATE_FMT, date);
 	}

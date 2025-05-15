@@ -414,7 +414,10 @@ public class DateTimeUtils {
 		return JodaTimeUtils.createFormatter(pattern, tz);
 	}
 	
-	public static DateTimeZone parseDateTimeZone(String tzid) {
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.parseTimezone
+	 */
+	@Deprecated public static DateTimeZone parseDateTimeZone(String tzid) {
 		return !StringUtils.isBlank(tzid) ? DateTimeZone.forID(tzid) : null;
 	}
 
@@ -430,10 +433,9 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * @deprecated Use printYmdHms instead
+	 * @deprecated Use JodaTimeUtils.printYMDHMS instead
 	 */
-	@Deprecated
-	public static String printYmdHmsWithZone(DateTime dateTime, DateTimeZone tz) {
+	@Deprecated public static String printYmdHmsWithZone(DateTime dateTime, DateTimeZone tz) {
 		return printYmdHms(dateTime, tz);
 	}
 	
