@@ -44,7 +44,7 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class DateWindow {
 	private static final String NULL = "00000000";
-	private static final DateTimeFormatter FMT = DateTimeUtils.createFormatter("yyyyMMdd", DateTimeZone.UTC);
+	private static final DateTimeFormatter FMT = JodaTimeUtils.createFormatter("yyyyMMdd", DateTimeZone.UTC);
 	private final LocalDate start;
 	private final LocalDate end;
 	
@@ -80,8 +80,8 @@ public class DateWindow {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-			.append(DateTimeUtils.print(FMT, start, NULL))
-			.append(DateTimeUtils.print(FMT, end, NULL))
+			.append(JodaTimeUtils.print(FMT, start, NULL))
+			.append(JodaTimeUtils.print(FMT, end, NULL))
 			.toHashCode();
 	}
 	
@@ -91,18 +91,18 @@ public class DateWindow {
 		if (this == obj) return true;
 		final DateWindow otherObject = (DateWindow)obj;
 		return new EqualsBuilder()
-			.append(DateTimeUtils.print(FMT, start, NULL), DateTimeUtils.print(FMT, otherObject.start, NULL))
-			.append(DateTimeUtils.print(FMT, end, NULL), DateTimeUtils.print(FMT, otherObject.end, NULL))
+			.append(JodaTimeUtils.print(FMT, start, NULL), JodaTimeUtils.print(FMT, otherObject.start, NULL))
+			.append(JodaTimeUtils.print(FMT, end, NULL), JodaTimeUtils.print(FMT, otherObject.end, NULL))
 			.isEquals();
 	}
 	
 	@Override
 	public String toString() {
-		return toString(DateTimeUtils.createFormatter("yyyy-MM-dd", DateTimeZone.getDefault()), "0000-00-00");
+		return toString(JodaTimeUtils.createFormatter("yyyy-MM-dd", DateTimeZone.getDefault()), "0000-00-00");
 	}
 	
 	private String toString(DateTimeFormatter formatter, String nullValue) {
-		return "(" + DateTimeUtils.print(formatter, start, nullValue) + " -> " + DateTimeUtils.print(formatter, end, nullValue) + ")";
+		return "(" + JodaTimeUtils.print(formatter, start, nullValue) + " -> " + JodaTimeUtils.print(formatter, end, nullValue) + ")";
 	}
 	
 	public static Builder builder() {

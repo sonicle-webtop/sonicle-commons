@@ -44,7 +44,7 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class TimeRange {
 	private static final String NULL = "000000000";
-	private static final DateTimeFormatter FMT = DateTimeUtils.createFormatter("HHmmssSSS", DateTimeZone.UTC);
+	private static final DateTimeFormatter FMT = JodaTimeUtils.createFormatter("HHmmssSSS", DateTimeZone.UTC);
 	private final LocalTime start;
 	private final LocalTime end;
 	
@@ -76,8 +76,8 @@ public class TimeRange {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-			.append(DateTimeUtils.print(FMT, start, NULL))
-			.append(DateTimeUtils.print(FMT, end, NULL))
+			.append(JodaTimeUtils.print(FMT, start, NULL))
+			.append(JodaTimeUtils.print(FMT, end, NULL))
 			.toHashCode();
 	}
 	
@@ -87,18 +87,18 @@ public class TimeRange {
 		if (this == obj) return true;
 		final TimeRange otherObject = (TimeRange)obj;
 		return new EqualsBuilder()
-			.append(DateTimeUtils.print(FMT, start, NULL), DateTimeUtils.print(FMT, otherObject.start, NULL))
-			.append(DateTimeUtils.print(FMT, end, NULL), DateTimeUtils.print(FMT, otherObject.end, NULL))
+			.append(JodaTimeUtils.print(FMT, start, NULL), JodaTimeUtils.print(FMT, otherObject.start, NULL))
+			.append(JodaTimeUtils.print(FMT, end, NULL), JodaTimeUtils.print(FMT, otherObject.end, NULL))
 			.isEquals();
 	}
 	
 	@Override
 	public String toString() {
-		return toString(DateTimeUtils.createFormatter("HH:mm:ss", DateTimeZone.getDefault()), "00:00:00");
+		return toString(JodaTimeUtils.createFormatter("HH:mm:ss", DateTimeZone.getDefault()), "00:00:00");
 	}
 	
 	private String toString(DateTimeFormatter formatter, String nullValue) {
-		return "(" + DateTimeUtils.print(formatter, start, nullValue) + " -> " + DateTimeUtils.print(formatter, end, nullValue) + ")";
+		return "(" + JodaTimeUtils.print(formatter, start, nullValue) + " -> " + JodaTimeUtils.print(formatter, end, nullValue) + ")";
 	}
 	
 	public static Builder builder() {

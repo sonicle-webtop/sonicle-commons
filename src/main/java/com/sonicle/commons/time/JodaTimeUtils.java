@@ -243,7 +243,7 @@ public class JodaTimeUtils {
 	 */
 	public static int calendarDaysBetween(DateTime dateTime1, DateTime dateTime2, boolean midnightAsDayBefore) {
 		LocalDate ld1 = dateTime1.toLocalDate();
-		LocalDate ld2 = (midnightAsDayBefore && DateTimeUtils.isMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
+		LocalDate ld2 = (midnightAsDayBefore && JodaTimeUtils.isMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
 		return Days.daysBetween(ld1, ld2).getDays();
 	}
 	
@@ -379,36 +379,91 @@ public class JodaTimeUtils {
 		return formatter.parseDateTime(datetime);
 	}
 	
-	// ---------- Parse
+	// ---------- Prints
 	
+	/**
+	 * Converts the passed date-time into a String in ISO format, applying UTC timezone before printing.
+	 * @param dateTime The value to convert.
+	 * @return The resulting String
+	 */
 	public static String printISO(final DateTime dateTime) {
 		return printISO( dateTime, null);
 	}
 	
+	/**
+	 * Converts the passed date-time into a String in ISO format, applying UTC timezone before printing.
+	 * @param dateTime The value to convert.
+	 * @param defaultString The String to return in case of null input.
+	 * @return The resulting String
+	 */
 	public static String printISO(final DateTime dateTime, final String defaultString) {
 		return print(ISO_DATEDIME_FMT, dateTime, defaultString);
 	}
 	
+	/**
+	 * Converts the passed date-time into a String in format "yyyy-MM-dd HH:mm:ss", 
+	 * applying the specified timezone before printing. A null string is returned 
+	 * in case of null input value.
+	 * @param tz Desired formatter timezone.
+	 * @param dateTime The value to convert.
+	 * @return The resulting String
+	 */
 	public static String printYMDHMS(final DateTimeZone tz, final DateTime dateTime) {
 		return printYMDHMS(tz, dateTime, null);
 	}
 	
+	/**
+	 * Converts the passed date-time into a String in format "yyyy-MM-dd HH:mm:ss", 
+	 * applying the specified timezone before printing.
+	 * @param tz Desired formatter timezone.
+	 * @param dateTime The value to convert.
+	 * @param defaultString The String to return in case of null input.
+	 * @return The resulting String
+	 */
 	public static String printYMDHMS(final DateTimeZone tz, final DateTime dateTime, final String defaultString) {
 		return print(createFormatterYMDHMS(tz), dateTime, defaultString);
 	}
 	
+	/**
+	 * Converts the passed partial value into a String using specified formatter.
+	 * A null string is returned in case of null input value.
+	 * @param formatter The formatter to use for printing. 
+	 * @param partial The value to convert.
+	 * @return The resulting String
+	 */
 	public static String print(final DateTimeFormatter formatter, final ReadablePartial partial) {
 		return print(formatter, partial, null);
 	}
 	
+	/**
+	 * Converts the passed partial value into a String using specified formatter.
+	 * @param formatter The formatter to use for printing. 
+	 * @param partial The value to convert.
+	 * @param defaultString The String to return in case of null input.
+	 * @return The resulting String
+	 */
 	public static String print(final DateTimeFormatter formatter, final ReadablePartial partial, final String defaultString) {
 		return (partial == null) ? defaultString : formatter.print(partial);
 	}
 	
+	/**
+	 * Converts the passed instant value into a String using specified formatter.
+	 * A null string is returned in case of null input value.
+	 * @param formatter The formatter to use for printing. 
+	 * @param instant The value to convert.
+	 * @return The resulting String
+	 */
 	public static String print(final DateTimeFormatter formatter, final ReadableInstant instant) {
 		return print(formatter, instant, null);
 	}
 	
+	/**
+	 * Converts the passed instant value into a String using specified formatter.
+	 * @param formatter The formatter to use for printing. 
+	 * @param instant The value to convert.
+	 * @param defaultString The String to return in case of null input.
+	 * @return The resulting String
+	 */
 	public static String print(final DateTimeFormatter formatter, final ReadableInstant instant, final String defaultString) {
 		return (instant == null) ? defaultString : formatter.print(instant);
 	}

@@ -526,7 +526,7 @@ public class DateTimeUtils {
 	// ---------- java.time utilities
 	
 	/**
-	 * @deprecated Moved! Use JavaTimeUtils.parseISOLocalDate
+	 * @deprecated Moved! Use JavaTimeUtils.parseLocalDateYMD
 	 */
 	@Deprecated public static java.time.LocalDate parseLocalDate(String isoLocalDate) {
 		return parseLocalDate(isoLocalDate, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);

@@ -44,7 +44,7 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class DateTimeWindow {
 	private static final String NULL = "00000000-000000000";
-	private static final DateTimeFormatter FMT = DateTimeUtils.createFormatter("yyyyMMdd-HHmmssSSS", DateTimeZone.UTC);
+	private static final DateTimeFormatter FMT = JodaTimeUtils.createFormatter("yyyyMMdd-HHmmssSSS", DateTimeZone.UTC);
 	private final DateTime start;
 	private final DateTime end;
 	
@@ -80,8 +80,8 @@ public class DateTimeWindow {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-			.append(DateTimeUtils.print(FMT, start, NULL))
-			.append(DateTimeUtils.print(FMT, end, NULL))
+			.append(JodaTimeUtils.print(FMT, start, NULL))
+			.append(JodaTimeUtils.print(FMT, end, NULL))
 			.toHashCode();
 	}
 	
@@ -91,18 +91,18 @@ public class DateTimeWindow {
 		if (this == obj) return true;
 		final DateTimeWindow otherObject = (DateTimeWindow)obj;
 		return new EqualsBuilder()
-			.append(DateTimeUtils.print(FMT, start, NULL), DateTimeUtils.print(FMT, otherObject.start, NULL))
-			.append(DateTimeUtils.print(FMT, end, NULL), DateTimeUtils.print(FMT, otherObject.end, NULL))
+			.append(JodaTimeUtils.print(FMT, start, NULL), JodaTimeUtils.print(FMT, otherObject.start, NULL))
+			.append(JodaTimeUtils.print(FMT, end, NULL), JodaTimeUtils.print(FMT, otherObject.end, NULL))
 			.isEquals();
 	}
 
 	@Override
 	public String toString() {
-		return toString(DateTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", DateTimeZone.getDefault()), "0000-00-00 00:00:00");
+		return toString(JodaTimeUtils.createFormatter("yyyy-MM-dd HH:mm:ss", DateTimeZone.getDefault()), "0000-00-00 00:00:00");
 	}
 	
 	private String toString(DateTimeFormatter formatter, String nullValue) {
-		return "(" + DateTimeUtils.print(formatter, start, nullValue) + " -> " + DateTimeUtils.print(formatter, end, nullValue) + ")";
+		return "(" + JodaTimeUtils.print(formatter, start, nullValue) + " -> " + JodaTimeUtils.print(formatter, end, nullValue) + ")";
 	}
 	
 	public static Builder builder() {
