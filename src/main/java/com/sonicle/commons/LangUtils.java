@@ -48,6 +48,7 @@ import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -68,6 +69,8 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.sf.qualitycheck.Check;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -247,6 +250,50 @@ public class LangUtils {
         buf.append(x);
         return buf.toString();
     }
+	
+	/**
+	 * Encodes all bytes from the specified byte array into a base64 String.
+	 * A {@code null} input byte array returns {@code null}.
+	 * @param bytes The byte array to encode.
+	 * @return A new String containing the encoded bytes
+	 */
+	public static String base64Encode(final byte[] bytes) {
+		return (bytes == null) ? null : new String(Base64.getEncoder().encode(bytes));
+	}
+	
+	/**
+	 * Decodes a base64 String into a byte array using base64 encoding scheme.
+	 * A {@code null} input String returns {@code null}.
+	 * @param s The String to decode.
+	 * @return A new byte array containing the decoded bytes
+	 */
+	public static byte[] base64Decode(final String s) {
+		return (s == null) ? null : Base64.getDecoder().decode(s);
+	}
+	
+	/**
+	 * Converts an array of bytes into a String representing the hexadecimal values of each byte in order.
+	 * A {@code null} input byte array returns {@code null}.
+	 * @param bytes The byte array to encode.
+	 * @return A new String containing the encoded bytes
+	 */
+	public static String hexEncode(final byte[] bytes) {
+		return bytes != null ? Hex.encodeHexString(bytes) : null;
+	}
+	
+	/**
+	 * Converts a String representing hexadecimal values into an array of bytes of those same values.
+	 * A {@code null} input String returns {@code null}.
+	 * @param hex The String to decode.
+	 * @return A new byte array containing the decoded bytes
+	 */
+	public static byte[] hexDecode(final String hex) {
+		try {
+			return Hex.decodeHex(hex.toCharArray());
+		} catch (DecoderException ex) {
+			return null;
+		}
+	}
 	
 	public static String encodeURL(final String url) {
 		try {
@@ -570,15 +617,6 @@ public class LangUtils {
 		return (value != null) ? value : defaultValue;
 	}
 	
-	// Returns an array containing all elements of a collection, without having 
-	// to explicitly instantiare the new array.
-	public static <T> T[] toArray(final Class<T[]> arrayType, final Collection<T> items) {
-		if (items == null) return null;
-		// https://stackoverflow.com/questions/529085/how-to-create-a-generic-array-in-java/4221845#4221845
-		final T[] newArray = arrayType.cast(Array.newInstance(arrayType.getComponentType(), items.size()));
-		return items.toArray(newArray);
-	}
-	
 	/**
 	 * Serializes the passed object into a suitable string according to its type.
 	 * If the object is a primitive type toString method will be used, 
@@ -720,6 +758,36 @@ public class LangUtils {
 			}
 		}
 		return sb.toString();
+	}
+	
+	// Returns an array containing all elements of a collection, without having 
+	// to explicitly instantiare the new array.
+	public static <T> T[] toArray(final Class<T[]> arrayType, final Collection<T> items) {
+		if (items == null) return null;
+		// https://stackoverflow.com/questions/529085/how-to-create-a-generic-array-in-java/4221845#4221845
+		final T[] newArray = arrayType.cast(Array.newInstance(arrayType.getComponentType(), items.size()));
+		return items.toArray(newArray);
+	}
+	
+	/**
+	 * Returns a String object representing the passed integer or NULL if 
+	 * passed value is NULL too.
+	 * @param value The Integer value to convert, it can be NULL.
+	 * @return The String value
+	 */
+	public static String toString(final Integer value) {
+		return toString(value, null);
+	}
+	
+	/**
+	 * Returns a String object representing the passed integer.
+	 * If value is NULL, provided default value will be returned instead.
+	 * @param value The Integer value to convert, it can be NULL.
+	 * @param defaultValue The default value to return if NULL.
+	 * @return The String value
+	 */
+	public static String toString(final Integer value, final String defaultValue) {
+		return (value != null) ? Integer.toString(value) : defaultValue;
 	}
 	
 	/**

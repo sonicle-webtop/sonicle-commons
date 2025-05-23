@@ -39,6 +39,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
