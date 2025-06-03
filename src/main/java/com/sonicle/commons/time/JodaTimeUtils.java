@@ -56,7 +56,7 @@ public class JodaTimeUtils {
 	public static final String HHMM_PATTERN = "HH:mm";
 	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter(ISO_DATE_PATTERN);
 	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter(ISO_TIME_PATTERN);
-	public static final DateTimeFormatter ISO_DATEDIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", DateTimeZone.UTC);
+	public static final DateTimeFormatter ISO_DATETIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", DateTimeZone.UTC);
 	public static final LocalTime TIME_AT_STARTOFDAY = new LocalTime(0, 0, 0, 0);
 	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
 	
@@ -399,7 +399,7 @@ public class JodaTimeUtils {
 	}
 	
 	public static DateTime parseDateTimeISO(final String datetime) {
-		return parseDateTime(ISO_DATEDIME_FMT, datetime);
+		return parseDateTime(ISO_DATETIME_FMT, datetime);
 	}
 	
 	public static DateTime parseDateTimeYMDHMS(final DateTimeZone tz, final String datetime) {
@@ -429,7 +429,7 @@ public class JodaTimeUtils {
 	 * @return The resulting String
 	 */
 	public static String printISO(final DateTime dateTime, final String defaultString) {
-		return print(ISO_DATEDIME_FMT, dateTime, defaultString);
+		return print(ISO_DATETIME_FMT, dateTime, defaultString);
 	}
 	
 	/**

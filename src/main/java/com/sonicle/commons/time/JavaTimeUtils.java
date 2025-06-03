@@ -43,6 +43,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
+import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -91,11 +92,27 @@ public class JavaTimeUtils {
 		return getMonthNamesLong(locale)[month-1];
 	}
 	
-	public static ZonedDateTime withTimeAtStartOfDay(final ZonedDateTime dt) {
-		if (dt == null) return null;
-		return dt.withHour(0).withMinute(0).withSecond(0).withNano(0);
+	/**
+	 * Set time at midnight (start-of-day).
+	 * @param dateTime The dateTime to set.
+	 * @return The dateTime at midnight
+	 */
+	public static ZonedDateTime withTimeAtStartOfDay(final ZonedDateTime dateTime) {
+		// https://stackoverflow.com/questions/30293748/java-time-equivalent-of-joda-time-withtimeatstartofday-get-first-moment-of-t
+		if (dateTime == null) return null;
+		return dateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
 	}
 	
+	/**
+	 * Creates a new dateTime at midnight (start-of-day) using passed localDate as template.
+	 * @param localDate The target localDate.
+	 * @param tz Desired timezone.
+	 * @return New dateTime at midnight
+	 */
+	public static ZonedDateTime withTimeAtStartOfDay(final LocalDate localDate, final ZoneId tz) {
+		if (localDate == null) return null;
+		return localDate.atStartOfDay(Check.notNull(tz, "tz"));
+	}
 	
 	// ---------- Formatting
 	
@@ -111,22 +128,22 @@ public class JavaTimeUtils {
 	/**
 	 * Instantiates the formatter using specified pattern and timezone.
 	 * @param pattern Desired pattern.
-	 * @param zone Desired formatter timezone.
+	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
 	 */
-	public static DateTimeFormatter createFormatter(final String pattern, final ZoneId zone) {
+	public static DateTimeFormatter createFormatter(final String pattern, final ZoneId tz) {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
-		return (zone != null) ? dtf.withZone(zone) : dtf;
+		return (tz != null) ? dtf.withZone(tz) : dtf;
 	}
 	
 	/**
 	 * Returns a copy for the passed formatter applying the specified timezone.
 	 * @param formatter The base formatter to copy.
-	 * @param zone Desired formatter timezone.
+	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
 	 */
-	public static DateTimeFormatter createFormatter(final DateTimeFormatter formatter, final ZoneId zone) {
-		return (zone != null) ? formatter.withZone(zone) : formatter;
+	public static DateTimeFormatter createFormatter(final DateTimeFormatter formatter, final ZoneId tz) {
+		return (tz != null) ? formatter.withZone(tz) : formatter;
 	}
 	
 	/**
@@ -139,20 +156,20 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates a ISO date-time ("yyyy-MM-dd HH:mm:ss") formatter using specified timezone.
-	 * @param zone Desired formatter timezone.
+	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
 	 */
-	public static DateTimeFormatter createFormatterYMDHMS(final ZoneId zone) {
-		return createFormatter(ISO_LOCALDATE_PATTERN + " " + ISO_LOCALTIME_PATTERN, zone);
+	public static DateTimeFormatter createFormatterYMDHMS(final ZoneId tz) {
+		return createFormatter(ISO_LOCALDATE_PATTERN + " " + ISO_LOCALTIME_PATTERN, tz);
 	}
 	
 	/**
 	 * Instantiates a ISO date-time ("yyyy-MM-dd HH:mm") formatter using specified timezone.
-	 * @param zone Desired formatter timezone.
+	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
 	 */
-	public static DateTimeFormatter createFormatterYMDHM(final ZoneId zone) {
-		return createFormatter(ISO_LOCALDATE_PATTERN + " " + ISO_LOCALTIME_SHORT_PATTERN, zone);
+	public static DateTimeFormatter createFormatterYMDHM(final ZoneId tz) {
+		return createFormatter(ISO_LOCALDATE_PATTERN + " " + ISO_LOCALTIME_SHORT_PATTERN, tz);
 	}
 	
 	/**
@@ -165,11 +182,11 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates "yyyy-MM-dd" formatter (ISO date) using specified timezone.
-	 * @param zone Desired formatter timezone.
+	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
 	 */
-	public static DateTimeFormatter createFormatterYMD(final ZoneId zone) {
-		return createFormatter(ISO_LOCALDATE_PATTERN, zone);
+	public static DateTimeFormatter createFormatterYMD(final ZoneId tz) {
+		return createFormatter(ISO_LOCALDATE_PATTERN, tz);
 	}
 	
 	/**
@@ -182,11 +199,11 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates a ISO time ("HH:mm:ss") formatter using specified timezone.
-	 * @param zone Desired formatter timezone.
+	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
 	 */
-	public static DateTimeFormatter createFormatterHMS(final ZoneId zone) {
-		return createFormatter(ISO_LOCALTIME_PATTERN, zone);
+	public static DateTimeFormatter createFormatterHMS(final ZoneId tz) {
+		return createFormatter(ISO_LOCALTIME_PATTERN, tz);
 	}
 	
 	/**
@@ -199,11 +216,11 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates a "HH:mm" formatter using specified timezone.
-	 * @param zone Desired formatter timezone.
+	 * @param tz Desired formatter timezone.
 	 * @return Formatter instance.
 	 */
-	public static DateTimeFormatter createFormatterHM(final ZoneId zone) {
-		return createFormatter(ISO_LOCALTIME_SHORT_PATTERN, zone);
+	public static DateTimeFormatter createFormatterHM(final ZoneId tz) {
+		return createFormatter(ISO_LOCALTIME_SHORT_PATTERN, tz);
 	}
 	
 	// ---------- Parse
@@ -226,8 +243,8 @@ public class JavaTimeUtils {
 		return LocalTime.parse(time, formatter);
 	}
 	
-	public static ZonedDateTime parseDateTimeISO(final String dateTime, final ZoneId zone) {
-		return parseDateTime(DateTimeFormatter.ISO_DATE_TIME.withZone(zone), dateTime);
+	public static ZonedDateTime parseDateTimeISO(final String dateTime, final ZoneId tz) {
+		return parseDateTime(DateTimeFormatter.ISO_DATE_TIME.withZone(tz), dateTime);
 	}
 	
 	public static ZonedDateTime parseDateTime(final DateTimeFormatter formatter, final String dateTime) {
@@ -261,14 +278,14 @@ public class JavaTimeUtils {
 	
 	// ---------- Transforms
 	
-	public static Instant toInstant(final LocalDate date, final ZoneId zone) {
+	public static Instant toInstant(final LocalDate date, final ZoneId tz) {
 		if (date == null) return null;
-		return date.atStartOfDay((zone == null) ? java.time.ZoneId.systemDefault() : zone).toInstant();
+		return date.atStartOfDay((tz == null) ? java.time.ZoneId.systemDefault() : tz).toInstant();
 	}
 	
-	public static Instant toInstant(final LocalTime time, final ZoneId zone) {
+	public static Instant toInstant(final LocalTime time, final ZoneId tz) {
 		if (time == null) return null;
-		return time.atDate(LocalDate.ofEpochDay(0)).atZone((zone == null) ? ZoneId.systemDefault() : zone).toInstant();
+		return time.atDate(LocalDate.ofEpochDay(0)).atZone((tz == null) ? ZoneId.systemDefault() : tz).toInstant();
 	}
 	
 	public static Instant toInstant(final ZonedDateTime dateTime) {
@@ -276,16 +293,16 @@ public class JavaTimeUtils {
 		return dateTime.toInstant();
 	}
 	
-	public static ZonedDateTime toZonedDateTime(final Instant instant, final ZoneId zone) {
+	public static ZonedDateTime toZonedDateTime(final Instant instant, final ZoneId tz) {
 		if (instant == null) return null;
-		return instant.atZone((zone == null) ? ZoneId.systemDefault() : zone);
+		return instant.atZone((tz == null) ? ZoneId.systemDefault() : tz);
 	}
 	
 	// ----------  JodaTime -> java.time
 	
-	public static ZoneId toZoneId(final org.joda.time.DateTimeZone timezone) {
-		if (timezone == null) return null;
-		return ZoneId.of(timezone.getID());
+	public static ZoneId toZoneId(final org.joda.time.DateTimeZone tz) {
+		if (tz == null) return null;
+		return ZoneId.of(tz.getID());
 	}
 	
 	public static LocalDate toLocalDate(final org.joda.time.LocalDate localDate) {
