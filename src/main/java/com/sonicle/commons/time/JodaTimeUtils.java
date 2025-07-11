@@ -51,12 +51,14 @@ import org.joda.time.format.DateTimeFormatter;
  * @author malbinola
  */
 public class JodaTimeUtils {
-	public static final String ISO_DATE_PATTERN = "yyyy-MM-dd";
-	public static final String ISO_TIME_PATTERN = "HH:mm:ss";
 	public static final String HHMM_PATTERN = "HH:mm";
+	public static final String ISO_DATE_PATTERN = "yyyy-MM-dd"; // Do NOT modify!
+	public static final String ISO_TIME_PATTERN = "HH:mm:ss"; // Do NOT modify!
 	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter(ISO_DATE_PATTERN);
 	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter(ISO_TIME_PATTERN);
-	public static final DateTimeFormatter ISO_DATETIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", DateTimeZone.UTC);
+	public static final DateTimeFormatter ISO_DATETIME_FMT = createFormatter(ISO_DATE_PATTERN + "'T'" + ISO_TIME_PATTERN + "'Z'", DateTimeZone.UTC);
+	public static final String SYNCTOKEN_PATTERN = "yyyyMMddHHmmssSSS";
+	public static final DateTimeFormatter SYNCTOKEN_FMT = createFormatter(SYNCTOKEN_PATTERN, DateTimeZone.UTC);
 	public static final LocalTime TIME_AT_STARTOFDAY = new LocalTime(0, 0, 0, 0);
 	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
 	

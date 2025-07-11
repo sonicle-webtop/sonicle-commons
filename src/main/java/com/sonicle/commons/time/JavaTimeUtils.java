@@ -53,12 +53,14 @@ import org.apache.commons.lang3.StringUtils;
  * https://blog.joda.org/2014/11/converting-from-joda-time-to-javatime.html
  */
 public class JavaTimeUtils {
-	public static final String ISO_LOCALDATE_PATTERN = "yyyy-MM-dd";
-	public static final String ISO_LOCALTIME_PATTERN = "HH:mm:ss";
 	public static final String ISO_LOCALTIME_SHORT_PATTERN = "HH:mm";
+	public static final String ISO_LOCALDATE_PATTERN = "yyyy-MM-dd"; // Do NOT modify!
+	public static final String ISO_LOCALTIME_PATTERN = "HH:mm:ss"; // Do NOT modify!
 	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter(ISO_LOCALDATE_PATTERN);
 	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter(ISO_LOCALTIME_PATTERN);
 	//public static final DateTimeFormatter ISO_DATEDIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", ZoneId.UTC);
+	public static final String SYNCTOKEN_PATTERN = "yyyyMMddHHmmssSSS";
+	public static final DateTimeFormatter SYNCTOKEN_FMT = createFormatter(SYNCTOKEN_PATTERN, ZoneOffset.UTC);
 	
 	public static String[] getDayNamesShort(final Locale locale) {
 		return new DateFormatSymbols(locale).getShortWeekdays();
