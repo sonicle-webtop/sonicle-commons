@@ -284,15 +284,24 @@ public class JavaTimeUtils {
 		return LocalTime.parse(time, formatter);
 	}
 	
-	public static ZonedDateTime parseDateTimeISO(final String dateTime) {
-		return parseDateTimeISO(true, dateTime);
+	public static ZonedDateTime parseDateTimeYMDHMS(final ZoneId tz, final String date, final String time) {
+		return parseDateTime(createFormatterYMDHMS(tz), StringUtils.join(date, " ", time));
 	}
 	
-	public static ZonedDateTime parseDateTimeISO(final boolean strict, final String dateTime) {
+	public static ZonedDateTime parseDateTimeYMDHMS(final ZoneId tz, final String dateTime) {
+		String s = StringUtils.replace(dateTime, "T", " "); // Ported from DateTimeUtils: why is necessary? Use case?
+		return parseDateTime(createFormatterYMDHMS(tz), dateTime);
+	}
+	
+	public static ZonedDateTime parseDateTimeISO(final String isoDateTime) {
+		return parseDateTimeISO(true, isoDateTime);
+	}
+	
+	public static ZonedDateTime parseDateTimeISO(final boolean strict, final String isoDateTime) {
 		if (strict) {
-			return parseDateTime(ISO_DATEDIME_FMT, dateTime);
+			return parseDateTime(ISO_DATEDIME_FMT, isoDateTime);
 		} else {
-			return parseDateTime(DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC), dateTime);
+			return parseDateTime(DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC), isoDateTime);
 		}
 	}
 	
@@ -302,6 +311,29 @@ public class JavaTimeUtils {
 	}
 	
 	// ---------- Prints
+	
+	public static String printYMDHMS() {
+		return null;
+	}
+	
+	/**
+	 * Converts the passed date-time into a String in ISO format, applying UTC timezone before printing.
+	 * @param dateTime The value to convert.
+	 * @return The resulting String
+	 */
+	public static String printISO(final ZonedDateTime dateTime) {
+		return printISO(dateTime, null);
+	}
+	
+	/**
+	 * Converts the passed date-time into a String in ISO format, applying UTC timezone before printing.
+	 * @param dateTime The value to convert.
+	 * @param defaultString The String to return in case of null input.
+	 * @return The resulting String
+	 */
+	public static String printISO(final ZonedDateTime dateTime, final String defaultString) {
+		return print(ISO_DATEDIME_FMT, dateTime, defaultString);
+	}
 	
 	/**
 	 * Converts the passed temporal value into a String using specified formatter.

@@ -32,20 +32,15 @@
  */
 package com.sonicle.commons.time;
 
-import java.text.DateFormatSymbols;
 import java.util.Locale;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
-import org.joda.time.Duration;
-import org.joda.time.IllegalInstantException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
@@ -179,7 +174,7 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * @deprecated Moved! Use JodaTimeUtils.toDateTime
+	 * @deprecated Moved! Use JodaTimeUtils.withTimeAtStartOfDay
 	 */
 	@Deprecated public static DateTime withTimeAtStartOfDay(DateTime dt) {
 		if (dt == null) return null;
@@ -250,14 +245,14 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * @deprecated Moved! Use JodaTimeUtils.datesBetween
+	 * @deprecated Moved! Use JodaTimeUtils.calendarDaysBetween
 	 */
 	@Deprecated public static int datesBetween(DateTime dt1, DateTime dt2) {
 		return JodaTimeUtils.calendarDaysBetween(dt1, dt2);
 	}
 	
 	/**
-	 * @deprecated Moved! Use JodaTimeUtils.datesBetween
+	 * @deprecated Moved! Use JodaTimeUtils.calendarDaysBetween
 	 */
 	@Deprecated public static int datesBetween(DateTime dt1, DateTime dt2, boolean midnightAsDayBefore) {
 		return JodaTimeUtils.calendarDaysBetween(dt1, dt2, midnightAsDayBefore);
@@ -420,33 +415,33 @@ public class DateTimeUtils {
 	@Deprecated public static DateTimeZone parseDateTimeZone(String tzid) {
 		return !StringUtils.isBlank(tzid) ? DateTimeZone.forID(tzid) : null;
 	}
-
-	public static DateTime parseYmdHmsWithZone(String date, String time, DateTimeZone tz) {
-		return parseYmdHmsWithZone(date + " " + time, tz);
+	
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.parseDateTimeYMDHMS
+	 */
+	@Deprecated public static DateTime parseYmdHmsWithZone(String date, String time, DateTimeZone tz) {
+		return JodaTimeUtils.parseDateTimeYMDHMS(tz, date, time);
 	}
 
-	public static DateTime parseYmdHmsWithZone(String dateTime, DateTimeZone tz) {
-		if(StringUtils.isBlank(dateTime)) return null;
-		String s = StringUtils.replace(dateTime, "T", " ");
-		DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZone(tz);
-		return fmt.parseDateTime(s);
+	/**
+	 * @deprecated Moved! Use JodaTimeUtils.parseDateTimeYMDHMS
+	 */
+	@Deprecated public static DateTime parseYmdHmsWithZone(String dateTime, DateTimeZone tz) {
+		return JodaTimeUtils.parseDateTimeYMDHMS(tz, dateTime);
 	}
 	
 	/**
 	 * @deprecated Use JodaTimeUtils.printYMDHMS instead
 	 */
 	@Deprecated public static String printYmdHmsWithZone(DateTime dateTime, DateTimeZone tz) {
-		return printYmdHms(dateTime, tz);
+		return JodaTimeUtils.printYMDHMS(tz, dateTime);
 	}
 	
-	public static String printYmdHms(DateTime dateTime, DateTimeZone tz) {
-		if (dateTime == null) return null;
-		return DateTimeUtils.createYmdHmsFormatter(tz).print(dateTime);
-	}
-	
-	public static String printYmd(DateTime dateTime, DateTimeZone tz) {
-		if (dateTime == null) return null;
-		return DateTimeUtils.createYmdFormatter(tz).print(dateTime);
+	/**
+	 * @deprecated Use JodaTimeUtils.printYMDHMS instead
+	 */
+	@Deprecated public static String printYmdHms(DateTime dateTime, DateTimeZone tz) {
+		return JodaTimeUtils.printYMDHMS(tz, dateTime);
 	}
 	
 	@Deprecated public static String print(final DateTimeFormatter formatter, final ReadablePartial rp) {
@@ -468,14 +463,14 @@ public class DateTimeUtils {
 	//event.setRecurrence(orec.getRule(), orec.getLocalStartDate(event.getDateTimeZone()));
 	
 	/**
-	 * @deprecated Moved! Use JavaTimeUtils.parseDateTime
+	 * @deprecated Moved! Use JodaTimeUtils.parseDateTime
 	 */
 	@Deprecated public static DateTime parseDateTime(DateTimeFormatter formatter, String s) {
 		return StringUtils.isBlank(s) ? null : formatter.parseDateTime(s);
 	}
 	
 	/**
-	 * @deprecated Moved! Use JavaTimeUtils.parseLocalDate
+	 * @deprecated Moved! Use JodaTimeUtils.parseLocalDate
 	 */
 	@Deprecated public static LocalDate parseLocalDate(DateTimeFormatter formatter, String s) {
 		return StringUtils.isBlank(s) ? null : formatter.parseLocalDate(s);
@@ -499,12 +494,11 @@ public class DateTimeUtils {
 	 * @deprecated Moved! Use JavaTimeUtils.toZoneId
 	 */
 	@Deprecated public static java.time.ZoneId toZoneId(DateTimeZone timezone) {
-		if (timezone == null) return null;
-		return java.time.ZoneId.of(timezone.getID());
+		return JavaTimeUtils.toZoneId(timezone);
 	}
 	
 	/**
-	 * @deprecated Moved! Use JavaTimeUtils.toDateTimeZone
+	 * @deprecated Moved! Use JodaTimeUtils.toDateTimeZone
 	 */
 	@Deprecated public static DateTimeZone toDateTimeZone(java.time.ZoneId zone) {
 		if (zone == null) return null;
@@ -517,7 +511,7 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * @deprecated Moved! Use JavaTimeUtils.toDateTime
+	 * @deprecated Moved! Use JodaTimeUtils.toDateTime
 	 */
 	@Deprecated public static DateTime toDateTime(java.time.ZonedDateTime dateTime) {
 		if (dateTime == null) return null;
@@ -543,33 +537,31 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * @deprecated Moved! Use JavaTimeUtils.parseISOLocalTime
+	 * @deprecated Moved! Use JavaTimeUtils.parseLocalTimeHMS
 	 */
 	@Deprecated public static java.time.LocalTime parseLocalTime(String isoLocalTime) {
-		return parseLocalTime(isoLocalTime, java.time.format.DateTimeFormatter.ISO_LOCAL_TIME);
+		return JavaTimeUtils.parseLocalTimeHMS(isoLocalTime);
 	}
 	
 	/**
 	 * @deprecated Moved! Use JavaTimeUtils.parseLocalTime
 	 */
 	@Deprecated public static java.time.LocalTime parseLocalTime(String time, java.time.format.DateTimeFormatter formatter) {
-		if (StringUtils.isBlank(time)) return null;
-		return java.time.LocalTime.parse(time, formatter);
+		return JavaTimeUtils.parseLocalTime(formatter, time);
 	}
 	
 	/**
-	 * @deprecated Moved! Use JavaTimeUtils.parseISODateTime
+	 * @deprecated Moved! Use JavaTimeUtils.parseDateTimeISO
 	 */
 	@Deprecated public static java.time.ZonedDateTime parseDateTime(String isoDateTime, java.time.ZoneId zone) {
-		return parseDateTime(isoDateTime, java.time.format.DateTimeFormatter.ISO_DATE_TIME.withZone(zone));
+		return JavaTimeUtils.parseDateTimeISO(isoDateTime);
 	}
 	
 	/**
 	 * @deprecated Moved! Use JavaTimeUtils.parseDateTime
 	 */
 	@Deprecated public static java.time.ZonedDateTime parseDateTime(String dateTime, java.time.format.DateTimeFormatter formatter) {
-		if (StringUtils.isBlank(dateTime)) return null;
-		return java.time.ZonedDateTime.parse(dateTime, formatter);
+		return JavaTimeUtils.parseDateTime(formatter, dateTime);
 	}
 	
 	/**

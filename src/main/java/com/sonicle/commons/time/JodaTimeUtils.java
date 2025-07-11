@@ -57,8 +57,8 @@ public class JodaTimeUtils {
 	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter(ISO_DATE_PATTERN);
 	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter(ISO_TIME_PATTERN);
 	public static final DateTimeFormatter ISO_DATETIME_FMT = createFormatter(ISO_DATE_PATTERN + "'T'" + ISO_TIME_PATTERN + "'Z'", DateTimeZone.UTC);
-	public static final String SYNCTOKEN_PATTERN = "yyyyMMddHHmmssSSS";
-	public static final DateTimeFormatter SYNCTOKEN_FMT = createFormatter(SYNCTOKEN_PATTERN, DateTimeZone.UTC);
+	public static final String SYNCTAG_PATTERN = "yyyyMMddHHmmssSSS";
+	public static final DateTimeFormatter SYNCTAG_FMT = createFormatter(SYNCTAG_PATTERN, DateTimeZone.UTC);
 	public static final LocalTime TIME_AT_STARTOFDAY = new LocalTime(0, 0, 0, 0);
 	public static final LocalTime TIME_AT_ENDOFDAY = new LocalTime(23, 59, 59, 0);
 	
@@ -400,12 +400,17 @@ public class JodaTimeUtils {
 		return formatter.parseLocalTime(time);
 	}
 	
-	public static DateTime parseDateTimeISO(final String datetime) {
-		return parseDateTime(ISO_DATETIME_FMT, datetime);
+	public static DateTime parseDateTimeYMDHMS(final DateTimeZone tz, final String date, final String time) {
+		return parseDateTime(createFormatterYMDHMS(tz), StringUtils.join(date, " ", time));
 	}
 	
 	public static DateTime parseDateTimeYMDHMS(final DateTimeZone tz, final String datetime) {
-		return parseDateTime(createFormatterYMDHMS(tz), datetime);
+		String s = StringUtils.replace(datetime, "T", " "); // Ported from DateTimeUtils: why is necessary? Use case?
+		return parseDateTime(createFormatterYMDHMS(tz), s);
+	}
+	
+	public static DateTime parseDateTimeISO(final String datetime) {
+		return parseDateTime(ISO_DATETIME_FMT, datetime);
 	}
 	
 	public static DateTime parseDateTime(final DateTimeFormatter formatter, final String datetime) {
