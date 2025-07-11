@@ -57,8 +57,8 @@ public class JavaTimeUtils {
 	public static final String ISO_LOCALDATE_PATTERN = "yyyy-MM-dd"; // Do NOT modify!
 	public static final String ISO_LOCALTIME_PATTERN = "HH:mm:ss"; // Do NOT modify!
 	public static final DateTimeFormatter ISO_LOCALDATE_FMT = createFormatter(ISO_LOCALDATE_PATTERN);
-	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter(ISO_LOCALTIME_PATTERN);
-	//public static final DateTimeFormatter ISO_DATEDIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", ZoneId.UTC);
+	public static final DateTimeFormatter ISO_LOCALTIME_FMT = createFormatter(ISO_LOCALTIME_PATTERN); // This is more strict respect the built-in DateTimeFormatter.ISO_LOCAL_DATE
+	public static final DateTimeFormatter ISO_DATEDIME_FMT = createFormatter("yyyy-MM-dd'T'HH:mm:ss'Z'", ZoneOffset.UTC); // This is more strict respect the built-in DateTimeFormatter.ISO_INSTANT
 	public static final String SYNCTOKEN_PATTERN = "yyyyMMddHHmmssSSS";
 	public static final DateTimeFormatter SYNCTOKEN_FMT = createFormatter(SYNCTOKEN_PATTERN, ZoneOffset.UTC);
 	
@@ -95,6 +95,37 @@ public class JavaTimeUtils {
 	}
 	
 	/**
+	 * Returns now (approximated - without nanos) dateTime in UTC.
+	 * @return A dateTime of now in UTC timezone.
+	 */
+	public static ZonedDateTime now() {
+		return now(ZoneOffset.UTC, false);
+	}
+	
+	/**
+	 * Returns now dateTime in UTC.
+	 * @param exactNanos Set to `false` to ignore nanos resetting them to zero.
+	 * @return A dateTime of now in UTC timezone.
+	 */
+	public static ZonedDateTime now(final boolean exactNanos) {
+		return now(ZoneOffset.UTC, exactNanos);
+	}
+	
+	/**
+	 * Returns now dateTime.
+	 * @param tz Desired Zone ID.
+	 * @param exactNanos Set to `false` to ignore nanos resetting them to zero.
+	 * @return A dateTime of now in desired timezone.
+	 */
+	public static ZonedDateTime now(final ZoneId tz, final boolean exactNanos) {
+		if (exactNanos) {
+			return ZonedDateTime.now(tz);
+		} else {
+			return ZonedDateTime.now(tz).withNano(0);
+		}
+	}
+	
+	/**
 	 * Set time at midnight (start-of-day).
 	 * @param dateTime The dateTime to set.
 	 * @return The dateTime at midnight
@@ -108,7 +139,7 @@ public class JavaTimeUtils {
 	/**
 	 * Creates a new dateTime at midnight (start-of-day) using passed localDate as template.
 	 * @param localDate The target localDate.
-	 * @param tz Desired timezone.
+	 * @param tz Desired Zone ID.
 	 * @return New dateTime at midnight
 	 */
 	public static ZonedDateTime withTimeAtStartOfDay(final LocalDate localDate, final ZoneId tz) {
@@ -130,7 +161,7 @@ public class JavaTimeUtils {
 	/**
 	 * Instantiates the formatter using specified pattern and timezone.
 	 * @param pattern Desired pattern.
-	 * @param tz Desired formatter timezone.
+	 * @param tz Desired Zone ID to apply to the formatter.
 	 * @return Formatter instance.
 	 */
 	public static DateTimeFormatter createFormatter(final String pattern, final ZoneId tz) {
@@ -141,7 +172,7 @@ public class JavaTimeUtils {
 	/**
 	 * Returns a copy for the passed formatter applying the specified timezone.
 	 * @param formatter The base formatter to copy.
-	 * @param tz Desired formatter timezone.
+	 * @param tz Desired Zone ID to apply to the formatter.
 	 * @return Formatter instance.
 	 */
 	public static DateTimeFormatter createFormatter(final DateTimeFormatter formatter, final ZoneId tz) {
@@ -158,7 +189,7 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates a ISO date-time ("yyyy-MM-dd HH:mm:ss") formatter using specified timezone.
-	 * @param tz Desired formatter timezone.
+	 * @param tz Desired Zone ID to apply to the formatter.
 	 * @return Formatter instance.
 	 */
 	public static DateTimeFormatter createFormatterYMDHMS(final ZoneId tz) {
@@ -167,7 +198,7 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates a ISO date-time ("yyyy-MM-dd HH:mm") formatter using specified timezone.
-	 * @param tz Desired formatter timezone.
+	 * @param tz Desired Zone ID to apply to the formatter.
 	 * @return Formatter instance.
 	 */
 	public static DateTimeFormatter createFormatterYMDHM(final ZoneId tz) {
@@ -184,7 +215,7 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates "yyyy-MM-dd" formatter (ISO date) using specified timezone.
-	 * @param tz Desired formatter timezone.
+	 * @param tz Desired Zone ID to apply to the formatter.
 	 * @return Formatter instance.
 	 */
 	public static DateTimeFormatter createFormatterYMD(final ZoneId tz) {
@@ -201,7 +232,7 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates a ISO time ("HH:mm:ss") formatter using specified timezone.
-	 * @param tz Desired formatter timezone.
+	 * @param tz Desired Zone ID to apply to the formatter.
 	 * @return Formatter instance.
 	 */
 	public static DateTimeFormatter createFormatterHMS(final ZoneId tz) {
@@ -218,7 +249,7 @@ public class JavaTimeUtils {
 	
 	/**
 	 * Instantiates a "HH:mm" formatter using specified timezone.
-	 * @param tz Desired formatter timezone.
+	 * @param tz Desired Zone ID to apply to the formatter.
 	 * @return Formatter instance.
 	 */
 	public static DateTimeFormatter createFormatterHM(final ZoneId tz) {
@@ -237,7 +268,15 @@ public class JavaTimeUtils {
 	}
 	
 	public static LocalTime parseLocalTimeHMS(final String time) {
-		return parseLocalTime(DateTimeFormatter.ISO_LOCAL_TIME, time);
+		return parseLocalTimeHMS(true, time);
+	}
+	
+	public static LocalTime parseLocalTimeHMS(final boolean strict, final String time) {
+		if (strict) {
+			return parseLocalTime(ISO_LOCALTIME_FMT, time);
+		} else {
+			return parseLocalTime(DateTimeFormatter.ISO_LOCAL_TIME, time);
+		}
 	}
 	
 	public static LocalTime parseLocalTime(final DateTimeFormatter formatter, final String time) {
@@ -245,8 +284,16 @@ public class JavaTimeUtils {
 		return LocalTime.parse(time, formatter);
 	}
 	
-	public static ZonedDateTime parseDateTimeISO(final String dateTime, final ZoneId tz) {
-		return parseDateTime(DateTimeFormatter.ISO_DATE_TIME.withZone(tz), dateTime);
+	public static ZonedDateTime parseDateTimeISO(final String dateTime) {
+		return parseDateTimeISO(true, dateTime);
+	}
+	
+	public static ZonedDateTime parseDateTimeISO(final boolean strict, final String dateTime) {
+		if (strict) {
+			return parseDateTime(ISO_DATEDIME_FMT, dateTime);
+		} else {
+			return parseDateTime(DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC), dateTime);
+		}
 	}
 	
 	public static ZonedDateTime parseDateTime(final DateTimeFormatter formatter, final String dateTime) {
