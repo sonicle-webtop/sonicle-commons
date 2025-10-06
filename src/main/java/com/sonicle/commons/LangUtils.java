@@ -1221,6 +1221,12 @@ public class LangUtils {
 		return null;
 	}
 	
+	public static String joinStrings(final String separator, final Collection<String> strings) {
+		String[] strings2 = null;
+		if (strings != null) strings2 = strings.toArray(new String[strings.size()]);
+		return joinStrings(separator, strings2);
+	}
+	
 	/**
 	 * Joins passed strings using provided separator, string is joined only if it is not blank.
 	 * @param separator The string sepatator.
