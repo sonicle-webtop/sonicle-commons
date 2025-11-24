@@ -66,11 +66,19 @@ import org.slf4j.LoggerFactory;
 public class HttpClientUtils {
 	private final static Logger LOGGER = (Logger) LoggerFactory.getLogger(HttpClientUtils.class);
 	
-	public static void closeQuietly(HttpClient httpClient) {
+	public static void closeQuietly(final HttpClient httpClient) {
 		org.apache.http.client.utils.HttpClientUtils.closeQuietly(httpClient);
 	}
 	
-	public static HttpClient createBasicHttpClient(URI uri) {
+	public static void consumeQuietly(final HttpResponse response) {
+		if (response != null) consumeQuietly(response.getEntity());
+	}
+	
+	public static void consumeQuietly(final HttpEntity entity) {
+		if (entity != null) EntityUtils.consumeQuietly(entity);
+	}
+	
+	public static HttpClient createBasicHttpClient(final URI uri) {
 		return createBasicHttpClient(HttpClientBuilder.create(), uri);
 	}
 	
@@ -78,7 +86,7 @@ public class HttpClientUtils {
 		return configureSSLAcceptAll(HttpClientBuilder.create());
 	}
 	
-	public static HttpClientBuilder configureSSLAcceptAll(HttpClientBuilder builder) {
+	public static HttpClientBuilder configureSSLAcceptAll(final HttpClientBuilder builder) {
 		try {
 			builder.setSSLContext(new SSLContextBuilder()
 				.loadTrustMaterial(null, new TrustAllStrategy()).build()
@@ -90,7 +98,7 @@ public class HttpClientUtils {
 		return builder;
 	}
 	
-	public static HttpClient createBasicHttpClient(HttpClientBuilder builder, URI uri) {
+	public static HttpClient createBasicHttpClient(final HttpClientBuilder builder, final URI uri) {
 		String[] tokens = URIUtils.getUserInfo(uri);
 		if (tokens != null) {
 			CredentialsProvider basic = new BasicCredentialsProvider();
@@ -100,12 +108,39 @@ public class HttpClientUtils {
 		return builder.build();
 	}
 	
-	public static boolean exists(HttpClient client, URI uri) throws IOException {
-		HttpResponse response = client.execute(new HttpHead(uri));
-		return response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;	
+	public static boolean exists(final HttpClient client, final URI uri) throws IOException {
+		return exists(client, uri, true);
 	}
 	
-	public static void writeContent(HttpClient client, URI uri, OutputStream output) throws IOException {
+	public static boolean exists(final HttpClient client, final URI uri, final boolean httpGetFallback) throws IOException {
+		HttpResponse response = null;
+		try {
+			response = client.execute(new HttpHead(uri));
+			final int status = response.getStatusLine().getStatusCode();
+			if (status == HttpStatus.SC_OK) return true;
+			
+		} finally {
+			consumeQuietly(response);
+		}
+		
+		// Handle GET fallback
+		if (httpGetFallback) {
+			try {
+				final HttpGet get = new HttpGet(uri);
+				get.setHeader("Range", "bytes=0-1023"); // Requests only first 1024 byte
+				response = client.execute(get);
+				final int status = response.getStatusLine().getStatusCode();
+				if (status == HttpStatus.SC_OK || status == HttpStatus.SC_PARTIAL_CONTENT) return true;
+
+			} finally {
+				consumeQuietly(response);
+			}
+		}
+		
+		return false;
+	}
+	
+	public static void writeContent(final HttpClient client, final URI uri, final OutputStream output) throws IOException {
 		HttpResponse response = client.execute(new HttpGet(uri));
 		final int statusCode = response.getStatusLine().getStatusCode();
 		if (statusCode == HttpStatus.SC_OK) {
@@ -115,7 +150,7 @@ public class HttpClientUtils {
 		}
 	}
 	
-	public static String getStringContent(HttpClient client, URI uri) throws IOException {
+	public static String getStringContent(final HttpClient client, final URI uri) throws IOException {
 		HttpResponse response = client.execute(new HttpGet(uri));
 		final StatusLine statusLine = response.getStatusLine();
 		if (HttpStatus.SC_OK == statusLine.getStatusCode()) {
@@ -126,7 +161,7 @@ public class HttpClientUtils {
 	}
 	
 	//public static HttpEntity getContent(HttpClient client, URI uri) throws IOException {
-	public static InputStream getContent(HttpClient client, URI uri) throws IOException {
+	public static InputStream getContent(final HttpClient client, final URI uri) throws IOException {
 		HttpResponse response = client.execute(new HttpGet(uri));
 		final StatusLine statusLine = response.getStatusLine();
 		if (HttpStatus.SC_OK == statusLine.getStatusCode()) {
