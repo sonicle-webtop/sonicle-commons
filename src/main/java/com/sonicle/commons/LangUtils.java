@@ -899,7 +899,8 @@ public class LangUtils {
 	 * @return 
 	 */
 	public static HashSet<String> parseStringAsSet(final String str) {
-		return parseStringAsSet(str, ",", true);
+		return parseStringAsSet(str, ",", true, String.class);
+		//return parseStringAsSet(str, ",", true);
 	}
 	
 	/**
@@ -911,11 +912,41 @@ public class LangUtils {
 	 * @return 
 	 */
 	public static HashSet<String> parseStringAsSet(final String str, final String separator, final boolean trim) {
+		return parseStringAsSet(str, separator, trim, String.class);
+		/*
 		LinkedHashSet<String> set = new LinkedHashSet<>();
 		if (!StringUtils.isBlank(str)) {
 			String[] ltokens = StringUtils.split(str, separator);
 			for (int i=0; i<ltokens.length; i++) {
 				set.add(trim ? StringUtils.trim(ltokens[i]) : ltokens[i]);
+			}
+		}
+		return set;
+		*/
+	}
+	
+	/**
+	 * Parses a String into a Set of items of the specified type, using the 
+	 * provided character as separator between items. Null-string will be ignored.
+	 * @param <T>
+	 * @param str The String value.
+	 * @param separator Separator char between items.
+	 * @param trim Controls whether to trim items before converting them.
+	 * @param type The object type.
+	 * @return 
+	 */
+	public static <T> HashSet<T> parseStringAsSet(final String str, final String separator, final boolean trim, final Class<T> type) {
+		LinkedHashSet<T> set = new LinkedHashSet<>();
+		if (!StringUtils.isBlank(str)) {
+			String[] ltokens = StringUtils.split(str, separator);
+			for (int i=0; i<ltokens.length; i++) {
+				String svalue = trim ? StringUtils.trim(ltokens[i]) : ltokens[i];
+				if (type.isAssignableFrom(String.class)) {
+					if (svalue != null) set.add((T)svalue);
+				} else {
+					T value = value(svalue, null, type);
+					if (value != null) set.add(value);
+				}
 			}
 		}
 		return set;
