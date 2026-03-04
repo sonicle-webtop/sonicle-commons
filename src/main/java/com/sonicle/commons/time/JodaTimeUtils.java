@@ -40,7 +40,9 @@ import org.joda.time.Days;
 import org.joda.time.Duration;
 import org.joda.time.IllegalInstantException;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
+import org.joda.time.Minutes;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 import org.joda.time.format.DateTimeFormat;
@@ -218,6 +220,35 @@ public class JodaTimeUtils {
 		return ((value.compareTo(instant1) >= 0) && (value.compareTo(instant2) <= 0));
 	}
 	
+	/**
+	 * Returns the difference in minutest between two instants.
+	 * @param instant1 The start instant, must not be null.
+	 * @param instant2 The end instant, must not be null.
+	 * @param absolute Set to `true` to return the absolute difference, instants position does not matter.
+	 * @return 
+	 */
+	public static int minutesBetween(final ReadableInstant instant1, final ReadableInstant instant2, final boolean absolute) {
+		int minutes = Minutes.minutesBetween(instant1, instant2).getMinutes();
+		return absolute ? Math.abs(minutes) : minutes;
+	}
+	
+	/**
+	 * Returns the difference in minutest between two partial datetimes.
+	 * @param partial1 The start partial date, must not be null.
+	 * @param partial2 The end partial date, must not be null.
+	 * @param absolute Set to `true` to return the absolute difference, dates position does not matter.
+	 * @return 
+	 */
+	public static int minutesBetween(final ReadablePartial partial1, final ReadablePartial partial2, final boolean absolute) {
+		int minutes = Minutes.minutesBetween(partial1, partial2).getMinutes();
+		return absolute ? Math.abs(minutes) : minutes;
+	}
+	
+	public static int daysBetween(final ReadablePartial partial1, final ReadablePartial partial2, final boolean absolute) {
+		int days = Days.daysBetween(partial1, partial2).getDays();
+		return absolute ? Math.abs(days) : days;
+	}
+	
 	public static Days daysBetween(ReadableInstant instant1, ReadableInstant instant2) {
 		return (instant1 != null && instant2 != null) ? Days.daysBetween(instant1, instant2) : null; 
 	}
@@ -243,10 +274,13 @@ public class JodaTimeUtils {
 	 * @param midnightAsDayBefore If 'true' and dt2 is at midnight, dt2 will be set at the day before.
 	 * @return 
 	 */
-	public static int calendarDaysBetween(DateTime dateTime1, DateTime dateTime2, boolean midnightAsDayBefore) {
-		LocalDate ld1 = dateTime1.toLocalDate();
-		LocalDate ld2 = (midnightAsDayBefore && JodaTimeUtils.isMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
-		return Days.daysBetween(ld1, ld2).getDays();
+	public static int calendarDaysBetween(final DateTime dateTime1, final DateTime dateTime2, final boolean midnightAsDayBefore) {
+		final LocalDate ld2 = (midnightAsDayBefore && JodaTimeUtils.isMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
+		return daysBetween(dateTime1.toLocalDate(), ld2, true);
+	}
+	
+	public static int calendarDaysBetween(final LocalDate date1, final LocalDate date2) {
+		return daysBetween(date1, date2, true);
 	}
 	
 	// ---------- Formatting
@@ -517,9 +551,15 @@ public class JodaTimeUtils {
 		// https://stackoverflow.com/questions/34617172/handling-time-zone-offset-transition-and-daylight-savings-time-with-joda
 		try {
 			return ld.toDateTime(lt, dtz);
+			
 		} catch (IllegalInstantException ex) {
 			if (!pushForwardAtGap) throw ex;
-			return ld.toDateTime(lt.plusHours(1), dtz);
+			
+			// Find the next transition and use that as the instant
+			LocalDateTime ldt = ld.toLocalDateTime(lt);
+			long gapStart = ldt.toDateTime(DateTimeZone.UTC).getMillis();
+			long transition = dtz.nextTransition(gapStart - dtz.getOffset(gapStart));
+			return new DateTime(transition, dtz);
 		}
 	}
 	
