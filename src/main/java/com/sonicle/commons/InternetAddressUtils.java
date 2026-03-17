@@ -51,6 +51,24 @@ public class InternetAddressUtils {
 	private static final Pattern TRAILING_TOKEN_DELIMITER_PATTERN = Pattern.compile("<\\|>$");
 	private static final Pattern TOKEN_DELIMITER_PATTERN = Pattern.compile("\\s*<\\|>\\s*");
 	
+	/**
+	 * Returns the address from an InternetAddress object.
+	 * @param ia The source InternetAddress
+	 * @return The address as String
+	 */
+	public static String getAddress(final InternetAddress ia) {
+		return (ia != null) ? ia.getAddress() : null;
+	}
+	
+	/**
+	 * Returns the personal from an InternetAddress object.
+	 * @param ia The source InternetAddress
+	 * @return The personal as String
+	 */
+	public static String getPersonal(final InternetAddress ia) {
+		return (ia != null) ? ia.getPersonal() : null;
+	}
+	
 	public static boolean isAddressValid(String address) {
 		if(StringUtils.isBlank(address)) return false;
 		return EMAIL_PATTERN.matcher(address).matches();
@@ -99,7 +117,7 @@ public class InternetAddressUtils {
 	 * @param address The source address.
 	 * @return Unicode address string
 	 */
-	public static String toFullAddress(InternetAddress address) {
+	public static String toFullAddress(final InternetAddress address) {
 		if (address == null) return null;
 		return toFullAddress(address.getAddress(), address.getPersonal());
 	}
