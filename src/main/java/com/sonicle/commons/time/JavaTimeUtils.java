@@ -33,6 +33,7 @@
 package com.sonicle.commons.time;
 
 import java.text.DateFormatSymbols;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +42,11 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
+import java.time.zone.ZoneOffsetTransition;
+import java.time.zone.ZoneRules;
 import java.util.Locale;
 import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
@@ -125,6 +130,18 @@ public class JavaTimeUtils {
 		}
 	}
 	
+	public static boolean isAtMidnight(final ZonedDateTime dateTime) {
+		return (dateTime.compareTo(withTimeAtStartOfDay(dateTime)) == 0);
+	}
+	
+	public static boolean isEndOfDay(final ZonedDateTime dateTime, final boolean relaxed) {
+		if (relaxed) {
+			return (dateTime.compareTo(withTimeAtEndOfDay(dateTime)) == 0) || ((dateTime.getHour() == 23) && (dateTime.getMinute()== 59));
+		} else {
+			return (dateTime.compareTo(withTimeAtEndOfDay(dateTime)) == 0);
+		}	
+	}
+	
 	/**
 	 * Set time at midnight (start-of-day).
 	 * @param dateTime The dateTime to set.
@@ -139,12 +156,105 @@ public class JavaTimeUtils {
 	/**
 	 * Creates a new dateTime at midnight (start-of-day) using passed localDate as template.
 	 * @param localDate The target localDate.
-	 * @param tz Desired Zone ID.
+	 * @param zone Desired Zone ID.
 	 * @return New dateTime at midnight
 	 */
-	public static ZonedDateTime withTimeAtStartOfDay(final LocalDate localDate, final ZoneId tz) {
+	public static ZonedDateTime withTimeAtStartOfDay(final LocalDate localDate, final ZoneId zone) {
 		if (localDate == null) return null;
-		return localDate.atStartOfDay(Check.notNull(tz, "tz"));
+		return localDate.atStartOfDay(Check.notNull(zone, "zone"));
+	}
+	
+	/**
+	 * Set time at midday.
+	 * @param dateTime The dateTime to set.
+	 * @return The dateTime at midday
+	 */
+	public static ZonedDateTime withTimeAtMidday(final ZonedDateTime dateTime) {
+		if (dateTime == null) return null;
+		return dateTime.withHour(12).withMinute(0).withSecond(0).withNano(0);
+	}
+	
+	/**
+	 * Set time at end-of-day.
+	 * @param dateTime The dateTime to set.
+	 * @return The dateTime at end-of-day
+	 */
+	public static ZonedDateTime withTimeAtEndOfDay(final ZonedDateTime dateTime) {
+		if (dateTime == null) return null;
+		return dateTime.withHour(23).withMinute(59).withSecond(59).withNano(0);
+	}
+	
+	/**
+	 * Creates a new dateTime at midnight (start-of-day) using passed localDate as template.
+	 * @param localDate The target localDate.
+	 * @param zone Desired Zone ID.
+	 * @return New dateTime at midnight
+	 */
+	public static ZonedDateTime withTimeAtEndOfDay(final LocalDate localDate, final ZoneId zone) {
+		if (localDate == null) return null;
+		return withTimeAtEndOfDay(withTimeAtStartOfDay(localDate, zone));
+	}
+	
+	/**
+	 * Compares two times and returns the youngest one.
+	 * @param time1 Time instance 1.
+	 * @param time2 Time instance 2.
+	 * @return Youngest time instance.
+	 */
+	public static LocalTime min(final LocalTime time1, final LocalTime time2) {
+		return (time1.compareTo(time2) < 0) ? time1 : time2;
+	}
+	
+	/**
+	 * Compares two times and returns the older one.
+	 * @param time1 Time instance 1.
+	 * @param time2 Time instance 2.
+	 * @return Oldest time instance.
+	 */
+	public static LocalTime max(final LocalTime time1, final LocalTime time2) {
+		return (time1.compareTo(time2) > 0) ? time1 : time2;
+	}
+	
+	//public static boolean between(final ReadablePartial value, final ReadablePartial partial1, final ReadablePartial partial2) {
+	
+	//public static boolean between(final ReadablePartial value, final ReadablePartial partial1, final ReadablePartial partial2, final boolean inclusiveStart, final boolean inclusiveEnd) {
+	
+	//public static boolean between(ReadableInstant value, ReadableInstant instant1, ReadableInstant instant2) {
+	
+	/**
+	 * Returns the difference in minutest between two temporal objects.
+	 * @param temporal1 The start temporal object, must not be null.
+	 * @param temporal2 The end temporal object, must not be null.
+	 * @param absolute Set to `true` to return the absolute difference, instants position does not matter.
+	 * @return 
+	 */
+	public static int minutesBetween(final Temporal temporal1, final Temporal temporal2, final boolean absolute) {
+		int minutes = (int) ChronoUnit.MINUTES.between(temporal1, temporal2);
+		return absolute ? Math.abs(minutes) : minutes;
+	}
+	
+	/**
+	 * Returns the difference in days between two temporal objects.
+	 * @param temporal1 The start temporal object, must not be null.
+	 * @param temporal2 The end temporal object, must not be null.
+	 * @param absolute Set to `true` to return the absolute difference, instants position does not matter.
+	 * @return 
+	 */
+	public static int daysBetween(final Temporal temporal1, final Temporal temporal2, final boolean absolute) {
+		int days = (int) ChronoUnit.DAYS.between(temporal1, temporal2);
+		return absolute ? Math.abs(days) : days;
+	}
+	
+	/**
+	 * Returns the difference in days not keeping into account the real amount of time passed between the two dates.
+	 * @param dateTime1 The first dateTime
+	 * @param dateTime2 The second dateTime.
+	 * @param midnightAsDayBefore If `true` and dateTime2 is at midnight, dateTime2 will be set at the day before.
+	 * @return 
+	 */
+	public static int calendarDaysBetween(final ZonedDateTime dateTime1, final ZonedDateTime dateTime2, final boolean midnightAsDayBefore) {
+		final LocalDate date2 = (midnightAsDayBefore && isAtMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
+		return daysBetween(dateTime1.toLocalDate(), date2, true);
 	}
 	
 	// ---------- Formatting
@@ -359,14 +469,14 @@ public class JavaTimeUtils {
 	
 	// ---------- Transforms
 	
-	public static Instant toInstant(final LocalDate date, final ZoneId tz) {
+	public static Instant toInstant(final LocalDate date, final ZoneId zone) {
 		if (date == null) return null;
-		return date.atStartOfDay((tz == null) ? java.time.ZoneId.systemDefault() : tz).toInstant();
+		return date.atStartOfDay((zone == null) ? java.time.ZoneId.systemDefault() : zone).toInstant();
 	}
 	
-	public static Instant toInstant(final LocalTime time, final ZoneId tz) {
+	public static Instant toInstant(final LocalTime time, final ZoneId zone) {
 		if (time == null) return null;
-		return time.atDate(LocalDate.ofEpochDay(0)).atZone((tz == null) ? ZoneId.systemDefault() : tz).toInstant();
+		return time.atDate(LocalDate.ofEpochDay(0)).atZone((zone == null) ? ZoneId.systemDefault() : zone).toInstant();
 	}
 	
 	public static Instant toInstant(final ZonedDateTime dateTime) {
@@ -374,9 +484,32 @@ public class JavaTimeUtils {
 		return dateTime.toInstant();
 	}
 	
-	public static ZonedDateTime toZonedDateTime(final Instant instant, final ZoneId tz) {
+	public static ZonedDateTime toZonedDateTime(final Instant instant, final ZoneId zone) {
 		if (instant == null) return null;
-		return instant.atZone((tz == null) ? ZoneId.systemDefault() : tz);
+		return instant.atZone((zone == null) ? ZoneId.systemDefault() : zone);
+	}
+	
+	public static ZonedDateTime toZonedDateTime(final LocalDate localDate, final LocalTime localTime, final ZoneId zone) {
+		return toZonedDateTime(localDate, localTime, zone, true);
+	}
+	
+	public static ZonedDateTime toZonedDateTime(final LocalDate localDate, final LocalTime localTime, final ZoneId zone, final boolean pushForwardAtGap) {
+		LocalDateTime ldt = localDate.atTime(localTime);
+		ZoneRules rules = zone.getRules();
+		
+		if (rules.isValidOffset(ldt, rules.getOffset(ldt))) {
+			// Instant is valid, no gap
+			return ldt.atZone(zone);
+		}
+		
+		// ldt falls in a gap
+		if (!pushForwardAtGap) {
+			throw new DateTimeException("Invalid local date-time in zone " + zone + ": " + ldt);
+		}
+		
+		// Find the transition and use its instant (first valid moment after the gap)
+		ZoneOffsetTransition transition = rules.getTransition(ldt);
+		return transition.getDateTimeAfter().atZone(zone);
 	}
 	
 	// ----------  JodaTime -> java.time
