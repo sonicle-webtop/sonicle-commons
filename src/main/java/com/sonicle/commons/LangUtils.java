@@ -1411,16 +1411,32 @@ public class LangUtils {
 			this.removed = (removed == null) ? new LinkedHashSet<>(0): removed;
 		}
 		
+		public boolean hasAdded() {
+			return !added.isEmpty();
+		}
+		
 		public Set<T> getAdded() {
 			return Collections.unmodifiableSet(added);
+		}
+		
+		public boolean hasUpdated() {
+			return !updated.isEmpty();
 		}
 		
 		public Set<T> getUpdated() {
 			return Collections.unmodifiableSet(updated);
 		}
 		
+		public boolean hasRemoved() {
+			return !removed.isEmpty();
+		}
+		
 		public Set<T> getRemoved() {
 			return Collections.unmodifiableSet(removed);
+		}
+		
+		public boolean hasMoved() {
+			return !added.isEmpty() || !removed.isEmpty();
 		}
 		
 		public Set<T> getMoved() {

@@ -42,7 +42,7 @@ public class FlagUtils {
 	 * Checks if the flag is set on the source value.
 	 * @param source The source value.
 	 * @param flag The flag which should be set.
-	 * @return `true` wether specified int flag is set, `false` otherwise.
+	 * @return `true` whether specified int flag is set, `false` otherwise.
 	 */
 	public static boolean has(int source, int flag) {
 		return (source & flag) == flag;
@@ -82,7 +82,7 @@ public class FlagUtils {
 	 * Checks if the flag is set on the source value.
 	 * @param source The source value.
 	 * @param flag The flag which should be set.
-	 * @return `true` wether specified int flag is set, `false` otherwise.
+	 * @return `true` whether specified int flag is set, `false` otherwise.
 	 */
 	public static boolean has(long source, long flag) {
 		return (source & flag) == flag;
