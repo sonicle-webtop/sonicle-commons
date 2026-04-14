@@ -32,10 +32,8 @@
  */
 package com.sonicle.commons.flags;
 
-import com.sonicle.commons.FlagUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import net.sf.qualitycheck.Check;
 
 /**

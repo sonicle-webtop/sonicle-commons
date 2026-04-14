@@ -74,26 +74,68 @@ public final class BitFlags<E extends Enum<E> & BitFlagsEnum<E>> extends BaseBit
 		return (BitFlags<E>)super.unset(flags);
 	}
 	
+	/**
+	 * Creates a deep copy of this BitFlags instance.
+	 * @return a new BitFlags instance with the same value
+	 */
 	public BitFlags<E> copy() {
 		return new BitFlags<>(this);
 	}
 	
+	/**
+	 * Creates a new BitFlags instance from another BitFlags-like object.
+	 * @param <E>
+	 * @param <T>
+	 * @param enumType the enum type
+	 * @param valueFrom the source instance
+	 * @return a new BitFlags instance
+	 */
 	public static <E extends Enum<E> & BitFlagsEnum<E>, T extends BaseBitFlags<E>> BitFlags<E> newFrom(final Class<E> enumType, BaseBitFlags<?> valueFrom) {
 		return new BitFlags<>(enumType, valueFrom.getValue());
 	}
 	
+	/**
+	 * Creates a new BitFlags instance from another raw bitmask value.
+	 * @param <E>
+	 * @param <T>
+	 * @param enumType the enum type
+	 * @param value the source raw bitmask value
+	 * @return a new BitFlags instance
+	 */
 	public static <E extends Enum<E> & BitFlagsEnum<E>, T extends BaseBitFlags<E>> BitFlags<E> newFrom(final Class<E> enumType, long value) {
 		return new BitFlags<>(enumType, value);
 	}
 	
+	/**
+	 * Creates a new BitFlags instance with all flags enabled.
+	 * @param <E>
+	 * @param <T>
+	 * @param enumType the enum type
+	 * @return a BitFlags instance with all flags set
+	 */
 	public static <E extends Enum<E> & BitFlagsEnum<E>, T extends BaseBitFlags<E>> BitFlags<E> allOf(final Class<E> enumType) {
 		return BitFlagsUtils.allOf(BitFlags.class, enumType);
 	}
 	
+	/**
+	 * Creates a new BitFlags instance with no flags enabled.
+	 * @param <E>
+	 * @param <T>
+	 * @param enumType enumType the enum type
+	 * @return a BitFlags instance with no flags set
+	 */
 	public static <E extends Enum<E> & BitFlagsEnum<E>, T extends BaseBitFlags<E>> BitFlags<E> noneOf(final Class<E> enumType) {
 		return BitFlagsUtils.noneOf(BitFlags.class, enumType);
 	}
 	
+	/**
+	 * Creates a new BitFlags instance with the specified flags enabled.
+	 * @param <E>
+	 * @param <T>
+	 * @param flag the first flag to set
+	 * @param moreFlags additional flags to set
+	 * @return a BitFlags instance with the specified flags
+	 */
 	public static <E extends Enum<E> & BitFlagsEnum<E>, T extends BaseBitFlags<E>> BitFlags<E> with(final E flag, final E... moreFlags) {
 		return BitFlagsUtils.with(BitFlags.class, flag, moreFlags);
 	}

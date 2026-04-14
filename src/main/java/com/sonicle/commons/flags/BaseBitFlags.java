@@ -79,14 +79,88 @@ public abstract class BaseBitFlags<E extends Enum<E> & BitFlagsEnum<E>> {
 		this(from.enumType, from.value);
 	}
 	
+	/**
+	 * Returns the underlying numeric value representing the current set of flags.
+	 * Each bit corresponds to a specific enum flag.
+	 * @return the raw bitmask value
+	 */
 	public final long getValue() {
 		return value;
 	}
 	
+	/**
+	 * Checks if NO flag is currently set.
+	 * @return true if at least a flag is set, false otherwise
+	 */
+	public final boolean isEmpty() {
+		return value == 0;
+	}
+	
+	/**
+	 * Checks whether the specified flag is currently set.
+	 * @param flag the flag to check
+	 * @return true if the flag is set, false otherwise
+	 */
 	public final boolean has(E flag) {
 		return FlagUtils.has(this.value, flag.mask());
 	}
 	
+	/**
+	 * Checks whether only the specified flag is set and no other flags are active.
+	 * @param flag the flag to check
+	 * @return true if this instance contains only the specified flag
+	 */
+	public final boolean hasOnly(E flag) {
+		return this.value == flag.mask();
+		//return has(flag) && this.value == flag.mask();
+	}
+	
+	/**
+	 * Checks whether only the specified flags are set.
+	 * @param flags the expected flags
+	 * @return true if exactly those flags are set and no others
+	 */
+	public final boolean hasOnly(E... flags) {
+		long expected = 0;
+		for (E f : flags) {
+			expected = FlagUtils.set(expected, f.mask());
+		}
+		return this.value == expected;
+	}
+	
+	/**
+	 * Checks whether at least one of the specified flags is set.
+	 * @param flags the flags to check
+	 * @return true if at least one flag is set, false otherwise
+	 */
+	public final boolean hasAny(E... flags) {
+		if (flags == null) return false;
+		
+		for (E flag : flags) {
+			if (has(flag)) return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks whether all the specified flags are set.
+	 * @param flags the flags to check
+	 * @return true if all flags are set, false otherwise
+	 */
+	public final boolean hasAll(E... flags) {
+		if (flags == null) return false;
+		
+		for (E flag : flags) {
+			if (!has(flag)) return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Sets all flags that are active in the provided BitFlags instance.
+	 * @param flags the flags to copy from
+	 * @return this instance for chaining
+	 */
 	public BaseBitFlags<E> set(BaseBitFlags<E> flags) {
 		for (E e : allAvailableFlags()) {
 			if (flags.has(e)) set(e);
@@ -94,35 +168,67 @@ public abstract class BaseBitFlags<E extends Enum<E> & BitFlagsEnum<E>> {
 		return this;
 	}
 	
+	/**
+	 * Sets the specified flag.
+	 * @param flag the flag to enable
+	 * @return this instance for chaining
+	 */
 	public BaseBitFlags<E> set(E flag) {
 		this.value = FlagUtils.set(this.value, flag.mask());
 		return this;
 	}
 	
+	/**
+	 * Enables all available flags.
+	 * @return this instance for chaining
+	 */
 	public BaseBitFlags<E> setAll() {
 		for (E e : allAvailableFlags()) set(e);
 		return this;
 	}
 	
+	/**
+	 * Sets multiple flags at once.
+	 * @param flags the flags to enable
+	 * @return this instance for chaining
+	 */
 	public BaseBitFlags<E> set(E... flags) {
 		for (E flag : flags) set(flag);
 		return this;
 	}
 	
+	/**
+	 * Unsets (clears) the specified flag.
+	 * @param flag flag the flag to disable
+	 * @return this instance for chaining
+	 */
 	public BaseBitFlags<E> unset(E flag) {
 		this.value = FlagUtils.unset(this.value, flag.mask());
 		return this;
 	}
 	
+	/**
+	 * Unsets (clears) multiple flags.
+	 * @param flags the flags to disable
+	 * @return this instance for chaining
+	 */
 	public BaseBitFlags<E> unset(E... flags) {
 		for (E flag : flags) unset(flag);
 		return this;
 	}
 	
+	/**
+	 * Returns all flags defined in the enum type.
+	 * @return list of all available flags
+	 */
 	public final List<E> allAvailableFlags() {
 		return EnumUtils.allTypesOf(enumType);
 	}
 	
+	/**
+	 * Returns the names of all available flags.
+	 * @return set of flag names
+	 */
 	public final Set<String> allAvailableFlagNames() {
 		return EnumUtils.allNamesOf(enumType);
 	}

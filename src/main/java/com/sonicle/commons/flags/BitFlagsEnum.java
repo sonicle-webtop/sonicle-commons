@@ -38,6 +38,11 @@ package com.sonicle.commons.flags;
  * @param <E>
  */
 public interface BitFlagsEnum<E extends Enum<E>> {
+	
+	/**
+	 * Returns the bit mask associated with this enum constant.
+	 * @return the bit mask value
+	 */
 	public long mask();
 	public String name();
 }
