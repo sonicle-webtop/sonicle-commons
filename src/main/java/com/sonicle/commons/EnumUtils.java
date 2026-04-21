@@ -173,6 +173,14 @@ public class EnumUtils {
 		return set;
 	}
 	
+	public static <E extends Enum<E>> boolean isOneOf(Enum<E> en, E... values) {
+		if (en == null) return false;
+		for (E value : values) {
+			if (en.equals(value)) return true;
+		}
+		return false;
+	}
+	
 	public static <E extends Enum> boolean contains(Collection<E> set, E value) {
 		for (E e : set) {
 			if (e.equals(value)) return true;
