@@ -195,6 +195,21 @@ public class EnumUtils {
 	
 	/**
 	 * Transforms a string name to enum value equivalent representation.
+	 * The source string is taken from passed Enum's name.
+	 * JSON library annotation will be used for getting the serializedName, so you
+	 * need to annotate the enum class properly before using this method.
+	 * @param <E> Enum type
+	 * @param <SE> The source Enum type
+	 * @param en The source Enum to use its name as source serializedName.
+	 * @param targetEnumClass The Enum class type
+	 * @return The matching enum if found, null otherwise
+	 */
+	public static <E extends Enum<E>, SE extends Enum> E forSerializedName(final SE en, final Class<E> targetEnumClass) {
+		return forSerializedName(getName(en), targetEnumClass);
+	}
+	
+	/**
+	 * Transforms a string name to enum value equivalent representation.
 	 * JSON library annotation will be used for getting the serializedName, so you
 	 * need to annotate the enum class properly before using this method.
 	 * 
@@ -206,11 +221,11 @@ public class EnumUtils {
 	 * 
 	 * @param <E> Enum type
 	 * @param serializedName The name as string
-	 * @param enumClass The enum class The Enum class type
+	 * @param targetEnumClass The Enum class type
 	 * @return The matching enum if found, null otherwise
 	 */
-	public static <E extends Enum<E>> E forSerializedName(final String serializedName, final Class<E> enumClass) {
-		return forSerializedName(serializedName, null, enumClass);
+	public static <E extends Enum<E>> E forSerializedName(final String serializedName, final Class<E> targetEnumClass) {
+		return forSerializedName(serializedName, null, targetEnumClass);
 	}
 	
 	/**
