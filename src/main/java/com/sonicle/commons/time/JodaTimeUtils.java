@@ -251,7 +251,7 @@ public class JodaTimeUtils {
 	
 	public static Days daysBetween(ReadableInstant instant1, ReadableInstant instant2) {
 		return (instant1 != null && instant2 != null) ? Days.daysBetween(instant1, instant2) : null; 
-	}
+	}	
 	
 	/**
 	 * Returns the difference in days not keeping into account the
@@ -262,7 +262,7 @@ public class JodaTimeUtils {
 	 * @return 
 	 */
 	public static int calendarDaysBetween(DateTime dateTime1, DateTime dateTime2) {
-		return calendarDaysBetween(dateTime1, dateTime2, false);
+		return calendarDaysBetween(dateTime1, dateTime2, false, true);
 	}
 	
 	/**
@@ -272,15 +272,20 @@ public class JodaTimeUtils {
 	 * @param dateTime1 The first dateTime
 	 * @param dateTime2 The second dateTime.
 	 * @param midnightAsDayBefore If 'true' and dt2 is at midnight, dt2 will be set at the day before.
+	 * @param absolute
 	 * @return 
 	 */
-	public static int calendarDaysBetween(final DateTime dateTime1, final DateTime dateTime2, final boolean midnightAsDayBefore) {
+	public static int calendarDaysBetween(final DateTime dateTime1, final DateTime dateTime2, final boolean midnightAsDayBefore, final boolean absolute) {
 		final LocalDate ld2 = (midnightAsDayBefore && JodaTimeUtils.isMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
-		return daysBetween(dateTime1.toLocalDate(), ld2, true);
+		return daysBetween(dateTime1.toLocalDate(), ld2, absolute);
 	}
 	
 	public static int calendarDaysBetween(final LocalDate date1, final LocalDate date2) {
 		return daysBetween(date1, date2, true);
+	}
+	
+	public static int calendarDaysDelta(DateTime dateTime1, DateTime dateTime2) {
+		return calendarDaysBetween(dateTime1, dateTime2, false, true);
 	}
 	
 	// ---------- Formatting

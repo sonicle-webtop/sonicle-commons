@@ -246,15 +246,41 @@ public class JavaTimeUtils {
 	}
 	
 	/**
-	 * Returns the difference in days not keeping into account the real amount of time passed between the two dates.
-	 * @param dateTime1 The first dateTime
-	 * @param dateTime2 The second dateTime.
-	 * @param midnightAsDayBefore If `true` and dateTime2 is at midnight, dateTime2 will be set at the day before.
-	 * @return 
+	 * Calculates the number of calendar days between two date-times,
+	 * ignoring the actual elapsed time (hours, minutes, seconds).
+	 * The result is always returned as an absolute value.
+	 * @param dateTime1 The first date-time.
+	 * @param dateTime2 The second date-time.
+	 * @return the absolute difference in calendar days
 	 */
-	public static int calendarDaysBetween(final ZonedDateTime dateTime1, final ZonedDateTime dateTime2, final boolean midnightAsDayBefore) {
+	public static int calendarDaysBetween(final ZonedDateTime dateTime1, final ZonedDateTime dateTime2) {
+		return calendarDaysBetween(dateTime1, dateTime2, false, true);
+	}
+	
+	/**
+	 * Calculates the number of calendar days between two date-times,
+	 * ignoring the actual elapsed time (hours, minutes, seconds).
+	 * @param dateTime1 The first date-time.
+	 * @param dateTime2 The second date-time.
+	 * @param midnightAsDayBefore If `true` and dateTime2 is exactly at midnight, it is considered as belonging to the previous day.
+	 * @param absolute if `true` returns the absolute difference; otherwise the result can be negative depending on the temporal order.
+	 * @return the difference in calendar days
+	 */
+	public static int calendarDaysBetween(final ZonedDateTime dateTime1, final ZonedDateTime dateTime2, final boolean midnightAsDayBefore, final boolean absolute) {
 		final LocalDate date2 = (midnightAsDayBefore && isAtMidnight(dateTime2)) ? dateTime2.minusDays(1).toLocalDate() : dateTime2.toLocalDate();
-		return daysBetween(dateTime1.toLocalDate(), date2, true);
+		return daysBetween(dateTime1.toLocalDate(), date2, absolute);
+	}
+	
+	/**
+	 * Calculates the signed difference in calendar days between two date-times,
+	 * ignoring the actual elapsed time (hours, minutes, seconds).
+	 * The result can be positive or negative depending on the temporal order of the inputs.
+	 * @param dateTime1 The first date-time.
+	 * @param dateTime2 The second date-time.
+	 * @return the signed difference in calendar days
+	 */
+	public static int calendarDaysDelta(final ZonedDateTime dateTime1, final ZonedDateTime dateTime2) {
+		return calendarDaysBetween(dateTime1, dateTime2, false, true);
 	}
 	
 	// ---------- Formatting

@@ -255,7 +255,7 @@ public class DateTimeUtils {
 	 * @deprecated Moved! Use JodaTimeUtils.calendarDaysBetween
 	 */
 	@Deprecated public static int datesBetween(DateTime dt1, DateTime dt2, boolean midnightAsDayBefore) {
-		return JodaTimeUtils.calendarDaysBetween(dt1, dt2, midnightAsDayBefore);
+		return JodaTimeUtils.calendarDaysBetween(dt1, dt2, midnightAsDayBefore, true);
 	}
 	
 	/**
