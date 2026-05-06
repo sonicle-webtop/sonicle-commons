@@ -32,7 +32,7 @@
  */
 package com.sonicle.commons.beans;
 
-import net.sf.qualitycheck.Check;
+import com.sonicle.commons.Check;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

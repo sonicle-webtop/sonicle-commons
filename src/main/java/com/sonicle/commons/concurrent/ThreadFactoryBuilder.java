@@ -32,10 +32,10 @@
  */
 package com.sonicle.commons.concurrent;
 
+import com.sonicle.commons.Check;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
-import net.sf.qualitycheck.Check;
 
 /**
  *

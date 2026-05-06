@@ -32,6 +32,7 @@
  */
 package com.sonicle.commons.concurrent;
 
+import com.sonicle.commons.Check;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Delayed;
@@ -39,7 +40,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import net.sf.qualitycheck.Check;
 
 /**
  *

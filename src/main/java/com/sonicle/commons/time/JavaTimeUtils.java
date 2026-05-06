@@ -32,6 +32,7 @@
  */
 package com.sonicle.commons.time;
 
+import com.sonicle.commons.Check;
 import java.text.DateFormatSymbols;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -48,7 +49,6 @@ import java.time.temporal.TemporalAccessor;
 import java.time.zone.ZoneOffsetTransition;
 import java.time.zone.ZoneRules;
 import java.util.Locale;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 
 /**

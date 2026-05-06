@@ -32,7 +32,7 @@
  */
 package com.sonicle.commons.time;
 
-import net.sf.qualitycheck.Check;
+import com.sonicle.commons.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

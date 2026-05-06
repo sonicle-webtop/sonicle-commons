@@ -32,9 +32,9 @@
  */
 package com.sonicle.commons.flags;
 
+import com.sonicle.commons.Check;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import net.sf.qualitycheck.Check;
 
 /**
  *

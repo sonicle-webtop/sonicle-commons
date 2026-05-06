@@ -33,12 +33,12 @@
 package com.sonicle.commons.beans;
 
 import com.google.gson.annotations.SerializedName;
+import com.sonicle.commons.Check;
 import com.sonicle.commons.EnumUtils;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

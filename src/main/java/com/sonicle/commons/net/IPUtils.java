@@ -32,6 +32,7 @@
  */
 package com.sonicle.commons.net;
 
+import com.sonicle.commons.Check;
 import com.sonicle.commons.RegexUtils;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
@@ -40,7 +41,6 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
-import net.sf.qualitycheck.Check;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.slf4j.Logger;
