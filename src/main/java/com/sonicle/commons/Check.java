@@ -66,10 +66,9 @@ public final class Check {
 	// =========================================================================
 	// notNull
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given reference is not null.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNull(T reference)}
 	 *
 	 * @param <T> the type of the reference
@@ -84,8 +83,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given reference is not null.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNull(T reference, String name)}
 	 *
 	 * @param <T> the type of the reference
@@ -106,10 +103,9 @@ public final class Check {
 	// =========================================================================
 	// notEmpty — CharSequence
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given {@link CharSequence} is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T chars)}
 	 *
 	 * @param <T> a type extending {@link CharSequence}
@@ -125,8 +121,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@link CharSequence} is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T chars, String name)}
 	 *
 	 * @param <T> a type extending {@link CharSequence}
@@ -149,10 +143,9 @@ public final class Check {
 	// =========================================================================
 	// notEmpty — Collection
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given {@link Collection} is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T collection)}
 	 *
 	 * @param <T> a type extending {@link Collection}
@@ -168,8 +161,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@link Collection} is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T collection, String name)}
 	 *
 	 * @param <T> a type extending {@link Collection}
@@ -192,10 +183,9 @@ public final class Check {
 	// =========================================================================
 	// notEmpty — Map
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given {@link Map} is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T map)}
 	 *
 	 * @param <T> a type extending {@link Map}
@@ -211,8 +201,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@link Map} is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T map, String name)}
 	 *
 	 * @param <T> a type extending {@link Map}
@@ -235,10 +223,9 @@ public final class Check {
 	// =========================================================================
 	// notEmpty — Array
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given array is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T[] array)}
 	 *
 	 * @param <T> the component type of the array
@@ -254,8 +241,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given array is neither null nor empty.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notEmpty(T[] array, String name)}
 	 *
 	 * @param <T> the component type of the array
@@ -274,15 +259,328 @@ public final class Check {
 		}
 		return array;
 	}
+	
+	// =========================================================================
+	// equals — primitives and Object/Comparable
+	// =========================================================================
+	
+	/**
+	 * Ensures that the {@code boolean} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(boolean expected, boolean check)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static boolean equals(final boolean expected, final boolean check) {
+		return equals(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@code boolean} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors:
+	 * {@code Check.equals(boolean expected, boolean check, String message)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static boolean equals(final boolean expected, final boolean check, @Nullable final String message) {
+		if (expected != check) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
+
+	/**
+	 * Ensures that the {@code byte} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(byte expected, byte check)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static byte equals(final byte expected, final byte check) {
+		return equals(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@code byte} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(byte expected, byte check, String message)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static byte equals(final byte expected, final byte check, @Nullable final String message) {
+		if (expected != check) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
+
+	/**
+	 * Ensures that the {@code char} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(char expected, char check)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static char equals(final char expected, final char check) {
+		return equals(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@code char} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(char expected, char check, String message)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static char equals(final char expected, final char check, @Nullable final String message) {
+		if (expected != check) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
+
+	/**
+	 * Ensures that the {@code int} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(int expected, int check)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static int equals(final int expected, final int check) {
+		return equals(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@code int} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(int expected, int check, String message)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static int equals(final int expected, final int check, @Nullable final String message) {
+		if (expected != check) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
+
+	/**
+	 * Ensures that the {@code long} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(long expected, long check)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static long equals(final long expected, final long check) {
+		return equals(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@code long} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(long expected, long check, String message)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static long equals(final long expected, final long check, @Nullable final String message) {
+		if (expected != check) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
+
+	/**
+	 * Ensures that the {@code short} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors: {@code Check.equals(short expected, short check)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static short equals(final short expected, final short check) {
+		return equals(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@code short} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected != check}.
+	 * Mirrors:
+	 * {@code Check.equals(short expected, short check, String message)}
+	 *
+	 * @param expected the expected value
+	 * @param check the value to validate
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNotEqualException if {@code check != expected}
+	 */
+	public static short equals(final short expected, final short check, @Nullable final String message) {
+		if (expected != check) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
+
+	/**
+	 * Ensures that the {@link Comparable} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected.compareTo(check) != 0}, mirroring the
+	 * original QualityCheck semantics. Use this overload for types like
+	 * {@link java.math.BigDecimal} where {@code equals} and {@code compareTo}
+	 * may disagree.
+	 * Mirrors: {@code Check.equals(T expected, T check)} for {@code Comparable}
+	 *
+	 * @param <T> a {@link Comparable} type
+	 * @param expected the expected value; must not be null
+	 * @param check the value to validate; must not be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNullArgumentException if either argument is null
+	 * @throws IllegalNotEqualException if
+	 * {@code expected.compareTo(check) != 0}
+	 */
+	@Nonnull
+	public static <T extends Comparable<T>> T equals(@Nonnull final T expected, @Nonnull final T check) {
+		return equals(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@link Comparable} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected.compareTo(check) != 0}, mirroring the
+	 * original QualityCheck semantics. Use this overload for types like
+	 * {@link java.math.BigDecimal} where {@code equals} and {@code compareTo}
+	 * may disagree.
+	 * Mirrors: {@code Check.equals(T expected, T check, String message)} for
+	 * {@code Comparable}
+	 *
+	 * @param <T> a {@link Comparable} type
+	 * @param expected the expected value; must not be null
+	 * @param check the value to validate; must not be null
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNullArgumentException if either argument is null
+	 * @throws IllegalNotEqualException if
+	 * {@code expected.compareTo(check) != 0}
+	 */
+	@Nonnull
+	public static <T extends Comparable<T>> T equals(@Nonnull final T expected, @Nonnull final T check, @Nullable final String message) {
+		notNull(expected, "expected");
+		notNull(check, "check");
+		if (expected.compareTo(check) != 0) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
+
+	/**
+	 * Ensures that the {@link Object} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected.equals(check)}, mirroring the
+	 * original QualityCheck semantics.
+	 * Mirrors: {@code Check.equals(T expected, T check)} for {@code Object}
+	 *
+	 * @param <T> the type of the objects being compared
+	 * @param expected the expected value; must not be null
+	 * @param check the value to validate; must not be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNullArgumentException if either argument is null
+	 * @throws IllegalNotEqualException if {@code !expected.equals(check)}
+	 */
+	@Nonnull
+	public static <T> T equalsObject(@Nonnull final T expected, @Nonnull final T check) {
+		return equalsObject(expected, check, null);
+	}
+
+	/**
+	 * Ensures that the {@link Object} value {@code check} is equal to
+	 * {@code expected}.
+	 * The comparison uses {@code expected.equals(check)}, mirroring the
+	 * original QualityCheck semantics.
+	 * Mirrors: {@code Check.equals(T expected, T check, String message)} for
+	 * {@code Object}
+	 *
+	 * @param <T> the type of the objects being compared
+	 * @param expected the expected value; must not be null
+	 * @param check the value to validate; must not be null
+	 * @param message descriptive message passed to the exception if the check
+	 * fails; may be null
+	 * @return {@code check} if it is equal to {@code expected}
+	 * @throws IllegalNullArgumentException if either argument is null
+	 * @throws IllegalNotEqualException if {@code !expected.equals(check)}
+	 */
+	@Nonnull
+	public static <T> T equalsObject(@Nonnull final T expected, @Nonnull final T check, @Nullable final String message) {
+		notNull(expected, "expected");
+		notNull(check, "check");
+		if (!expected.equals(check)) {
+			throw new IllegalNotEqualException(expected, check, message);
+		}
+		return check;
+	}
 
 	// =========================================================================
 	// noNullElements — Iterable
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given iterable is not null and contains no null
 	 * elements.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.noNullElements(T iterable)}
 	 *
 	 * @param <T> a type extending {@link Iterable}
@@ -299,8 +597,6 @@ public final class Check {
 	/**
 	 * Ensures that the given iterable is not null and contains no null
 	 * elements.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.noNullElements(T iterable, String name)}
 	 *
 	 * @param <T> a type extending {@link Iterable}
@@ -327,8 +623,6 @@ public final class Check {
 	// =========================================================================
 	/**
 	 * Ensures that the given array is not null and contains no null elements.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.noNullElements(T[] array)}
 	 *
 	 * @param <T> the component type of the array
@@ -344,8 +638,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given array is not null and contains no null elements.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.noNullElements(T[] array, String name)}
 	 *
 	 * @param <T> the component type of the array
@@ -370,14 +662,11 @@ public final class Check {
 	// =========================================================================
 	// greaterThan — Comparable
 	// =========================================================================
+	
 	/**
 	 * Ensures that {@code check} is strictly greater than {@code expected}.
-	 *
-	 * <p>
 	 * The comparison uses {@code expected.compareTo(check) >= 0}, mirroring the
 	 * original QualityCheck semantics exactly.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.greaterThan(T expected, T check)}
 	 *
 	 * @param <T> a {@link Comparable} type
@@ -395,12 +684,8 @@ public final class Check {
 
 	/**
 	 * Ensures that {@code check} is strictly greater than {@code expected}.
-	 *
-	 * <p>
 	 * The comparison uses {@code expected.compareTo(check) >= 0}, mirroring the
 	 * original QualityCheck semantics exactly.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.greaterThan(T expected, T check, String message)}
 	 *
 	 * @param <T> a {@link Comparable} type
@@ -426,6 +711,7 @@ public final class Check {
 	// =========================================================================
 	// greaterThan — primitives (int, long, double, float, short, byte)
 	// =========================================================================
+	
 	/**
 	 * Ensures that the {@code int} value {@code check} is strictly greater than
 	 * {@code expected}.
@@ -697,12 +983,8 @@ public final class Check {
 
 	/**
 	 * Ensures that {@code check} is strictly less than {@code expected}.
-	 *
-	 * <p>
 	 * The comparison uses {@code expected.compareTo(check) <= 0}, mirroring the
 	 * original QualityCheck semantics exactly.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.lesserThan(T expected, T check, String message)}
 	 *
 	 * @param <T> a {@link Comparable} type
@@ -917,10 +1199,9 @@ public final class Check {
 	// =========================================================================
 	// notNegative — guards value >= 0
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given {@code int} value is not negative (i.e., >= 0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(int value)}
 	 *
 	 * @param value the value to validate
@@ -933,8 +1214,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@code int} value is not negative (i.e., >= 0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(int value, String name)}
 	 *
 	 * @param value the value to validate
@@ -952,8 +1231,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@code long} value is not negative (i.e., >= 0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(long value)}
 	 *
 	 * @param value the value to validate
@@ -966,8 +1243,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@code long} value is not negative (i.e., >= 0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(long value, String name)}
 	 *
 	 * @param value the value to validate
@@ -986,8 +1261,6 @@ public final class Check {
 	/**
 	 * Ensures that the given {@code double} value is not negative (i.e., >=
 	 * 0.0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(double value)}
 	 *
 	 * @param value the value to validate
@@ -1001,8 +1274,6 @@ public final class Check {
 	/**
 	 * Ensures that the given {@code double} value is not negative (i.e., >=
 	 * 0.0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(double value, String name)}
 	 *
 	 * @param value the value to validate
@@ -1021,8 +1292,6 @@ public final class Check {
 	/**
 	 * Ensures that the given {@code float} value is not negative (i.e., >=
 	 * 0.0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(float value)}
 	 *
 	 * @param value the value to validate
@@ -1036,8 +1305,6 @@ public final class Check {
 	/**
 	 * Ensures that the given {@code float} value is not negative (i.e., >=
 	 * 0.0).
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNegative(float value, String name)}
 	 *
 	 * @param value the value to validate
@@ -1056,10 +1323,9 @@ public final class Check {
 	// =========================================================================
 	// notNaN — guards against Double.NaN / Float.NaN
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given {@code double} value is not NaN.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNaN(double value)}
 	 *
 	 * @param value the value to validate
@@ -1073,8 +1339,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@code double} value is not NaN.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNaN(double value, String name)}
 	 *
 	 * @param value the value to validate
@@ -1093,8 +1357,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@code float} value is not NaN.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNaN(float value)}
 	 *
 	 * @param value the value to validate
@@ -1107,8 +1369,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given {@code float} value is not NaN.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.notNaN(float value, String name)}
 	 *
 	 * @param value the value to validate
@@ -1127,10 +1387,9 @@ public final class Check {
 	// =========================================================================
 	// stateIsTrue — arbitrary boolean condition
 	// =========================================================================
+	
 	/**
 	 * Ensures that the given boolean expression is {@code true}.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.stateIsTrue(boolean expression)}
 	 *
 	 * @param expression the condition that must be true to indicate a valid
@@ -1143,8 +1402,6 @@ public final class Check {
 
 	/**
 	 * Ensures that the given boolean expression is {@code true}.
-	 *
-	 * <p>
 	 * Mirrors:
 	 * {@code Check.stateIsTrue(boolean expression, String description)}
 	 *
@@ -1163,12 +1420,8 @@ public final class Check {
 	/**
 	 * Ensures that the given boolean expression is {@code true}, using a
 	 * formatted message.
-	 *
-	 * <p>
 	 * The message is built via {@link String#format(String, Object...)} and is
 	 * only evaluated when the check actually fails.
-	 *
-	 * <p>
 	 * Mirrors:
 	 * {@code Check.stateIsTrue(boolean expression, String template, Object... args)}
 	 *
@@ -1191,8 +1444,6 @@ public final class Check {
 	/**
 	 * Ensures that the given {@link CharSequence} fully matches the given regex
 	 * {@link Pattern}.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.matchesPattern(Pattern pattern, T chars)}
 	 *
 	 * @param <T> a type extending {@link CharSequence}
@@ -1211,8 +1462,6 @@ public final class Check {
 	/**
 	 * Ensures that the given {@link CharSequence} fully matches the given regex
 	 * {@link Pattern}.
-	 *
-	 * <p>
 	 * Mirrors:
 	 * {@code Check.matchesPattern(Pattern pattern, T chars, String name)}
 	 *
@@ -1238,11 +1487,10 @@ public final class Check {
 	// =========================================================================
 	// positionIndex
 	// =========================================================================
+	
 	/**
 	 * Ensures that {@code index} is a valid position index within a sequence of
 	 * length {@code size}, i.e., {@code 0 <= index <= size}.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.positionIndex(int index, int size)}
 	 *
 	 * @param index the index to validate
@@ -1261,6 +1509,7 @@ public final class Check {
 	// =========================================================================
 	// range
 	// =========================================================================
+	
 	/**
 	 * Ensures that {@code (start, end, size)} form a valid range.
 	 *
@@ -1292,15 +1541,12 @@ public final class Check {
 	// =========================================================================
 	// contains
 	// =========================================================================
+	
 	/**
 	 * Ensures that {@code needle} is contained in {@code haystack}.
-	 *
-	 * <p>
 	 * The check is implemented via {@link Collection#contains(Object)}.
 	 * Particularly useful to verify that an enum value belongs to an
 	 * {@code EnumSet}.
-	 *
-	 * <p>
 	 * Mirrors: {@code Check.contains(Collection haystack, T needle)}
 	 *
 	 * @param <T> the element type
@@ -1319,13 +1565,9 @@ public final class Check {
 
 	/**
 	 * Ensures that {@code needle} is contained in {@code haystack}.
-	 *
-	 * <p>
 	 * The check is implemented via {@link Collection#contains(Object)}.
 	 * Particularly useful to verify that an enum value belongs to an
 	 * {@code EnumSet}.
-	 *
-	 * <p>
 	 * Mirrors:
 	 * {@code Check.contains(Collection haystack, T needle, String name)}
 	 *
@@ -1398,6 +1640,18 @@ public final class Check {
 			super(name != null
 				? "The argument '" + name + "' must not contain null elements."
 				: "An argument must not contain null elements.");
+		}
+	}
+
+	/**
+	 * Thrown when a value is not equal to the expected value.
+	 */
+	public static final class IllegalNotEqualException extends BaseIllegalArgumentException {
+
+		public IllegalNotEqualException(final Object expected, final Object check, @Nullable final String message) {
+			super(message != null
+				? message
+				: "The value '" + check + "' must be equal to '" + expected + "'.");
 		}
 	}
 
