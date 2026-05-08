@@ -280,7 +280,7 @@ public class JavaTimeUtils {
 	 * @return the signed difference in calendar days
 	 */
 	public static int calendarDaysDelta(final ZonedDateTime dateTime1, final ZonedDateTime dateTime2) {
-		return calendarDaysBetween(dateTime1, dateTime2, false, true);
+		return calendarDaysBetween(dateTime1, dateTime2, false, false);
 	}
 	
 	// ---------- Formatting
