@@ -39,6 +39,7 @@ package com.sonicle.commons.l4j;
 public abstract class AbstractProduct {
 	
 	public static final String LQT_USERS = "users";
+	public static final String LQT_ACCOUNTS = "accounts";
 	
 	private final String hardwareId;
 	

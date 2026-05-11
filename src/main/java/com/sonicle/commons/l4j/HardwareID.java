@@ -34,7 +34,9 @@ package com.sonicle.commons.l4j;
 
 import com.license4j.util.Hex;
 import com.sonicle.commons.OS;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -46,7 +48,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +119,9 @@ public class HardwareID {
 		final ArrayList<Comparable> list = new ArrayList<>();
 		if (LOGGER.isDebugEnabled()) LOGGER.debug("Enumerating interfaces...");
 		final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+		// Compute once per invocation for macOS; null = couldn't determine
+		final Set<String> macOSPhysical = OS.isMac() ? loadMacOSPhysicalDevices() : null;
+		
 		while (networkInterfaces.hasMoreElements()) {
 			if (limit != -1 && list.size() >= limit) break;
 			final NetworkInterface networkInterface = networkInterfaces.nextElement();
@@ -122,6 +130,9 @@ public class HardwareID {
 				if (OS.isLinux()) {
 					final Boolean virtual = isLinuxVirtualInterface(networkInterface.getName());
 					if (virtual != null && virtual == true) continue;
+				} else if (OS.isMac()) {
+					final Boolean virtual = isMacOSVirtualInterface(networkInterface.getName(), macOSPhysical);
+					if (virtual != null && virtual) continue;
 				}
 				if (LOGGER.isDebugEnabled()) LOGGER.debug("Using '{}' from interface '{}'", networkInterface.getHardwareAddress(), networkInterface.getName());
 				list.add(Hex.encodeHexString(networkInterface.getHardwareAddress()));
@@ -151,4 +162,45 @@ public class HardwareID {
 		}
 		return null;
 	}
+	
+	private static Boolean isMacOSVirtualInterface(final String name, final Set<String> physicalDevices) {
+		if (physicalDevices == null) return null; // could not determine
+		return !physicalDevices.contains(name);
+	}
+
+	private static Set<String> loadMacOSPhysicalDevices() {
+		final Set<String> devices = new HashSet<>();
+		try {
+			final Process process = new ProcessBuilder("/usr/sbin/networksetup", "-listallhardwareports")
+					.redirectErrorStream(true)
+					.start();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					// Lines look like: "Device: en0"
+					if (line.startsWith("Device: ")) {
+						devices.add(line.substring("Device: ".length()).trim());
+					}
+				}
+			}
+			if (!process.waitFor(5, TimeUnit.SECONDS)) {
+				process.destroyForcibly();
+				LOGGER.error("Timeout waiting for networksetup to complete");
+				return null;
+			}
+			if (process.exitValue() != 0) {
+				LOGGER.error("networksetup exited with code {}", process.exitValue());
+				return null;
+			}
+			if (LOGGER.isDebugEnabled()) LOGGER.debug("macOS physical devices: {}", devices);
+			return devices;
+		} catch (IOException ex) {
+			LOGGER.error("Unable to enumerate macOS physical network devices", ex);
+			return null;
+		} catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			LOGGER.error("Interrupted while enumerating macOS physical network devices", ex);
+			return null;
+		}
+	}	
 }
