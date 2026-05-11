@@ -285,7 +285,7 @@ public class JodaTimeUtils {
 	}
 	
 	public static int calendarDaysDelta(DateTime dateTime1, DateTime dateTime2) {
-		return calendarDaysBetween(dateTime1, dateTime2, false, true);
+		return calendarDaysBetween(dateTime1, dateTime2, false, false);
 	}
 	
 	// ---------- Formatting
