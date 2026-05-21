@@ -1387,7 +1387,31 @@ public class LangUtils {
 		}
 	}
 	
-	public static <T>ChangeSet computeChangeSet(Collection<T> fromCollection, Collection<T> toCollection) {
+	/**
+	 * Computes the difference between two collections.
+	 * <p>
+	 * The returned change set contains:
+	 * </p>
+	 * <ul>
+	 *   <li>items that are present in {@code toCollection} but not in
+	 * {@code fromCollection};</li>
+	 *   <li>items that are present in both collections;</li>
+	 *   <li>items that are present in {@code fromCollection} but not in
+	 * {@code toCollection}.</li>
+	 * </ul>
+	 *
+	 * <p>
+	 * Equality is evaluated using the {@code equals} and {@code hashCode}
+	 * implementations of the collection items (see IdentityEquality).
+	 * </p>
+	 *
+	 * @param fromCollection the original collection
+	 * @param toCollection the target collection
+	 * @param <T> the item type
+	 * @return a {@link ChangeSet} describing added, updated and removed items,
+	 * or {@code null} if either collection is {@code null}
+	 */
+	public static <T>ChangeSet computeChangeSet(final Collection<T> fromCollection, final Collection<T> toCollection) {
 		if (fromCollection == null || toCollection == null) return null;
 		Set<T> added = new LinkedHashSet<>(toCollection);
 		added.removeAll(fromCollection);
@@ -1398,12 +1422,35 @@ public class LangUtils {
 		return new ChangeSet<>(added, updated, removed);
 	}
 	
+	/**
+	 * Represents the result of a collection difference computation.
+	 * <p>
+	 * The change set contains three groups of items:
+	 * </p>
+	 * <ul>
+	 *	 <li>{@code added}: items existing only in the target collection;</li>
+	 *   <li>{@code updated}: items existing in both source and target
+	 * collections;</li>
+	 *   <li>{@code removed}: items existing only in the source collection.</li>
+	 * </ul>
+	 *
+	 * <p>
+	 * Items are classified according to their {@code equals} and
+	 * {@code hashCode} implementations (see IdentityEquality).
+	 * </p>
+	 * 
+	 * <strong>Important:</strong> this class assumes stable equality semantics.
+	 * Items whose {@code equals} or {@code hashCode} values change while they are
+	 * part of a hash-based collection may produce incorrect results.
+	 * 
+	 * @param <T> the item type
+	 */
 	public static class ChangeSet<T> {
 		private final Set<T> added;
 		private final Set<T> updated;
 		private final Set<T> removed;
 		
-		public ChangeSet(Set<T> added, Set<T> updated, Set<T> removed) {
+		public ChangeSet(final Set<T> added, final Set<T> updated, final Set<T> removed) {
 			this.added = (added == null) ? new LinkedHashSet<>(0): added;
 			this.updated = (updated == null) ? new LinkedHashSet<>(0): updated;
 			this.removed = (removed == null) ? new LinkedHashSet<>(0): removed;
