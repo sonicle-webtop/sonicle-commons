@@ -32,9 +32,8 @@
  */
 package com.sonicle.commons.beans;
 
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  *
@@ -88,20 +87,16 @@ public class VirtualAddress {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(local)
-			.append(domain)
-			.toHashCode();
+		return Objects.hash(local, domain);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof VirtualAddress == false) return false;
-		if(this == obj) return true;
-		final VirtualAddress otherObject = (VirtualAddress) obj;
-		return new EqualsBuilder()
-			.append(local, otherObject.local)
-			.append(domain, otherObject.domain)
-			.isEquals();
+		if (this == obj) return true;
+		if (!(obj instanceof VirtualAddress)) return false; // Allow subclass equality
+		
+		final VirtualAddress otherObject = (VirtualAddress)obj;
+		return Objects.equals(local, otherObject.local)
+			&& Objects.equals(domain, otherObject.domain);
 	}
 }
