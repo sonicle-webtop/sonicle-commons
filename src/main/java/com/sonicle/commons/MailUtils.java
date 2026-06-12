@@ -911,16 +911,22 @@ public class MailUtils {
   }
 
   
-	public synchronized static String peekText(IMAPMessage m) throws MessagingException, IOException {
-		m.setPeek(true);
-		String s;
-		try{
-			s=getText(m);
-		} catch(Exception e) {
-			s="";
+	//Synchronized on the message, NOT on the class: the only thing needing protection is the
+	//setPeek(true)->getText->setPeek(false) sequence on the SAME message (a concurrent preview
+	//interleaving could issue a non-PEEK body fetch and mark the message \Seen). A class-level
+	//lock would needlessly serialize previews of different messages across the whole JVM,
+	//one body download at a time.
+	public static String peekText(IMAPMessage m) throws MessagingException, IOException {
+		synchronized(m) {
+			m.setPeek(true);
+			try {
+				return getText(m);
+			} catch(Exception e) {
+				return "";
+			} finally {
+				m.setPeek(false);
+			}
 		}
-		m.setPeek(false);
-		return s;
 	}
 
 	/**
