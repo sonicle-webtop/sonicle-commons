@@ -38,10 +38,9 @@ import com.sonicle.commons.EnumUtils;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * This class is used as an argument for functions that sort a data set.
@@ -72,19 +71,16 @@ public class SortInfo {
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(getField())
-			.toHashCode();
+		return Objects.hash(field);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof SortInfo == false) return false;
 		if (this == obj) return true;
+		if (!(obj instanceof SortInfo)) return false; // Allow subclass equality
+		
 		final SortInfo otherObject = (SortInfo)obj;
-		return new EqualsBuilder()
-			.append(getField(), otherObject.getField())
-			.isEquals();
+		return Objects.equals(field, otherObject.field);
 	}
 	
 	public static SortInfo asc(final String field) {

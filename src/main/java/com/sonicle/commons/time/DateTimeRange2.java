@@ -32,8 +32,7 @@
  */
 package com.sonicle.commons.time;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -75,21 +74,20 @@ public class DateTimeRange2 {
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(JodaTimeUtils.print(FMT, start, NULL))
-			.append(JodaTimeUtils.print(FMT, end, NULL))
-			.toHashCode();
+		return Objects.hash(
+			JodaTimeUtils.print(FMT, start, NULL),
+			JodaTimeUtils.print(FMT, end, NULL)
+		);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof DateTimeRange2 == false) return false;
 		if (this == obj) return true;
+		if (!(obj instanceof DateTimeRange2)) return false; // Allow subclass equality
+		
 		final DateTimeRange2 otherObject = (DateTimeRange2)obj;
-		return new EqualsBuilder()
-			.append(JodaTimeUtils.print(FMT, start, NULL), JodaTimeUtils.print(FMT, otherObject.start, NULL))
-			.append(JodaTimeUtils.print(FMT, end, NULL), JodaTimeUtils.print(FMT, otherObject.end, NULL))
-			.isEquals();
+		return Objects.equals(JodaTimeUtils.print(FMT, start, NULL), JodaTimeUtils.print(FMT, otherObject.start, NULL))
+			&& Objects.equals(JodaTimeUtils.print(FMT, end, NULL), JodaTimeUtils.print(FMT, otherObject.end, NULL));
 	}
 
 	@Override

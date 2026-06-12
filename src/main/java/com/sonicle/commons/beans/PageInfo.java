@@ -33,8 +33,7 @@
 package com.sonicle.commons.beans;
 
 import com.sonicle.commons.Check;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  *
@@ -65,20 +64,16 @@ public class PageInfo {
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(getPageNumber())
-			.append(getPageSize())
-			.toHashCode();
+		return Objects.hash(getPageNumber(), getPageSize());
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof PageInfo == false) return false;
 		if (this == obj) return true;
+		if (!(obj instanceof PageInfo)) return false; // Allow subclass equality
+		
 		final PageInfo otherObject = (PageInfo)obj;
-		return new EqualsBuilder()
-			.append(getPageNumber(), otherObject.getPageNumber())
-			.append(getPageSize(), otherObject.getPageSize())
-			.isEquals();
+		return getPageNumber() == otherObject.getPageNumber()
+			&& getPageSize() == otherObject.getPageSize();
 	}
 }
