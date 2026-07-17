@@ -65,6 +65,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.codec.DecoderException;
@@ -73,6 +75,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.owasp.encoder.Encode;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -340,6 +345,54 @@ public class LangUtils {
 	public static String encodeForHTMLAttribute(final String str) {
 		if (StringUtils.isBlank(str)) return str;
 		return Encode.forHtmlAttribute(str);
+	}
+	
+	// Allowlist: only safe structural/formatting tags, no styles/scripts/iframes.
+	// Sanitizers.FORMATTING covers b/i/u/strong/em/br/etc.
+	// Sanitizers.LINKS covers <a href> but strips javascript:/data: schemes
+	// and forces safe rel attributes on external links.
+	private static final PolicyFactory HTML_POLICY = Sanitizers.FORMATTING
+		.and(Sanitizers.LINKS)
+		.and(Sanitizers.BLOCKS) // p, div, ul, ol, li, blockquote
+		.and(new HtmlPolicyBuilder()
+			.requireRelNofollowOnLinks()
+			.toFactory());
+	
+	public static String sanitizeHtml(final String rawHtml) {
+		return sanitizeHtml(rawHtml, HTML_POLICY);
+	}
+	
+	public static String sanitizeHtml(final String rawHtml, final PolicyFactory policy) {
+		if (StringUtils.isBlank(rawHtml)) return rawHtml;
+		Check.notNull(policy, "policy");
+		return HTML_POLICY.sanitize(rawHtml);
+	}
+	
+	private static final Pattern URL_PATTERN = Pattern.compile("(https?://[^\\s<]+)");
+	
+	/**
+	 * Turns bare URLs into anchor tags. Runs after HTML encoding, so the
+	 * matched text is already encoded plain text - safe to wrap in <a>.
+	 * The URL itself is re-encoded with forHtmlAttribute for the href value,
+	 * since attribute context has different encoding rules than text content
+	 * (e.g. quotes must be neutralized to prevent breaking out of href="").
+	 * @param encodedText
+	 * @return 
+	 */
+	public static String linkifyText(final String encodedText) {
+		Matcher matcher = URL_PATTERN.matcher(encodedText);
+		StringBuilder result = new StringBuilder();
+		int lastEnd = 0;
+		while (matcher.find()) {
+			result.append(encodedText, lastEnd, matcher.start());
+			String url = matcher.group(1);
+			result.append("<a href=\"").append(Encode.forHtmlAttribute(url))
+					.append("\" target=\"_blank\" rel=\"noopener noreferrer\">")
+					.append(url).append("</a>");
+			lastEnd = matcher.end();
+		}
+		result.append(encodedText.substring(lastEnd));
+		return result.toString();
 	}
 	
 	/**

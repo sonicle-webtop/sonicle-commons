@@ -33,6 +33,7 @@
 package com.sonicle.commons.time;
 
 import com.sonicle.commons.Check;
+import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -385,6 +386,33 @@ public class JodaTimeUtils {
 	 */
 	public static DateTimeFormatter createFormatterHM(final DateTimeZone tz) {
 		return createFormatter(HHMM_PATTERN, tz);
+	}
+	
+	/**
+	 * Formats a time interval between two {@link DateTime} instances into a human-readable string,
+	 * delegating to ICU's {@link com.ibm.icu.text.DateIntervalFormat}.
+	 * @param formatSkeleton The ICU date/time format skeleton (e.g. "yMMMd") describing which fields to include
+	 * @param locale The locale used to resolve the ICU formatter
+	 * @param from The start of the interval; if {@code null}, the method returns {@code null}
+	 * @param to The end of the interval; if {@code null}, the method returns {@code null}
+	 * @return the formatted interval as a {@link String}, or {@code null} if either {@code from} or {@code to} is {@code null}
+	 */
+	public static String formatDateTimeInterval(final String formatSkeleton, final Locale locale, final DateTime from, final DateTime to) {
+		if (from == null || to == null) return null;
+		return JavaTimeUtils.formatDateTimeInterval(formatSkeleton, locale, from.getMillis(), to.getMillis());
+	}
+	
+	/**
+	 * Formats a time interval between two {@link DateTime} instances into a human-readable string,
+	 * delegating to ICU's {@link com.ibm.icu.text.DateIntervalFormat}.
+	 * @param formatSkeleton The ICU date/time format skeleton (e.g. "yMMMd") describing which fields to include
+	 * @param locale The locale used to resolve the ICU formatter
+	 * @param fromMillis The start of the interval, in epoch milliseconds
+	 * @param toMillis The end of the interval, in epoch milliseconds
+	 * @return the formatted interval as a {@link String}, or {@code null} if either {@code from} or {@code to} is {@code null}
+	 */
+	public static String formatDateTimeInterval(final String formatSkeleton, final Locale locale, final long fromMillis, final long toMillis) {
+		return JavaTimeUtils.formatDateTimeInterval(formatSkeleton, locale, fromMillis, toMillis);
 	}
 	
 	// ---------- Parse

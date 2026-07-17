@@ -32,6 +32,9 @@
  */
 package com.sonicle.commons.time;
 
+import com.ibm.icu.text.DateIntervalFormat;
+import com.ibm.icu.util.DateInterval;
+import com.ibm.icu.util.ULocale;
 import com.sonicle.commons.Check;
 import java.text.DateFormatSymbols;
 import java.time.DateTimeException;
@@ -390,6 +393,67 @@ public class JavaTimeUtils {
 	 */
 	public static DateTimeFormatter createFormatterHM(final ZoneId tz) {
 		return createFormatter(ISO_LOCALTIME_SHORT_PATTERN, tz);
+	}
+	
+	/**
+	 * Formats a time interval between two {@link ZonedDateTime} instances into a human-readable string,
+	 * delegating to ICU's {@link com.ibm.icu.text.DateIntervalFormat}.
+	 * @param formatSkeleton The ICU date/time format skeleton (e.g. "yMMMd") describing which fields to include
+	 * @param locale The locale used to resolve the ICU formatter
+	 * @param from The start of the interval; if {@code null}, the method returns {@code null}
+	 * @param to The end of the interval; if {@code null}, the method returns {@code null}
+	 * @return the formatted interval as a {@link String}, or {@code null} if either {@code from} or {@code to} is {@code null}
+	 */
+	public static String formatDateTimeInterval(final String formatSkeleton, final Locale locale, final ZonedDateTime from, final ZonedDateTime to) {
+		if (from == null || to == null) return null;
+		return formatDateTimeInterval(formatSkeleton, locale, from.toInstant(), to.toInstant());
+	}
+	
+	/**
+	 * Formats a time interval between two {@link Instant} instances into a human-readable string,
+	 * delegating to ICU's {@link com.ibm.icu.text.DateIntervalFormat}.
+	 * @param formatSkeleton The ICU date/time format skeleton (e.g. "yMMMd") describing which fields to include
+	 * @param locale The locale used to resolve the ICU formatter
+	 * @param from The start of the interval; if {@code null}, the method returns {@code null}
+	 * @param to The end of the interval; if {@code null}, the method returns {@code null}
+	 * @return the formatted interval as a {@link String}, or {@code null} if either {@code from} or {@code to} is {@code null}
+	 */
+	public static String formatDateTimeInterval(final String formatSkeleton, final Locale locale, final Instant from, final Instant to) {
+		if (from == null || to == null) return null;
+		return formatDateTimeInterval(formatSkeleton, locale, from.toEpochMilli(), to.toEpochMilli());
+	}
+	
+	/**
+	 * Formats a time interval, identified by two millisecond timestamps, into a human-readable string
+	 * using the given ICU format skeleton and locale.
+	 * Internally builds an ICU {@link DateIntervalFormat} for the given skeleton/locale pair
+	 * and delegates to {@link #formatDateTimeInterval(DateIntervalFormat, long, long)}.
+	 * Note that a new formatter is created on every call; if this method is invoked repeatedly
+	 * with the same {@code formatSkeleton}/{@code locale} pair, consider reusing a cached
+	 * {@link DateIntervalFormat} instance via the other overload instead.
+	 * @param formatSkeleton The ICU date/time format skeleton (e.g. "yMMMd") describing which fields to include; must not be {@code null} or empty
+	 * @param locale The locale used to resolve the ICU formatter; must not be {@code null}
+	 * @param fromMillis The start of the interval, in epoch milliseconds
+	 * @param toMillis The end of the interval, in epoch milliseconds
+	 * @return the formatted interval as a {@link String}
+	 */
+	public static String formatDateTimeInterval(final String formatSkeleton, final Locale locale, final long fromMillis, final long toMillis) {
+		Check.notEmpty(formatSkeleton, "formatSkeleton");
+		Check.notNull(locale, "locale");
+		return formatDateTimeInterval(DateIntervalFormat.getInstance(formatSkeleton, ULocale.forLocale(locale)), fromMillis, toMillis);
+	}
+	
+	/**
+	 * Formats a time interval, identified by two millisecond timestamps, into a human-readable string
+	 * using a pre-built ICU {@link DateIntervalFormat}.
+	 * @param formatter The ICU formatter to use; must not be {@code null}
+	 * @param fromMillis The start of the interval, in epoch milliseconds
+	 * @param toMillis The end of the interval, in epoch milliseconds
+	 * @return the formatted interval as a {@link String}
+	 */
+	public static String formatDateTimeInterval(final DateIntervalFormat formatter, final long fromMillis, final long toMillis) {
+		Check.notNull(formatter, "formatter");
+		return formatter.format(new DateInterval(fromMillis, toMillis));
 	}
 	
 	// ---------- Parse
