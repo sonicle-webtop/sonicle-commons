@@ -1416,7 +1416,7 @@ public class LangUtils {
 	}
 	
 	public static <T> Set<T> asSet(final T... values) {
-		return Stream.of(values).collect(Collectors.toSet());
+		return Stream.of(values).collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 	
 	public static <T> Set<T> asSet(final Collection<T> collection) {
