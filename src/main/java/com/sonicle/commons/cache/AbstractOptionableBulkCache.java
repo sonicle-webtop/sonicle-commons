@@ -45,7 +45,8 @@ import java.util.concurrent.locks.StampedLock;
 public abstract class AbstractOptionableBulkCache<O> {
 	private static final long serialVersionUID = 1L;
 	protected final StampedLock lock = new StampedLock();
-	private int buildsCount = 0;
+	//volatile: getBuildsCount()/isInitialized() read it without holding the lock
+	private volatile int buildsCount = 0;
 	
 	/**
 	 * Hook-point: load you data.Implement you custom logic here!

@@ -59,6 +59,17 @@ public abstract class AbstractPassiveExpiringBulkCache extends AbstractBulkCache
 		this(ConstantTimeToLiveExpirationPolicy.validateAndConvertToMillis(timeToLive, timeUnit));
 	}
 	
+	/**
+	 * Explicitly false (the base default): expiring caches replace their
+	 * structures wholesale on build (see the Map/Set subclasses), and clearing
+	 * first would only degrade the error path, which today keeps serving the
+	 * previous data when a rebuild fails.
+	 */
+	@Override
+	protected boolean cleanupBeforeBuild() {
+		return false;
+	}
+
 	@Override
 	protected void internalBuild() {
 		super.internalBuild();

@@ -43,7 +43,8 @@ import java.util.concurrent.locks.StampedLock;
 public abstract class AbstractBulkCache {
 	private static final long serialVersionUID = 1L;
 	protected final StampedLock lock = new StampedLock();
-	private int buildsCount = 0;
+	//volatile: getBuildsCount()/isInitialized() read it without holding the lock
+	private volatile int buildsCount = 0;
 	
 	/**
 	 * Hook-point: load you data. Implement you custom logic here!
@@ -104,18 +105,38 @@ public abstract class AbstractBulkCache {
 	}
 	
 	/**
+	 * Hook-point: whether {@link #internalBuild()} must clear current data (via
+	 * {@link #internalCleanupCache()}) before re-building. Defaults to false to
+	 * preserve legacy behavior for existing subclasses — several of them (e.g.
+	 * swap-style builds, error-swallowing builds) deliberately keep the previous
+	 * data when a rebuild fails. Subclasses whose {@link #internalBuildCache()}
+	 * populates its structures assuming they are EMPTY (additive builds) must
+	 * override this returning true, or a re-issued {@link #init()} accumulates
+	 * duplicates.
+	 * @return
+	 */
+	protected boolean cleanupBeforeBuild() {
+		return false;
+	}
+
+	/**
 	 * Internal method that performs cache building.
 	 */
 	protected void internalBuild() {
+		if (cleanupBeforeBuild()) internalCleanupCache();
 		internalBuildCache();
 		buildsCount++;
 	}
-	
+
 	/**
 	 * Internal method that performs cache clearing.
 	 */
 	protected void internalClear() {
 		internalCleanupCache();
+		//a cleared cache must count as UNinitialized: without this reset a
+		//cleared instance kept alive by a straggler reference would serve empty
+		//data forever instead of lazily rebuilding on next access
+		buildsCount = 0;
 	}
 	
 	/**
@@ -139,7 +160,10 @@ public abstract class AbstractBulkCache {
 		try {
 			if (internalShouldBuild()) {
 				stamp = upgradeToWriteLock(stamp);
-				internalBuild();
+				//re-check: upgradeToWriteLock may release the read lock before
+				//re-acquiring write, letting another thread build meanwhile —
+				//without this, two concurrent first readers both built
+				if (internalShouldBuild()) internalBuild();
 			}
 		} finally {
 			lock.unlock(stamp);
