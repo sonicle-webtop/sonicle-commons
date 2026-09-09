@@ -380,6 +380,7 @@ public class LangUtils {
 	 * @return 
 	 */
 	public static String linkifyText(final String encodedText) {
+		if (StringUtils.isBlank(encodedText)) return encodedText;
 		Matcher matcher = URL_PATTERN.matcher(encodedText);
 		StringBuilder result = new StringBuilder();
 		int lastEnd = 0;
