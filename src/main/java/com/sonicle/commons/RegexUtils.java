@@ -81,9 +81,25 @@ public class RegexUtils {
     
     public static final Pattern SPECIAL_REGEX_CHARS = Pattern.compile("([^a-zA-z0-9])");
 	
-	public static final String MATCH_URL = "(http|https|ftp)\\://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,20}(/\\S*)?";
-	public static final String MATCH_WWW_URL = "(^|\\s)(www\\.[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,20})(\\S*)?";
+	public static final String MATCH_URL =
+		"(?i)\\b(?:https?|ftp)://" +                                  // scheme
+		"(?:\\d{1,3}(?:\\.\\d{1,3}){3}" +                             // IPv4 host
+		"|[a-zA-Z0-9\\-]+(?:\\.[a-zA-Z0-9\\-]+)*\\.[a-zA-Z]{2,20})" + // or DNS host
+		"(?::\\d{1,5})?" +                                            // optional port
+		"(?:[/?#](?:[^\\s<>\"']*[^\\s<>\"'.,;:!?)\\]}])?)?";          // path/query/fragment
 
+	public static final String MATCH_WWW_URL =
+		"(?i)(?<![\\w.@:/-])" +                                       // not inside another URL/email
+		"www\\.[a-zA-Z0-9\\-]+(?:\\.[a-zA-Z0-9\\-]+)*\\.[a-zA-Z]{2,20}" +
+		"(?::\\d{1,5})?" +                                            // optional port
+		"(?:[/?#](?:[^\\s<>\"']*[^\\s<>\"'.,;:!?)\\]}])?)?";          // path/query/fragment	
+	
+	public static final String MATCH_ANY_URL =
+		"(?i)(?<![\\w.@:/-])" +
+		"(?:(?:https?|ftp)://(?:\\d{1,3}(?:\\.\\d{1,3}){3}|[a-zA-Z0-9\\-]+(?:\\.[a-zA-Z0-9\\-]+)*\\.[a-zA-Z]{2,20})" +
+		"|www\\.[a-zA-Z0-9\\-]+(?:\\.[a-zA-Z0-9\\-]+)*\\.[a-zA-Z]{2,20})" +
+		"(?::\\d{1,5})?" +
+		"(?:[/?#](?:[^\\s<>\"']*[^\\s<>\"'.,;:!?)\\]}])?)?";
 	/**
 	 * Matches a URI
 	 * Examples:
