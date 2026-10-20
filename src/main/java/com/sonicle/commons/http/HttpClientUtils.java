@@ -32,6 +32,7 @@
  */
 package com.sonicle.commons.http;
 
+import com.sonicle.commons.Check;
 import com.sonicle.commons.URIUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +50,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -96,6 +98,18 @@ public class HttpClientUtils {
 		}
 		builder.setSSLHostnameVerifier(new NoopHostnameVerifier());
 		return builder;
+	}
+	
+	public static HttpClientBuilder configureRequestTimeouts(final HttpClientBuilder builder, final int connectTimeout, final int socketTimeout, final int connectionRequestTimeout) {
+		Check.notNull(builder, "builder");
+		return builder.setDefaultRequestConfig(configureRequestTimeouts(RequestConfig.custom(), connectTimeout, socketTimeout, connectionRequestTimeout).build());
+	}
+	
+	public static RequestConfig.Builder configureRequestTimeouts(final RequestConfig.Builder builder, final int connectTimeout, final int socketTimeout, final int connectionRequestTimeout) {
+		Check.notNull(builder, "builder");
+		return builder.setConnectTimeout(connectTimeout)
+			.setSocketTimeout(socketTimeout)
+			.setConnectionRequestTimeout(connectionRequestTimeout);
 	}
 	
 	public static HttpClient createBasicHttpClient(final HttpClientBuilder builder, final URI uri) {
